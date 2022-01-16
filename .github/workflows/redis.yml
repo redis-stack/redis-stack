@@ -6,9 +6,10 @@ jobs:
 
   build-ubuntu-focal:
     runs-on: ubuntu-latest
-    matrix:
-      redis-version: ['6.2.6']
-      ubuntu-version: ['focal', 'bionic', 'xenial']
+    strategy:
+      matrix:
+        redis-version: ['6.2.6']
+        ubuntu-version: ['focal', 'bionic', 'xenial']
     container: ubuntu:${{matrix.ubuntu-version}}
     steps:
     - uses: actions/checkout@v2
