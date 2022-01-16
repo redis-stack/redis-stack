@@ -34,8 +34,9 @@ jobs:
 
   build-macos-latest:
     runs-on: macos-latest
-    matrix:
-      redis-version: ['6.2.6']
+    strategy:
+      matrix:
+        redis-version: ['6.2.6']
     steps:
     - uses: actions/checkout@v2
       with:
@@ -56,9 +57,10 @@ jobs:
           redis/src/redis-benchmark
 
   build-centos7:
-    matrix:
-      redis-version: ['6.2.6']
-      centos-version: ['7', '8']
+    strategy:
+      matrix:
+        redis-version: ['6.2.6']
+        centos-version: ['7', '8']
     image: centos:${{matrix.centos-version}}
     steps:
     - uses: actions/checkout@v2
