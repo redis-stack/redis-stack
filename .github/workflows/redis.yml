@@ -181,7 +181,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
       - name: install packaging tools
         run: |
-          apt-get install -y rpm
+          sudo apt-get install -y rpm
       - run: gem install fpm -v 1.14.1
       - uses: actions/download-artifact@v2
         with:
