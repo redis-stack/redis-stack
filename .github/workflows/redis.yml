@@ -4,13 +4,12 @@ on: [push, pull_request]
 
 jobs:
 
-  build-ubuntu:
+  build-ubuntu-focal:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         redis-version: ['6.2.6']
-        ubuntu-version: ['focal', 'bionic', 'xenial']
-    container: ubuntu:${{matrix.ubuntu-version}}
+    container: ubuntu:focal
     steps:
     - uses: actions/checkout@v2
       with:
@@ -18,13 +17,13 @@ jobs:
         path: redis
         ref: ${{matrix.redis-version}}
     - name: install dependencies
-      run: apt-get update && apt-get install -y build-essential
+      run: apt-get update && apt-get install -y build-essential libssl-dev
     - name: make
       run: make -C redis/src all test BUILD_TLS=yes
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:
-        name: redis-${{matrix.ubuntu-version}}-${{matrix.redis-version}}
+        name: redis-${{matrix.redis-version}}-focal
         path: |
           redis/src/redis-server
           redis/src/redis-sentinel
@@ -32,54 +31,109 @@ jobs:
           redis/src/redis-checkrdb
           redis/src/redis-benchmark
 
-  build-macos-latest:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        redis-version: ['6.2.6']
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        repository: redis/redis
-        path: redis
-        ref: ${{matrix.redis-version}}
-    - name: make
-      run: make -C redis/src all test BUILD_TLS=yes
-    - name: perist redis
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-osx-${{matrix.redis-version}}
-        path: |
-          redis/src/redis-server
-          redis/src/redis-sentinel
-          redis/src/redis-checkaof
-          redis/src/redis-checkrdb
-          redis/src/redis-benchmark
-
-  build-centos:
+  build-ubuntu-bionic:
     runs-on: ubuntu-latest
-    container: centos:${{matrix.centos-version}}
     strategy:
       matrix:
         redis-version: ['6.2.6']
-        centos-version: ['7', '8']
+    container: ubuntu:bionic
     steps:
     - uses: actions/checkout@v2
       with:
         repository: redis/redis
         path: redis
         ref: ${{matrix.redis-version}}
+    - name: install dependencies
+      run: apt-get update && apt-get install -y build-essential libssl-dev
     - name: make
-      run: |
-        yum -y install gcc make jemalloc-devel
-        make -C redis/src all test BUILD_TLS=yes
+      run: make -C redis/src all test BUILD_TLS=yes
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:
-        name: redis-centos${{matrix.centos-version}}-${{matrix.redis-version}}
+        name: redis-${{matrix.redis-version}}-bionic
         path: |
           redis/src/redis-server
           redis/src/redis-sentinel
           redis/src/redis-checkaof
           redis/src/redis-checkrdb
           redis/src/redis-benchmark
+
+  build-ubuntu-xenial:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        redis-version: ['6.2.6']
+    container: ubuntu:xenial
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: redis/redis
+        path: redis
+        ref: ${{matrix.redis-version}}
+    - name: install dependencies
+      run: apt-get update && apt-get install -y build-essential libssl-dev
+    - name: make
+      run: make -C redis/src all test BUILD_TLS=yes
+    - name: perist redis
+      uses: actions/upload-artifact@v2
+      with:
+        name: redis-${{matrix.redis-version}}-xenial
+        path: |
+          redis/src/redis-server
+          redis/src/redis-sentinel
+          redis/src/redis-checkaof
+          redis/src/redis-checkrdb
+          redis/src/redis-benchmark
+
+
+#  build-macos-latest:
+#    runs-on: macos-latest
+#    strategy:
+#      matrix:
+#        redis-version: ['6.2.6']
+#    steps:
+#    - uses: actions/checkout@v2
+#      with:
+#        repository: redis/redis
+#        path: redis
+#        ref: ${{matrix.redis-version}}
+#    - name: make
+#      run: make -C redis/src all test BUILD_TLS=yes
+#    - name: perist redis
+#      uses: actions/upload-artifact@v2
+#      with:
+#        name: redis-osx-${{matrix.redis-version}}
+#        path: |
+#          redis/src/redis-server
+#          redis/src/redis-sentinel
+#          redis/src/redis-checkaof
+#          redis/src/redis-checkrdb
+#          redis/src/redis-benchmark
+#
+#  build-centos:
+#    runs-on: ubuntu-latest
+#    container: centos:${{matrix.centos-version}}
+#    strategy:
+#      matrix:
+#        redis-version: ['6.2.6']
+#        centos-version: ['7', '8']
+#    steps:
+#    - uses: actions/checkout@v2
+#      with:
+#        repository: redis/redis
+#        path: redis
+#        ref: ${{matrix.redis-version}}
+#    - name: make
+#      run: |
+#        yum -y install gcc make jemalloc-devel
+#        make -C redis/src all test BUILD_TLS=yes
+#    - name: perist redis
+#      uses: actions/upload-artifact@v2
+#      with:
+#        name: redis-centos${{matrix.centos-version}}-${{matrix.redis-version}}
+#        path: |
+#          redis/src/redis-server
+#          redis/src/redis-sentinel
+#          redis/src/redis-checkaof
+#          redis/src/redis-checkrdb
+#          redis/src/redis-benchmark
