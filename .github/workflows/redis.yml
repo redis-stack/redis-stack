@@ -176,12 +176,7 @@ jobs:
   package:
     runs-on: ubuntu-latest
     steps:
-      needs: |
-        - build-ubuntu-focal
-        - build-ubuntu-bionic
-        - build-ubuntu-xenial
-        - build-centos-7
-        - build-centos-8
+      needs: [ build-ubuntu-focal, build-ubuntu-bionic, build-ubuntu-xenial, build-centos-7, build-centos-8 ]
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
       - name: install packaging tools
