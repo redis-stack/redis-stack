@@ -197,13 +197,11 @@ jobs:
       - name: build rpm package
         run: |
           OS=Linux ARCH=x86_64 OSNICK=rhel7 REDIS_BINARIES=deps/redis-6.2.6-centos7 ./assemble.sh rpm
-    - name: perist packages
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-6.2.6-centos8
-        retention-days: 1
-        path: |
-          *.rpm
-          *.deb
-
-
+      - name: perist packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: redis-6.2.6-centos8
+          retention-days: 1
+          path: |
+            *.rpm
+            *.deb
