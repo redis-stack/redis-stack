@@ -113,7 +113,7 @@ jobs:
 #          redis/src/redis-checkrdb
 #          redis/src/redis-benchmark
 #
-  build-centos7:
+  build-centos-7:
     runs-on: ubuntu-latest
     container: centos:7
     steps:
@@ -143,7 +143,7 @@ jobs:
           redis/src/redis-checkrdb
           redis/src/redis-benchmark
 
-  build-centos8:
+  build-centos-8:
     runs-on: ubuntu-latest
     container: centos:8
     steps:
@@ -196,4 +196,14 @@ jobs:
           OS=Linux ARCH=x86_64 OSNICK=ubuntu16.04 REDIS_BINARIES=deps/redis-6.2.6-xenial ./assemble.sh deb
       - name: build rpm package
         run: |
-          OS=Linux ARCH=x86_64 OSNICK=rhel7 REDIS_BINARIES=deps/redis-6.2.6-xenial ./assemble.sh rpm
+          OS=Linux ARCH=x86_64 OSNICK=rhel7 REDIS_BINARIES=deps/redis-6.2.6-centos7 ./assemble.sh rpm
+    - name: perist packages
+      uses: actions/upload-artifact@v2
+      with:
+        name: redis-6.2.6-centos8
+        retention-days: 1
+        path: |
+          *.rpm
+          *.deb
+
+
