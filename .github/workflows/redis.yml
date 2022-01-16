@@ -124,7 +124,8 @@ jobs:
         ref: ${{matrix.redis-version}}
     - name: make
       run: |
-        yum -y install gcc make jemalloc-devel
+        yum -y install epel-release
+        yum -y install gcc make jemalloc-devel openssl-devel
         make -C redis/src all BUILD_TLS=yes
     - name: perist redis
       uses: actions/upload-artifact@v2
@@ -151,7 +152,8 @@ jobs:
         ref: ${{matrix.redis-version}}
     - name: make
       run: |
-        yum -y install gcc make jemalloc-devel
+        yum -y install epel-release
+        yum -y install gcc make jemalloc-devel openssl-devel
         make -C redis/src all BUILD_TLS=yes
     - name: perist redis
       uses: actions/upload-artifact@v2
