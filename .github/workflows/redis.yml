@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
 
-  build-ubuntu-focal:
+  build-ubuntu:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -18,7 +18,7 @@ jobs:
         path: redis
         ref: ${{matrix.redis-version}}
     - name: install dependencies
-      run: sudo apt-get update && sudo apt-get install -y build-essential
+      run: apt-get update && apt-get install -y build-essential
     - name: make
       run: make -C redis/src all test BUILD_TLS=yes
     - name: perist redis
@@ -56,7 +56,7 @@ jobs:
           redis/src/redis-checkrdb
           redis/src/redis-benchmark
 
-  build-centos7:
+  build-centos:
     runs-on: ubuntu-latest
     container: centos:${{matrix.centos-version}}
     strategy:
@@ -71,7 +71,7 @@ jobs:
         ref: ${{matrix.redis-version}}
     - name: make
       run: |
-        yum -y install gcc make
+        yum -y install gcc make jemalloc-devel
         make -C redis/src all test BUILD_TLS=yes
     - name: perist redis
       uses: actions/upload-artifact@v2
