@@ -57,11 +57,12 @@ jobs:
           redis/src/redis-benchmark
 
   build-centos7:
+    runs-on: ubuntu-latest
+    container: centos:${{matrix.centos-version}}
     strategy:
       matrix:
         redis-version: ['6.2.6']
         centos-version: ['7', '8']
-    image: centos:${{matrix.centos-version}}
     steps:
     - uses: actions/checkout@v2
       with:
