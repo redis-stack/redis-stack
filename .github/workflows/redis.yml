@@ -1,0 +1,81 @@
+name: Build Redis
+
+on: [push, pull_request]
+
+jobs:
+
+  build-ubuntu-focal:
+    runs-on: ubuntu-latest
+    matrix:
+      redis-version: ['6.2.6']
+      ubuntu-version: ['focal', 'bionic', 'xenial']
+    container: ubuntu:${{matrix.ubuntu-version}}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: redis/redis
+        path: redis
+        ref: ${{matrix.redis-version}}
+    - name: install dependencies
+      run: sudo apt-get update && sudo apt-get install -y build-essential
+    - name: make
+      run: make -C redis/src all test BUILD_TLS=yes
+    - name: perist redis
+      uses: actions/upload-artifact@v2
+      with:
+        name: redis-${{matrix.ubuntu-version}}-${{matrix.redis-version}}
+        path: |
+          redis/src/redis-server
+          redis/src/redis-sentinel
+          redis/src/redis-checkaof
+          redis/src/redis-checkrdb
+          redis/src/redis-benchmark
+
+  build-macos-latest:
+    runs-on: macos-latest
+    matrix:
+      redis-version: ['6.2.6']
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: redis/redis
+        path: redis
+        ref: ${{matrix.redis-version}}
+    - name: make
+      run: make -C redis/src all test BUILD_TLS=yes
+    - name: perist redis
+      uses: actions/upload-artifact@v2
+      with:
+        name: redis-osx-${{matrix.redis-version}}
+        path: |
+          redis/src/redis-server
+          redis/src/redis-sentinel
+          redis/src/redis-checkaof
+          redis/src/redis-checkrdb
+          redis/src/redis-benchmark
+
+  build-centos7:
+    matrix:
+      redis-version: ['6.2.6']
+      centos-version: ['7', '8']
+    image: centos:${{matrix.centos-version}}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: redis/redis
+        path: redis
+        ref: ${{matrix.redis-version}}
+    - name: make
+      run: |
+        yum -y install gcc make
+        make -C redis/src all test BUILD_TLS=yes
+    - name: perist redis
+      uses: actions/upload-artifact@v2
+      with:
+        name: redis-centos${{matrix.centos-version}}-${{matrix.redis-version}}
+        path: |
+          redis/src/redis-server
+          redis/src/redis-sentinel
+          redis/src/redis-checkaof
+          redis/src/redis-checkrdb
+          redis/src/redis-benchmark
