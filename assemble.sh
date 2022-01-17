@@ -1,7 +1,8 @@
 #!/bin/bash
 
-if [[ -z ${OS} || -z ${OSNICK} || -z ${ARCH} || -z ${REDIS_BINARIES} ]]; then
-    echo "All of OS, OSNICK, ARCH, and REDIS_BINARIES must all be defined."
+if [[ -z ${OS} || -z ${OSNICK} || -z ${ARCH} || -z ${REDIS_BINARIES} || -z ${DISTRIBUTION} ]]; then
+    echo "Each of OS, OSNICK, ARCH, DISTRIBUTION, and REDIS_BINARIES must all be defined."
+    echo "eg: OS=Linux OSNICK=ubuntu18.04 ARCH=x86_64 REDIS_BINARIES=/my/path DISTRIBUTION=bionic ${0} "
     exit 3
 fi
 
@@ -11,6 +12,7 @@ fi
 
 if [ -z ${1} ]; then
     echo "Usage: ${0} {deb|rpm}"
+    echo "Usage: OS=Linux OSNICK=ubuntu18.04 ARCH=x86_64 REDIS_BINARIES=/my/path DISTRIBUTION=bionic ${0} {deb|rpm}"
     exit 3
 fi
 
@@ -82,10 +84,15 @@ LICENSE="MIT"
 PRODUCT_USER=redis
 PRODUCT_GROUP=redis
 
+if [ -z ${BUILD_NUMBER} ]; then
+    BUILD_NUMBER=1
+fi
+
 function deb() {
     fpm \
         -s dir \
         -t deb \
+        --iteration ${BUILD_NUMBER} \
         -C `pwd`/deps/${OSNICK}-${ARCH} \
         -n ${PRODUCT} \
         --provides redis \
@@ -97,14 +104,17 @@ function deb() {
         --license ${LICENSE} \
         --category server \
         --maintainer "${EMAIL}" \
+        -p ${PRODUCT}-${VERSION}-${BUILD_NUMBER}.${DISTRIBUTION}.${ARCH}.deb \
         --deb-user ${PRODUCT_USER} \
-        --deb-group ${PRODUCT_GROUP}
+        --deb-group ${PRODUCT_GROUP} \
+        --deb-dist ${DISTRIBUTION}
 }
 
 function rpm() {
     fpm \
         -s dir \
         -t rpm \
+        --iteration ${BUILD_NUMBER} \
         -C `pwd`/deps/${OSNICK}-${ARCH} \
         -n ${PRODUCT} \
         --provides redis \
@@ -116,8 +126,10 @@ function rpm() {
         --license ${LICENSE} \
         --category server \
         --maintainer "${EMAIL}" \
+        -p ${PRODUCT}-${VERSION}-${BUILD_NUMBER}.${DISTRIBUTION}.${ARCH}.rpm \
         --rpm-user ${PRODUCT_USER} \
-        --rpm-group ${PRODUCT_GROUP}
+        --rpm-group ${PRODUCT_GROUP} \
+        --rpm-dist ${DISTRIBUTION}
 }
 
 $1
