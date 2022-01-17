@@ -191,10 +191,10 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: redis-6.2.6-focal
-          path: deps/redis-6.2.6-focal.zip
+          path: /tmp/redis-6.2.6-focal.zip
       - name: unzip download
         run: |
-          unzip deps/redis-6.2.6-focal.zip -d deps/redis-6.2.6-focal
+          unzip /tmp/redis-6.2.6-focal.zip -d deps/redis-6.2.6-focal
       - name: build debian package
         run: |
           OS=Linux ARCH=x86_64 OSNICK=ubuntu16.04 REDIS_BINARIES=deps/redis-6.2.6-focal ./assemble.sh deb
