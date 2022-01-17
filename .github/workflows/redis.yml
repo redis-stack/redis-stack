@@ -49,12 +49,11 @@ jobs:
       - name: build the package
         run: |
           OS=Linux OSNICK=ubuntu18.04 ARCH=x86_64 REDIS_BINARIES=/usr/bin assemble.sh deb
-    - name: perist packages
-      uses: actions/upload-artifact@v2
-      with:
-        name: packages
-        retention-days: 5
-        path: |
-          *.deb
-          *.rpm
-
+      - name: perist packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: packages
+          retention-days: 5
+          path: |
+            *.deb
+            *.rpm
