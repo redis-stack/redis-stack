@@ -21,17 +21,19 @@ jobs:
       run: apt-get update && apt-get install -y build-essential libssl-dev
     - name: make
       run: make -C redis/src all BUILD_TLS=yes
+    - name: cache outputs
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:
         name: redis-6.2.6-focal
-        retention-days: 5
+        retention-days: 1
         path: |
-          redis/src/redis-server
-          redis/src/redis-sentinel
-          redis/src/redis-checkaof
-          redis/src/redis-checkrdb
-          redis/src/redis-benchmark
+          redis/src/redis*
+          !redis/src/*.h
+          !redis/src/*.c
+          !redis/src/*.d
+          !redis/src/*.o
+          !redis/src/*.rb
 
 #  build-ubuntu-bionic:
 #    runs-on: ubuntu-latest
@@ -191,21 +193,22 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: redis-6.2.6-focal
-          path: /tmp/redis-6.2.6-focal.zip
-      - name: unzip download
-        run: |
-          unzip /tmp/redis-6.2.6-focal.zip -d deps/redis-6.2.6-focal
-      - name: build debian package
-        run: |
-          OS=Linux ARCH=x86_64 OSNICK=ubuntu16.04 REDIS_BINARIES=deps/redis-6.2.6-focal ./assemble.sh deb
-#      - name: build rpm package
+      - name: show downloaded artifact
+        run: ls -R
+#      - name: unzip download
 #        run: |
-#          OS=Linux ARCH=x86_64 OSNICK=rhel7 REDIS_BINARIES=deps/redis-6.2.6-centos7 ./assemble.sh rpm
-      - name: perist packages
-        uses: actions/upload-artifact@v2
-        with:
-          name: redis-6.2.6-centos8
-          retention-days: 1
-          path: |
-            *.deb
-            #            *.rpm
+#          unzip redis-6.2.6-focal.zip -d deps/redis-6.2.6-focal
+#      - name: build debian package
+#        run: |
+#          OS=Linux ARCH=x86_64 OSNICK=ubuntu16.04 REDIS_BINARIES=deps/redis-6.2.6-focal ./assemble.sh deb
+##      - name: build rpm package
+##        run: |
+##          OS=Linux ARCH=x86_64 OSNICK=rhel7 REDIS_BINARIES=deps/redis-6.2.6-centos7 ./assemble.sh rpm
+#      - name: perist packages
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: redis-6.2.6-centos8
+#          retention-days: 1
+#          path: |
+#            *.deb
+#            #            *.rpm
