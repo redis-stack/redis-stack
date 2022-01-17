@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [[ -z ${OS} || -z ${OSNICK} || -z ${ARCH} || -z ${REDIS_BINARIES} ]]; then
     echo "All of OS, OSNICK, ARCH, and REDIS_BINARIES must all be defined."
