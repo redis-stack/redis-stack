@@ -150,7 +150,7 @@ jobs:
       - run: gem install fpm -v 1.14.1
       - uses: actions/download-artifact@v2
         with:
-          name: redis-6.2.6-rhel7
+          name: redis-6.2.6-centos7
           path: deps/redis-6.2.6-centos7
       - name: display structure
         run: ls -R
