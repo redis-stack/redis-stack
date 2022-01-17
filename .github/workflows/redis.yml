@@ -190,14 +190,14 @@ jobs:
 #          path: deps/redis-6.2.6-centos7.zip
       - uses: actions/download-artifact@v2
         with:
-          name: redis-6.2.6-xenial
-          path: deps/redis-6.2.6-xenial.zip
+          name: redis-6.2.6-focal
+          path: deps/redis-6.2.6-focal.zip
       - name: unzip download
         run: |
-          unzip deps/redis-6.2.6-xenial.zip -d deps/redis-6.2.6-xenial
+          unzip deps/redis-6.2.6-focal.zip -d deps/redis-6.2.6-focal
       - name: build debian package
         run: |
-          OS=Linux ARCH=x86_64 OSNICK=ubuntu16.04 REDIS_BINARIES=deps/redis-6.2.6-xenial ./assemble.sh deb
+          OS=Linux ARCH=x86_64 OSNICK=ubuntu16.04 REDIS_BINARIES=deps/redis-6.2.6-focal ./assemble.sh deb
 #      - name: build rpm package
 #        run: |
 #          OS=Linux ARCH=x86_64 OSNICK=rhel7 REDIS_BINARIES=deps/redis-6.2.6-centos7 ./assemble.sh rpm
