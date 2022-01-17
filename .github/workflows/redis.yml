@@ -4,9 +4,9 @@ on: [push, pull_request]
 
 jobs:
 
-  build-ubuntu-focal:
+  build-ubuntu-bionic:
     runs-on: ubuntu-latest
-    container: ubuntu:focal
+    container: ubuntu:bionic
     steps:
     - uses: actions/checkout@v2
       with:
@@ -20,7 +20,7 @@ jobs:
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:
-        name: redis-6.2.6-focal
+        name: redis-6.2.6-bionic
         retention-days: 5
         path: |
           redis/src/redis-server
@@ -32,7 +32,7 @@ jobs:
 
   package:
     runs-on: ubuntu-latest
-    needs: [ build-ubuntu-focal]
+    needs: [ build-ubuntu-bionic]
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
@@ -42,6 +42,19 @@ jobs:
       - run: gem install fpm -v 1.14.1
       - uses: actions/download-artifact@v2
         with:
-          name: redis-6.2.6-focal
+          name: redis-6.2.6-bionic
+          path: deps/redis-6.2.6-bionic
       - name: display structure
         run: ls -R
+      - name: build the package
+        run: |
+          OS=Linux OSNICK=ubuntu18.04 ARCH=x86_64 REDIS_BINARIES=/usr/bin assemble.sh deb
+    - name: perist packages
+      uses: actions/upload-artifact@v2
+      with:
+        name: packages
+        retention-days: 5
+        path: |
+          *.deb
+          *.rpm
+
