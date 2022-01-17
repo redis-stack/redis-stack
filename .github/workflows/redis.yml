@@ -13,171 +13,25 @@ jobs:
         repository: redis/redis
         path: redis
         ref: 6.2.6
-#    - uses: actions/cache@v2
-#      with:
-#        path: redis/src
-#        key: redis-6.2.6-focal
     - name: install dependencies
       run: apt-get update && apt-get install -y build-essential libssl-dev
     - name: make
       run: make -C redis/src all BUILD_TLS=yes
-    - name: cache outputs
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:
         name: redis-6.2.6-focal
-        retention-days: 1
+        retention-days: 5
         path: |
-          redis/src/redis*
-          !redis/src/*.h
-          !redis/src/*.c
-          !redis/src/*.d
-          !redis/src/*.o
-          !redis/src/*.rb
+          redis/src/redis-server
+          redis/src/redis-sentinel
+          redis/src/redis-check-aof
+          redis/src/redis-check-rdb
+          redis/src/redis-benchmark
+          redis/src/redis-cli
 
-#  build-ubuntu-bionic:
-#    runs-on: ubuntu-latest
-#    container: ubuntu:bionic
-#    steps:
-#    - uses: actions/checkout@v2
-#      with:
-#        repository: redis/redis
-#        path: redis
-#        ref: 6.2.6
-#    - uses: actions/cache@v2
-#      with:
-#        path: src
-#        key: redis-6.2.6-bionic
-#    - name: install dependencies
-#      run: apt-get update && apt-get install -y build-essential libssl-dev
-#    - name: make
-#      run: make -C redis/src all BUILD_TLS=yes
-#    - name: perist redis
-#      uses: actions/upload-artifact@v2
-#      with:
-#        name: redis-6.2.6-bionic
-#        retention-days: 5
-#        path: |
-#          redis/src/redis-server
-#          redis/src/redis-sentinel
-#          redis/src/redis-checkaof
-#          redis/src/redis-checkrdb
-#          redis/src/redis-benchmark
-#
-#  build-ubuntu-xenial:
-#    runs-on: ubuntu-latest
-#    container: ubuntu:xenial
-#    steps:
-#    - uses: actions/checkout@v2
-#      with:
-#        repository: redis/redis
-#        path: redis
-#        ref: 6.2.6
-#    - uses: actions/cache@v2
-#      with:
-#        path: src
-#        key: redis-6.2.6-xenial
-#    - name: install dependencies
-#      run: apt-get update && apt-get install -y build-essential libssl-dev
-#    - name: make
-#      run: make -C redis/src all BUILD_TLS=yes
-#    - name: perist redis
-#      uses: actions/upload-artifact@v2
-#      with:
-#        name: redis-6.2.6-xenial
-#        retention-days: 5
-#        path: |
-#          redis/src/redis-server
-#          redis/src/redis-sentinel
-#          redis/src/redis-checkaof
-#          redis/src/redis-checkrdb
-#          redis/src/redis-benchmark
-#
-#
-##  build-macos-latest:
-##    runs-on: macos-latest
-##    steps:
-##    - uses: actions/checkout@v2
-##      with:
-##        repository: redis/redis
-##        path: redis
-##        ref: 6.2.6
-##    - name: make
-##      run: make -C redis/src all test BUILD_TLS=yes
-##    - name: perist redis
-##      uses: actions/upload-artifact@v2
-##      with:
-##        name: redis-osx-6.2.6
-##        path: |
-##          redis/src/redis-server
-##          redis/src/redis-sentinel
-##          redis/src/redis-checkaof
-##          redis/src/redis-checkrdb
-##          redis/src/redis-benchmark
-##
-#  build-centos-7:
-#    runs-on: ubuntu-latest
-#    container: centos:7
-#    steps:
-#    - uses: actions/checkout@v2
-#      with:
-#        repository: redis/redis
-#        path: redis
-#        ref: 6.2.6
-#    - uses: actions/cache@v2
-#      with:
-#        path: src
-#        key: redis-6.2.6-centos7
-#    - name: make
-#      run: |
-#        yum -y install epel-release
-#        yum -y install gcc make jemalloc-devel openssl-devel
-#        make -C redis/src all BUILD_TLS=yes
-#    - name: perist redis
-#      uses: actions/upload-artifact@v2
-#      with:
-#        name: redis-6.2.6-centos7
-#        retention-days: 5
-#        path: |
-#          redis/src/redis-server
-#          redis/src/redis-sentinel
-#          redis/src/redis-checkaof
-#          redis/src/redis-checkrdb
-#          redis/src/redis-benchmark
-#
-#  build-centos-8:
-#    runs-on: ubuntu-latest
-#    container: centos:8
-#    steps:
-#    - uses: actions/checkout@v2
-#      with:
-#        repository: redis/redis
-#        path: redis
-#        ref: 6.2.6
-#    - uses: actions/cache@v2
-#      with:
-#        path: src
-#        key: redis-6.2.6-centos8
-#    - name: make
-#      run: |
-#        yum -y install epel-release
-#        yum -y install gcc make jemalloc-devel openssl-devel
-#        make -C redis/src all BUILD_TLS=yes
-#    - name: perist redis
-#      uses: actions/upload-artifact@v2
-#      with:
-#        name: redis-6.2.6-centos8
-#        retention-days: 5
-#        path: |
-#          redis/src/redis-server
-#          redis/src/redis-sentinel
-#          redis/src/redis-checkaof
-#          redis/src/redis-checkrdb
-#          redis/src/redis-benchmark
-#
   package:
     runs-on: ubuntu-latest
-    #needs: [ build-ubuntu-focal, build-ubuntu-bionic, build-ubuntu-xenial, build-centos-7, build-centos-8 ]
     needs: [ build-ubuntu-focal]
     steps:
       - uses: actions/checkout@v2
@@ -186,29 +40,8 @@ jobs:
         run: |
           sudo apt-get install -y rpm unzip
       - run: gem install fpm -v 1.14.1
-#      - uses: actions/download-artifact@v2
-#        with:
-#          name: redis-6.2.6-centos7
-#          path: deps/redis-6.2.6-centos7.zip
       - uses: actions/download-artifact@v2
         with:
           name: redis-6.2.6-focal
-      - name: show downloaded artifact
+      - name: display structure
         run: ls -R
-#      - name: unzip download
-#        run: |
-#          unzip redis-6.2.6-focal.zip -d deps/redis-6.2.6-focal
-#      - name: build debian package
-#        run: |
-#          OS=Linux ARCH=x86_64 OSNICK=ubuntu16.04 REDIS_BINARIES=deps/redis-6.2.6-focal ./assemble.sh deb
-##      - name: build rpm package
-##        run: |
-##          OS=Linux ARCH=x86_64 OSNICK=rhel7 REDIS_BINARIES=deps/redis-6.2.6-centos7 ./assemble.sh rpm
-#      - name: perist packages
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: redis-6.2.6-centos8
-#          retention-days: 1
-#          path: |
-#            *.deb
-#            #            *.rpm
