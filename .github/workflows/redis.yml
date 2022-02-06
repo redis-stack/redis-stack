@@ -241,12 +241,12 @@ jobs:
       arch: x86_64
       target: rpm
     steps:
+      - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
       - name: install python
         uses: actions/setup-python@v2
         with:
           python-version: ${{env.pythonversion}}
-      - uses: actions/checkout@v2
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
