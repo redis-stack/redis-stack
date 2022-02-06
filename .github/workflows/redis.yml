@@ -2,6 +2,9 @@ name: Build Redis
 
 on: [push, pull_request]
 
+env:
+  redisversion: 6.2.6
+
 jobs:
 
   build-ubuntu-bionic:
@@ -12,7 +15,7 @@ jobs:
       with:
         repository: redis/redis
         path: redis
-        ref: 6.2.6
+        ref: ${{env.redisversion}}
     - name: install dependencies
       run: apt-get update && apt-get install -y build-essential libssl-dev
     - name: make
@@ -20,7 +23,7 @@ jobs:
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:
-        name: redis-6.2.6-bionic
+        name: redis-${{env.redisversion}}-bionic
         retention-days: 5
         path: |
           redis/src/redis-server
@@ -33,189 +36,204 @@ jobs:
   package-bionic:
     runs-on: ubuntu-latest
     needs: [build-ubuntu-bionic]
+    env:
+      platform: bionic
+      osname: Linux
+      osnick: ubuntu18.04
+      arch: x86_64
+      target: deb
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
+          sudo pip install -r requirements.txt
       - run: gem install fpm -v 1.14.1
       - uses: actions/download-artifact@v2
         with:
-          name: redis-6.2.6-bionic
-          path: deps/redis-6.2.6-bionic
+          name: redis-${{env.redisversion}}-bionic
+          path: deps/redis-${{env.redisversion}}-bionic
       - name: display structure
         run: ls -R
       - name: build the package
         run: |
-          BUILD_NUMBER=${{github.run_id}} DISTRIBUTION=bionic OS=Linux OSNICK=ubuntu18.04 ARCH=x86_64 REDIS_BINARIES=deps/redis-6.2.6-bionic ./assemble.sh deb
+          invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}}
       - name: perist packages
         uses: actions/upload-artifact@v2
         with:
-          name: redis-stack-bionic.deb
+          name: redis-stack-${{env.platform}}-${{arch}}.deb
           retention-days: 5
           path: |
             *.deb
 
-  build-ubuntu-xenial:
-    runs-on: ubuntu-latest
-    container: ubuntu:xenial
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        repository: redis/redis
-        path: redis
-        ref: 6.2.6
-    - name: install dependencies
-      run: apt-get update && apt-get install -y build-essential libssl-dev
-    - name: make
-      run: make -C redis/src all BUILD_TLS=yes
-    - name: perist redis
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-6.2.6-xenial
-        retention-days: 5
-        path: |
-          redis/src/redis-server
-          redis/src/redis-sentinel
-          redis/src/redis-check-aof
-          redis/src/redis-check-rdb
-          redis/src/redis-benchmark
-          redis/src/redis-cli
+  # build-ubuntu-xenial:
+  #   runs-on: ubuntu-latest
+  #   container: ubuntu:xenial
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #     with:
+  #       repository: redis/redis
+  #       path: redis
+  #       ref: 6.2.6
+  #   - name: install dependencies
+  #     run: apt-get update && apt-get install -y build-essential libssl-dev
+  #   - name: make
+  #     run: make -C redis/src all BUILD_TLS=yes
+  #   - name: perist redis
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       name: redis-6.2.6-xenial
+  #       retention-days: 5
+  #       path: |
+  #         redis/src/redis-server
+  #         redis/src/redis-sentinel
+  #         redis/src/redis-check-aof
+  #         redis/src/redis-check-rdb
+  #         redis/src/redis-benchmark
+  #         redis/src/redis-cli
 
-  package-xenial:
-    runs-on: ubuntu-latest
-    needs: [build-ubuntu-xenial]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-      - name: install packaging tools
-        run: |
-          sudo apt-get install -y rpm unzip
-      - run: gem install fpm -v 1.14.1
-      - uses: actions/download-artifact@v2
-        with:
-          name: redis-6.2.6-xenial
-          path: deps/redis-6.2.6-xenial
-      - name: display structure
-        run: ls -R
-      - name: build the package
-        run: |
-          BUILD_NUMBER=${{github.run_id}} DISTRIBUTION=xenial OS=Linux OSNICK=ubuntu16.04 ARCH=x86_64 REDIS_BINARIES=deps/redis-6.2.6-xenial ./assemble.sh deb
-      - name: perist packages
-        uses: actions/upload-artifact@v2
-        with:
-          name: redis-stack-xenial.deb
-          retention-days: 1
-          path: |
-            *.deb
+  # package-xenial:
+  #   runs-on: ubuntu-latest
+  #   needs: [build-ubuntu-xenial]
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: ruby/setup-ruby@v1
+  #     - name: install packaging tools
+  #       run: |
+  #         sudo apt-get install -y rpm unzip
+  #     - run: gem install fpm -v 1.14.1
+  #     - uses: actions/download-artifact@v2
+  #       with:
+  #         name: redis-6.2.6-xenial
+  #         path: deps/redis-6.2.6-xenial
+  #     - name: display structure
+  #       run: ls -R
+  #     - name: build the package
+  #       run: |
+  #         BUILD_NUMBER=${{github.run_id}} DISTRIBUTION=xenial OS=Linux OSNICK=ubuntu16.04 ARCH=x86_64 REDIS_BINARIES=deps/redis-6.2.6-xenial ./assemble.sh deb
+  #     - name: perist packages
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: redis-stack-xenial.deb
+  #         retention-days: 1
+  #         path: |
+  #           *.deb
 
-  build-centos-7:
-    runs-on: ubuntu-latest
-    container: centos:7
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        repository: redis/redis
-        path: redis
-        ref: 6.2.6
-    - name: install dependencies
-      run: |
-        yum -y install epel-release
-        yum -y install gcc make jemalloc-devel openssl-devel
-    - name: make
-      run: make -C redis/src all BUILD_TLS=yes
-    - name: perist redis
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-6.2.6-centos7
-        retention-days: 1
-        path: |
-          redis/src/redis-server
-          redis/src/redis-sentinel
-          redis/src/redis-check-aof
-          redis/src/redis-check-rdb
-          redis/src/redis-benchmark
-          redis/src/redis-cli
+  # build-centos-7:
+  #   runs-on: ubuntu-latest
+  #   container: centos:7
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #     with:
+  #       repository: redis/redis
+  #       path: redis
+  #       ref: 6.2.6
+  #   - name: install dependencies
+  #     run: |
+  #       yum -y install epel-release
+  #       yum -y install gcc make jemalloc-devel openssl-devel
+  #   - name: make
+  #     run: make -C redis/src all BUILD_TLS=yes
+  #   - name: perist redis
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       name: redis-6.2.6-centos7
+  #       retention-days: 1
+  #       path: |
+  #         redis/src/redis-server
+  #         redis/src/redis-sentinel
+  #         redis/src/redis-check-aof
+  #         redis/src/redis-check-rdb
+  #         redis/src/redis-benchmark
+  #         redis/src/redis-cli
 
-  package-centos-7:
-    runs-on: ubuntu-latest
-    needs: [build-centos-7]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-      - name: install packaging tools
-        run: |
-          sudo apt-get install -y rpm unzip
-      - run: gem install fpm -v 1.14.1
-      - uses: actions/download-artifact@v2
-        with:
-          name: redis-6.2.6-centos7
-          path: deps/redis-6.2.6-centos7
-      - name: display structure
-        run: ls -R
-      - name: build the package
-        run: |
-          BUILD_NUMBER=${{github.run_id}} DISTRIBUTION=rhel7 OS=Linux OSNICK=rhel7 ARCH=x86_64 REDIS_BINARIES=deps/redis-6.2.6-centos7 ./assemble.sh rpm
-      - name: perist packages
-        uses: actions/upload-artifact@v2
-        with:
-          name: redis-stack-rhel7.rpm
-          retention-days: 1
-          path: |
-            *.rpm
+  # package-centos-7:
+  #   runs-on: ubuntu-latest
+  #   needs: [build-centos-7]
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: ruby/setup-ruby@v1
+  #     - name: install python
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: 3.9
+  #     - name: install packaging tools
+  #       run: |
+  #         sudo apt-get install -y rpm unzip
+  #     - run: gem install fpm -v 1.14.1
+  #     - uses: actions/download-artifact@v2
+  #       with:
+  #         name: redis-6.2.6-centos7
+  #         path: deps/redis-6.2.6-centos7
+  #     - name: display structure
+  #       run: ls -R
+  #     - name: build the package
+  #       run: |
+  #         BUILD_NUMBER=${{github.run_id}} DISTRIBUTION=rhel7 OS=Linux OSNICK=rhel7 ARCH=x86_64 REDIS_BINARIES=deps/redis-6.2.6-centos7 ./assemble.sh rpm
+  #     - name: perist packages
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: redis-stack-rhel7.rpm
+  #         retention-days: 1
+  #         path: |
+  #           *.rpm
 
-  build-centos-8:
-    runs-on: ubuntu-latest
-    container: centos:8
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        repository: redis/redis
-        path: redis
-        ref: 6.2.6
-    - name: install dependencies
-      run: |
-        yum -y install epel-release
-        yum -y install gcc make jemalloc-devel openssl-devel
-    - name: make
-      run: make -C redis/src all BUILD_TLS=yes
-    - name: perist redis
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-6.2.6-centos8
-        retention-days: 1
-        path: |
-          redis/src/redis-server
-          redis/src/redis-sentinel
-          redis/src/redis-check-aof
-          redis/src/redis-check-rdb
-          redis/src/redis-benchmark
-          redis/src/redis-cli
+  # build-centos-8:
+  #   runs-on: ubuntu-latest
+  #   container: centos:8
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #     with:
+  #       repository: redis/redis
+  #       path: redis
+  #       ref: 6.2.6
+  #   - name: install dependencies
+  #     run: |
+  #       yum -y install epel-release
+  #       yum -y install gcc make jemalloc-devel openssl-devel
+  #   - name: make
+  #     run: make -C redis/src all BUILD_TLS=yes
+  #   - name: perist redis
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       name: redis-6.2.6-centos8
+  #       retention-days: 1
+  #       path: |
+  #         redis/src/redis-server
+  #         redis/src/redis-sentinel
+  #         redis/src/redis-check-aof
+  #         redis/src/redis-check-rdb
+  #         redis/src/redis-benchmark
+  #         redis/src/redis-cli
 
-  package-centos-8:
-    runs-on: ubuntu-latest
-    needs: [build-centos-8]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-      - name: install packaging tools
-        run: |
-          sudo apt-get install -y rpm unzip
-      - run: gem install fpm -v 1.14.1
-      - uses: actions/download-artifact@v2
-        with:
-          name: redis-6.2.6-centos8
-          path: deps/redis-6.2.6-centos8
-      - name: display structure
-        run: ls -R
-      - name: build the package
-        run: |
-          BUILD_NUMBER=${{github.run_id}} DISTRIBUTION=rhel8 OS=Linux OSNICK=rhel8 ARCH=x86_64 REDIS_BINARIES=deps/redis-6.2.6-centos8 ./assemble.sh rpm
-      - name: perist packages
-        uses: actions/upload-artifact@v2
-        with:
-          name: redis-stack-rhel8.rpm
-          retention-days: 1
-          path: |
-            *.rpm
+  # package-centos-8:
+  #   runs-on: ubuntu-latest
+  #   needs: [build-centos-8]
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: ruby/setup-ruby@v1
+  #     - name: install packaging tools
+  #       run: |
+  #         sudo apt-get install -y rpm unzip
+  #     - run: gem install fpm -v 1.14.1
+  #     - uses: actions/download-artifact@v2
+  #       with:
+  #         name: redis-6.2.6-centos8
+  #         path: deps/redis-6.2.6-centos8
+  #     - name: display structure
+  #       run: ls -R
+  #     - name: build the package
+  #       run: |
+  #         BUILD_NUMBER=${{github.run_id}} DISTRIBUTION=rhel8 OS=Linux OSNICK=rhel8 ARCH=x86_64 REDIS_BINARIES=deps/redis-6.2.6-centos8 ./assemble.sh rpm
+  #     - name: perist packages
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: redis-stack-rhel8.rpm
+  #         retention-days: 1
+  #         path: |
+  #           *.rpm
