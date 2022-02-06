@@ -1,0 +1,13 @@
+[Unit]
+Description=redis-stack
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=centos
+execStart=/opt/redis-stack/bin/redis-stack -c /opt/redis-stack/etc/redis-stack.conf
+
+[Install]
+WantedBy=multi-user.target
