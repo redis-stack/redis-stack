@@ -15,7 +15,7 @@ jobs:
       arch: x86_64
       osnick: catalina
       target: osxpkg
-      dist: catalina
+      platform: catalina
       osname: macos
 
     runs-on: macos-latest
