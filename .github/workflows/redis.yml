@@ -15,7 +15,7 @@ jobs:
   #     arch: x86_64
   #     osnick: catalina
   #     target: osxpkg
-  #     dist: catalina
+  #     platform: catalina
   #     osname: macos
 
   #   runs-on: macos-latest
@@ -45,7 +45,7 @@ jobs:
   #   - name: build redis from source
   #     run: |
   #       cd redis-stack
-  #       /Users/runner/.local/bin/invoke build-redis -r ../redis/src
+  #       /Users/runner/.local/bin/invoke build-redis -r ../redis
   #   - name: build the package
   #     run: |
   #       cd redis-stack
