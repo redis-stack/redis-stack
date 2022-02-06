@@ -209,7 +209,6 @@ jobs:
     steps:
     - name: install dependencies
       run: |
-        yum -y install epel-release
         yum -y install gcc make jemalloc-devel openssl-devel tar
     - uses: actions/checkout@v2
       with:
