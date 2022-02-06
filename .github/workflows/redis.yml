@@ -241,7 +241,6 @@ jobs:
       arch: x86_64
       target: rpm
     steps:
-      - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
       - name: install python
         uses: actions/setup-python@v2
@@ -249,8 +248,9 @@ jobs:
           python-version: ${{env.pythonversion}}
       - name: install packaging tools
         run: |
-          sudo apt-get install -y rpm unzip
+          sudo apt-get install -y rpm unzip tar
           sudo pip install -r requirements.txt
+      - uses: actions/checkout@v2
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
