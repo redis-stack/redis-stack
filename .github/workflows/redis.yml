@@ -125,7 +125,7 @@ jobs:
         run: ls -R
       - name: build the package
         run: |
-          invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}} -I
+          invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}}
       - name: perist packages
         uses: actions/upload-artifact@v2
         with:

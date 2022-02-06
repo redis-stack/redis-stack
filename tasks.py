@@ -45,6 +45,8 @@ def package(
     build_number=1,
 ):
     """Create a redis-stack package"""
+
+    # TODO remove the -I once all modules are stable
     cmd = [
         sys.executable,
         "assemble.py",
@@ -56,5 +58,6 @@ def package(
         f"-b {build_number}",
         f"-p {package}",
         f"-x",
+        f"-I",
     ]
     run(' '.join(cmd))
