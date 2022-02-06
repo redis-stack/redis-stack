@@ -1,3 +1,13 @@
 bin
 dist
 out
+
+# paths
+deps
+build
+
+# packages
+*.deb
+*.rpm
+*.osxpkg
+*.pacman

@@ -50,6 +50,7 @@ class Assemble:
         self.BINDIR = os.path.join(self.BASEDIR, "bin")
         self.ETCDIR = os.path.join(self.BASEDIR, "etc")
         self.SVCDIR = os.path.join(self.ETCDIR, "systemd", "system")
+        self.CONFDIR = os.path.join(self.ETCDIR, PRODUCT)
 
     @property
     def __destdir__(self) -> str:
@@ -207,14 +208,18 @@ class Assemble:
             os.makedirs(i, exist_ok=True, mode=0o755)
 
         for i in [self.redisearch, self.redisgraph, self.redistimeseries,
-                  self.rejson, self.redisbloom,
-                  self.redisinsight,
+                  self.rejson,
+                  #self.redisbloom,
+                  #self.redisinsight,
                   #self.redisgears, self.redisai
                   ]:
             try:
                 i()
             except requests.HTTPError:
-                pass
+                if ignore:
+                    pass
+                else:
+                    raise
 
         logger.debug(f"Copying redis binaries from {binary_dir}")
         for i in [
@@ -228,6 +233,10 @@ class Assemble:
             dest = os.path.join(self.BINDIR, i)
             shutil.copy2(os.path.join(binary_dir, i), dest)
             os.chmod(dest, mode=0o755)
+
+            # copy configuration files
+            shutil.copytree(os.path.join(SCRIPTDIR, "conf"),
+                            self.CONFDIR, dirs_exist_ok=True)
 
     def package(
         self,
