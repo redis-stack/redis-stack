@@ -409,4 +409,4 @@ jobs:
           path: redis-stack.deb
       - name: build docker
         run: |
-          docker build -f Dockerfile . -t redislabs/redis-stack:latest
+          docker build -f Dockerfile -t redislabs/redis-stack:latest .
