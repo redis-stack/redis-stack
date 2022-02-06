@@ -44,11 +44,12 @@ jobs:
         pip install --user -r redis-stack/requirements.txt
     - name: build redis from source
       run: |
-        /Users/runner/.local/bin/invoke build-redis -r redis/src
+        cd redis-stack
+        /Users/runner/.local/bin/invoke build-redis -r ../redis/src
     - name: build the package
       run: |
         cd redis-stack
-        /Users/runner/.local/bin/invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r redis-src -p ${{env.target}}
+        /Users/runner/.local/bin/invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -p ${{env.target}}
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:
