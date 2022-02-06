@@ -207,15 +207,15 @@ jobs:
     runs-on: ubuntu-latest
     container: oraclelinux:8
     steps:
+    - name: install dependencies
+      run: |
+        yum -y install epel-release
+        yum -y install gcc make jemalloc-devel openssl-devel tar
     - uses: actions/checkout@v2
       with:
         repository: redis/redis
         path: redis
         ref: ${{env.redisversion}}
-    - name: install dependencies
-      run: |
-        yum -y install epel-release
-        yum -y install gcc make jemalloc-devel openssl-devel
     - name: make
       run: make -C redis/src all BUILD_TLS=yes
     - name: perist redis
@@ -246,11 +246,11 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{env.pythonversion}}
+      - uses: actions/checkout@v2
       - name: install packaging tools
         run: |
-          sudo apt-get install -y rpm unzip tar
+          sudo apt-get install -y rpm unzip
           sudo pip install -r requirements.txt
-      - uses: actions/checkout@v2
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
