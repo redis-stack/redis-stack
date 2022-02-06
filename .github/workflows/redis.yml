@@ -209,7 +209,8 @@ jobs:
     steps:
     - name: install dependencies
       run: |
-        yum -y install gcc make jemalloc-devel openssl-devel tar
+        dnf install -y oracle-epel-release-el8
+        dnf install -y gcc make jemalloc-devel openssl-devel tar git
     - uses: actions/checkout@v2
       with:
         repository: redis/redis
