@@ -6,8 +6,68 @@ env:
   redisversion: 6.2.6
   pythonversion: 3.9
   fpmversion: 1.14.1
+  rubyversion: 2.7.2
 
 jobs:
+
+  build-package-osx:
+    env:
+      arch: x86_64
+      osnick: catalina
+      target: osxpkg
+      dist: catalina
+      osname: macos
+
+    runs-on: macos-latest
+    steps:
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{env.rubyversion}}
+    - name: install python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "${{ env.pythonversion }}"
+    - name: checkout sources
+      uses: actions/checkout@v2
+      with:
+        path: redis-stack
+    - name: clone redis
+      uses: actions/checkout@v2
+      with:
+        repository: redis/redis
+        path: redis
+        ref: ${{env.redisversion}}
+    - name: install dependencies
+      run: |
+        brew install openssl
+        gem install fpm -v ${{env.fpmversion}}
+        pip install --user -r redis-stack/requirements.txt
+    - name: build redis from source
+      run: |
+        invoke build-redis -r redis/src
+    - name: build the package
+      run: |
+        cd redis-stack
+        invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r redis-src -p ${{env.target}}
+    - name: perist redis
+      uses: actions/upload-artifact@v2
+      with:
+        name: redis-${{env.redisversion}}-osx
+        retention-days: 1
+        path: |
+          redis/src/redis-server
+          redis/src/redis-sentinel
+          redis/src/redis-check-aof
+          redis/src/redis-check-rdb
+          redis/src/redis-benchmark
+          redis/src/redis-cli
+    - name: perist osx pkg
+      uses: actions/upload-artifact@v2
+      with:
+        name: redis-stack.osxpkg
+        retention-days: 5
+        path: |
+          *.osxpkg
 
   build-ubuntu-bionic:
     runs-on: ubuntu-latest
