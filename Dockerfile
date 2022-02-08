@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM debian:bullseye-slim
 
 RUN apt-get update -qqy
 RUN apt-get upgrade -qqy

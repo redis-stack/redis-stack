@@ -12,6 +12,8 @@ import requests
 import jinja2
 import tempfile
 from loguru import logger
+import semantic_version
+
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 EXTERNAL = os.path.join(HERE, "deps", "external")
@@ -52,6 +54,7 @@ class Assemble:
         self.OSNAME = osname
 
         self.BASEDIR = os.path.join(self.__workdir__, "opt", PRODUCT)
+        self.USRBINDIR = os.path.join(self.__workdir__, "usr", "bin")
         self.LIBDIR = os.path.join(self.BASEDIR, "lib")
         self.BINDIR = os.path.join(self.BASEDIR, "bin")
         self.ETCDIR = os.path.join(self.BASEDIR, "etc")
@@ -91,10 +94,17 @@ class Assemble:
     def generate_url(self, module: str, version: str):
         """Assuming the module follows the standard, return the URL from
         which to grab it"""
-        return urllib.parse.urljoin(
-            f"https://{AWS_S3_BUCKET}",
-            f"{module}/{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip",
-        )
+        try:
+            semantic_version.Version(version)
+            return urllib.parse.urljoin(
+                f"https://{AWS_S3_BUCKET}",
+                f"{module}/{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip",
+            )
+        except ValueError:
+            return urllib.parse.urljoin(
+                f"https://{AWS_S3_BUCKET}",
+                f"{module}/snapshots/{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip",
+            )
 
     def rejson(self, version: str = MODULE_VERSIONS["REJSON"]):
         """rejson specific fetch"""
@@ -162,7 +172,6 @@ class Assemble:
     #         os.path.join(self.LIBDIR, "redisgears.so"),
     #     )
 
-
     def redisbloom(self, version: str = MODULE_VERSIONS["REDISBLOOM"]):
         """bloom specific fetch"""
         logger.info("Fetching redisbloom")
@@ -210,18 +219,24 @@ class Assemble:
         with zipfile.ZipFile(destfile, "r") as zp:
             zp.extractall(self.__destdir__)
 
-    def prepackage(self, binary_dir: str, ignore: bool=False):
-        for i in [EXTERNAL, self.__destdir__, self.LIBDIR, self.BINDIR]:
+    def prepackage(self, binary_dir: str, ignore: bool = False, version_override: str=None):
+        for i in [EXTERNAL, self.__destdir__, self.LIBDIR, self.BINDIR, self.USRBINDIR]:
             os.makedirs(i, exist_ok=True, mode=0o755)
 
-        for i in [self.redisearch, self.redisgraph, self.redistimeseries,
-                  self.rejson,
-                  #self.redisbloom,
-                  #self.redisinsight,
-                  #self.redisgears, self.redisai
-                  ]:
+        for i in [
+            self.redisearch,
+            self.redisgraph,
+            self.redistimeseries,
+            self.rejson,
+            # self.redisbloom,
+            # self.redisinsight,
+            # self.redisgears, self.redisai
+        ]:
             try:
-                i()
+                if version_override is None:
+                    i()
+                else:
+                    i(version_override)
             except requests.HTTPError:
                 if ignore:
                     pass
@@ -242,8 +257,16 @@ class Assemble:
             os.chmod(dest, mode=0o755)
 
             # copy configuration files
-            shutil.copytree(os.path.join(SCRIPTDIR, "conf"),
-                            self.CONFDIR, dirs_exist_ok=True)
+            shutil.copytree(
+                os.path.join(SCRIPTDIR, "conf"), self.CONFDIR, dirs_exist_ok=True
+            )
+
+        # symlink redis-stack to the target
+        # TODO change to redis-stack once we build a redis-stack binary
+        os.symlink(
+            os.path.join(self.BINDIR, "redis-server"),
+            os.path.join(self.USRBINDIR, "redis-stack"),
+        )
 
     def package(
         self,
@@ -266,9 +289,13 @@ class Assemble:
 
             if not os.path.isdir(self.SVCDIR):
                 os.makedirs(self.SVCDIR)
-            shutil.copyfile(os.path.join(SCRIPTDIR, "redis-stack.service"),
-                            os.path.join(self.SVCDIR, "redis-stack.service"))
-            fpmargs.append(f"--config-files {(os.path.join(self.SVCDIR, 'redis-stack.service'))}")
+            shutil.copyfile(
+                os.path.join(SCRIPTDIR, "redis-stack.service"),
+                os.path.join(self.SVCDIR, "redis-stack.service"),
+            )
+            fpmargs.append(
+                f"--config-files {(os.path.join(self.SVCDIR, 'redis-stack.service'))}"
+            )
 
         elif package_type == "rpm":
             fpmargs.append(
@@ -281,18 +308,20 @@ class Assemble:
 
             if not os.path.isdir(self.SVCDIR):
                 os.makedirs(self.SVCDIR)
-            shutil.copyfile(os.path.join(SCRIPTDIR, "redis-stack.service"),
-                            os.path.join(self.SVCDIR, "redis-stack.service"))
-            fpmargs.append(f"--config-files {(os.path.join(self.SVCDIR, 'redis-stack.service'))}")
+            shutil.copyfile(
+                os.path.join(SCRIPTDIR, "redis-stack.service"),
+                os.path.join(self.SVCDIR, "redis-stack.service"),
+            )
+            fpmargs.append(
+                f"--config-files {(os.path.join(self.SVCDIR, 'redis-stack.service'))}"
+            )
         elif package_type == "osxpkg":
             fpmargs.append(
                 f"-p {PRODUCT}-{VERSION}-{build_number}.{distribution}.{self.ARCH}.osxpkg"
             )
             fpmargs.append("-t osxpkg")
-        elif package_type == 'pacman':
-            fpmargs.append(
-                f"-p {PRODUCT}-{VERSION}-{build_number}.{self.ARCH}.pacman"
-            )
+        elif package_type == "pacman":
+            fpmargs.append(f"-p {PRODUCT}-{VERSION}-{build_number}.{self.ARCH}.pacman")
             fpmargs.append(f"--pacman-user {PRODUCT_USER}")
             fpmargs.append(f"--pacman-group {PRODUCT_GROUP}")
             fpmargs.append("--pacman-compression gz")
@@ -301,16 +330,17 @@ class Assemble:
             snap_grade = "stable"
             snap_confinement = "classic"
 
-            vars = {'PRODUCT': PRODUCT,
-                    'VERSION': VERSION,
-                    'SUMMARY': SUMMARY,
-                    'DESCRIPTION': DESCRIPTION,
-                    "SNAP_GRADE": snap_grade,
-                    "SNAP_CONFINEMENT": snap_confinement,
+            vars = {
+                "PRODUCT": PRODUCT,
+                "VERSION": VERSION,
+                "SUMMARY": SUMMARY,
+                "DESCRIPTION": DESCRIPTION,
+                "SNAP_GRADE": snap_grade,
+                "SNAP_CONFINEMENT": snap_confinement,
             }
 
             # generate the snapcraft.yaml from the template
-            dest = os.path.join(HERE, 'snapcraft.yaml')
+            dest = os.path.join(HERE, "snapcraft.yaml")
             dest = tempfile.mktemp(suffix=".yaml", prefix="snapcraft")
             src = "snapcraft.j2"
 
@@ -318,7 +348,7 @@ class Assemble:
             env = jinja2.Environment(loader=loader)
             tmpl = loader.load(name=src, environment=env)
             generated = tmpl.render(vars)
-            with open(dest, 'w+') as fp:
+            with open(dest, "w+") as fp:
                 fp.write(generated)
 
             fpmargs.append(f"-p {PRODUCT}-{VERSION}-{build_number}.{self.ARCH}.snap")
@@ -367,7 +397,13 @@ if __name__ == "__main__":
     p.add_option(
         "-a", "--arch", dest="ARCH", help="Dependency architecture", default="x86_64"
     )
-    p.add_option("-v", "--variant", dest="VARIANT", help="[optional] package variant")
+    p.add_option("-v", "--variant", dest="VARIANT", help="[Optional] package variant")
+    p.add_option(
+        "-V",
+        "--version-override",
+        dest="VERSION_OVERRIDE",
+        help="[Optional] Version with which to override all package versions",
+    )
     p.add_option(
         "-b",
         "--build-number",
@@ -431,7 +467,7 @@ if __name__ == "__main__":
     a = Assemble(opts.OSNICK, opts.ARCH, opts.OSNAME)
 
     if opts.SKIP is None or opts.SKIP != "fetch":
-        a.prepackage(opts.REDISBIN, opts.IGNORE)
+        a.prepackage(opts.REDISBIN, opts.IGNORE, opts.VERSION_OVERRIDE)
 
     if opts.SKIP is None or opts.SKIP != "package":
         sys.exit(a.package(opts.TARGET, opts.BUILD_NUMBER, opts.DIST))
