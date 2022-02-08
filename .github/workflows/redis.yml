@@ -56,7 +56,7 @@ jobs:
         name: redis-${{env.redisversion}}-osx
         retention-days: 1
         path: |
-          redis/src/redis-server
+          redis/src/redis-stack
           redis/src/redis-sentinel
           redis/src/redis-check-aof
           redis/src/redis-check-rdb
@@ -82,14 +82,16 @@ jobs:
     - name: install dependencies
       run: apt-get update && apt-get install -y build-essential libssl-dev
     - name: make
-      run: make -C redis/src all BUILD_TLS=yes
+      run: |
+        perl -i -pe 's/redis-server/redis-stack/' redis/src/server.c
+        make -C redis/src REDIS_SERVER_NAME=redis-stack all BUILD_TLS=yes
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:
         name: redis-${{env.redisversion}}-focal
         retention-days: 5
         path: |
-          redis/src/redis-server
+          redis/src/redis-stack
           redis/src/redis-sentinel
           redis/src/redis-check-aof
           redis/src/redis-check-rdb
@@ -146,14 +148,16 @@ jobs:
     - name: install dependencies
       run: apt-get update && apt-get install -y build-essential libssl-dev
     - name: make
-      run: make -C redis/src all BUILD_TLS=yes
+      run: |
+        perl -i -pe 's/redis-server/redis-stack/' redis/src/server.c
+        make -C redis/src REDIS_SERVER_NAME=redis-stack all BUILD_TLS=yes
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:
         name: redis-${{env.redisversion}}-bionic
         retention-days: 5
         path: |
-          redis/src/redis-server
+          redis/src/redis-stack
           redis/src/redis-sentinel
           redis/src/redis-check-aof
           redis/src/redis-check-rdb
@@ -210,14 +214,16 @@ jobs:
     - name: install dependencies
       run: apt-get update && apt-get install -y build-essential libssl-dev
     - name: make
-      run: make -C redis/src all BUILD_TLS=yes
+      run: |
+        perl -i -pe 's/redis-server/redis-stack/' redis/src/server.c
+        make -C redis/src REDIS_SERVER_NAME=redis-stack all BUILD_TLS=yes
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:
         name: redis-${{env.redisversion}}-xenial
         retention-days: 5
         path: |
-          redis/src/redis-server
+          redis/src/redis-stack
           redis/src/redis-sentinel
           redis/src/redis-check-aof
           redis/src/redis-check-rdb
@@ -274,16 +280,18 @@ jobs:
     - name: install dependencies
       run: |
         yum -y install epel-release
-        yum -y install gcc make jemalloc-devel openssl-devel
+        yum -y install gcc make jemalloc-devel openssl-devel perl
     - name: make
-      run: make -C redis/src all BUILD_TLS=yes
+      run: |
+        perl -i -pe 's/redis-server/redis-stack/' redis/src/server.c
+        make -C redis/src REDIS_SERVER_NAME=redis-stack all BUILD_TLS=yes
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:
         name: redis-${{env.redisversion}}-rhel7
         retention-days: 1
         path: |
-          redis/src/redis-server
+          redis/src/redis-stack
           redis/src/redis-sentinel
           redis/src/redis-check-aof
           redis/src/redis-check-rdb
@@ -342,14 +350,16 @@ jobs:
         path: redis
         ref: ${{env.redisversion}}
     - name: make
-      run: make -C redis/src all BUILD_TLS=yes
+      run: |
+        perl -i -pe 's/redis-server/redis-stack/' redis/src/server.c
+        make -C redis/src REDIS_SERVER_NAME=redis-stack all BUILD_TLS=yes
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:
         name: redis-${{env.redisversion}}-rhel8
         retention-days: 1
         path: |
-          redis/src/redis-server
+          redis/src/redis-stack
           redis/src/redis-sentinel
           redis/src/redis-check-aof
           redis/src/redis-check-rdb

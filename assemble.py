@@ -250,7 +250,7 @@ class Assemble:
             "redis-check-rdb",
             "redis-cli",
             "redis-sentinel",
-            "redis-server",
+            "redis-stack",
         ]:
             dest = os.path.join(self.BINDIR, i)
             shutil.copy2(os.path.join(binary_dir, i), dest)
@@ -264,7 +264,7 @@ class Assemble:
         # symlink redis-stack to the target
         # TODO change to redis-stack once we build a redis-stack binary
         os.symlink(
-            os.path.join(self.BINDIR, "redis-server"),
+            os.path.join(self.BINDIR, "redis-stack"),
             os.path.join(self.USRBINDIR, "redis-stack"),
         )
 
