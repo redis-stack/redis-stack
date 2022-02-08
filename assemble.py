@@ -9,6 +9,8 @@ import shutil
 import zipfile
 import urllib
 import requests
+import jinja2
+import tempfile
 from loguru import logger
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -37,6 +39,10 @@ EMAIL = "Redis OSS <oss@redislabs.com>"
 LICENSE = "MIT"
 PRODUCT_USER = "redis"
 PRODUCT_GROUP = "redis"
+
+# TODO need to edit these
+SUMMARY = "Some king od siummary, I too am a placeholder"
+DESCRIPTION = "A placeholder for some sort of description"
 
 
 class Assemble:
@@ -79,6 +85,7 @@ class Assemble:
             f"--license {LICENSE}",
             f"--category server",
             f"--maintainer '{EMAIL}'",
+            f"--description '{DESCRIPTION}'",
         ]
 
     def generate_url(self, module: str, version: str):
@@ -290,6 +297,35 @@ class Assemble:
             fpmargs.append(f"--pacman-group {PRODUCT_GROUP}")
             fpmargs.append("--pacman-compression gz")
             fpmargs.append("-t pacman")
+        elif package_type == "snap":
+            snap_grade = "stable"
+            snap_confinement = "classic"
+
+            vars = {'PRODUCT': PRODUCT,
+                    'VERSION': VERSION,
+                    'SUMMARY': SUMMARY,
+                    'DESCRIPTION': DESCRIPTION,
+                    "SNAP_GRADE": snap_grade,
+                    "SNAP_CONFINEMENT": snap_confinement,
+            }
+
+            # generate the snapcraft.yaml from the template
+            dest = os.path.join(HERE, 'snapcraft.yaml')
+            dest = tempfile.mktemp(suffix=".yaml", prefix="snapcraft")
+            src = "snapcraft.j2"
+
+            loader = jinja2.FileSystemLoader(HERE)
+            env = jinja2.Environment(loader=loader)
+            tmpl = loader.load(name=src, environment=env)
+            generated = tmpl.render(vars)
+            with open(dest, 'w+') as fp:
+                fp.write(generated)
+
+            fpmargs.append(f"-p {PRODUCT}-{VERSION}-{build_number}.{self.ARCH}.snap")
+            fpmargs.append(f"--snap-confinement {snap_confinement}")
+            fpmargs.append(f"--snap-grade {snap_grade}")
+            fpmargs.append(f"--snap-yaml {dest}")
+            fpmargs.append("-t snap")
 
         else:
             raise AttributeError(f"{package_type} is an invalid package type")
@@ -347,7 +383,7 @@ if __name__ == "__main__":
         help="Target package type (eg dpkg)",
         default="deb",
         type="choice",
-        choices=["rpm", "deb", "osxpkg", "pacman"],
+        choices=["rpm", "deb", "osxpkg", "pacman", "snap"],
     )
 
     # run time argumetns

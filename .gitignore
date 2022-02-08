@@ -1,13 +1,14 @@
-bin
-dist
-out
-
 # paths
 deps
 build
+bin
+dist
+out
+.venv
 
 # packages
 *.deb
 *.rpm
 *.osxpkg
 *.pacman
+*.snap

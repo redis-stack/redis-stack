@@ -65,10 +65,10 @@ jobs:
     - name: perist osx pkg
       uses: actions/upload-artifact@v2
       with:
-        name: redis-stack.osxpkg
+        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
         retention-days: 5
         path: |
-          *.osxpkg
+          redis-stack/*.osxpkg
 
   build-ubuntu-focal:
     runs-on: ubuntu-latest
@@ -406,7 +406,47 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: redis-stack-${{env.platform}}-${{env.arch}}.deb
-          path: redis-stack.deb
+          path: redis-stack
+      - name: display structure
+        run: ls -R
       - name: build docker
         run: |
           docker build -f Dockerfile -t redislabs/redis-stack:latest .
+
+  package-snap:
+    runs-on: ubuntu-latest
+    needs: [build-ubuntu-focal]
+    env:
+      platform: focal
+      osname: Linux
+      osnick: ubuntu20.04
+      arch: x86_64
+      target: snap
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{env.pythonversion}}
+      - name: install packaging tools
+        run: |
+          sudo apt-get install -y rpm unzip
+          sudo pip install -r requirements.txt
+      - run: gem install fpm -v ${{env.fpmversion}}
+      - uses: actions/download-artifact@v2
+        with:
+          name: redis-${{env.redisversion}}-${{env.platform}}
+          path: deps/redis-${{env.redisversion}}-${{env.platform}}
+      - name: display structure
+        run: ls -R
+      - name: build the package
+        run: |
+          invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}}
+      - name: perist packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
+          retention-days: 5
+          path: |
+            *.snap

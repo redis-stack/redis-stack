@@ -1,0 +1,12 @@
+name: {{PRODUCT}}
+version: {{VERSION}}
+summary: {{SUMMARY}}
+description: |
+    {{DESCRIPTION}}
+
+grade: {{SNAP_GRADE}}
+confinement: {{SNAP_CONFINEMENT}}
+
+apps:
+    {{PRODUCT}}:
+        command: /opt/redis-stack/bin/redis-server -p /opt/redis-stack/etc/redis-stack.conf
