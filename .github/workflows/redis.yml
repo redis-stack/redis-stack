@@ -196,6 +196,13 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
