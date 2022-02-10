@@ -31,10 +31,10 @@ jobs:
       uses: snok/install-poetry@v1
       with:
         version: latest
-        virutalenvs-in-project: false
+        virtualenvs-in-project: true
         virtualenvs-create: true
         installer-parallel: true
-        virtualenvs-path: ~/.virtualenvs
+
     - name: checkout sources
       uses: actions/checkout@v2
       with:
@@ -54,11 +54,13 @@ jobs:
     - name: build redis from source
       run: |
         cd redis-stack
-        /Users/runner/.local/bin/invoke build-redis -r ../redis
+        source .venv/bin/activate
+        invoke build-redis -r ../redis
     - name: build the package
       run: |
         cd redis-stack
-        /Users/runner/.local/bin/invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -p ${{env.target}}
+        source .venv/bin/activate
+        invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -p ${{env.target}}
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:
@@ -125,10 +127,10 @@ jobs:
         uses: snok/install-poetry@v1
         with:
           version: latest
-          virutalenvs-in-project: false
+          virtualenvs-in-project: true
           virtualenvs-create: true
           installer-parallel: true
-          virtualenvs-path: ~/.virtualenvs
+
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
@@ -142,6 +144,7 @@ jobs:
         run: ls -R
       - name: build the package
         run: |
+          source .venv/bin/activate
           invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}}
       - name: perist packages
         uses: actions/upload-artifact@v2
@@ -206,6 +209,7 @@ jobs:
         run: ls -R
       - name: build the package
         run: |
+          source .venv/bin/activate
           invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}}
       - name: perist packages
         uses: actions/upload-artifact@v2
@@ -261,10 +265,10 @@ jobs:
         uses: snok/install-poetry@v1
         with:
           version: latest
-          virutalenvs-in-project: false
+          virtualenvs-in-project: true
           virtualenvs-create: true
           installer-parallel: true
-          virtualenvs-path: ~/.virtualenvs
+
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
@@ -278,6 +282,7 @@ jobs:
         run: ls -R
       - name: build the package
         run: |
+          source .venv/bin/activate
           invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}}
       - name: perist packages
         uses: actions/upload-artifact@v2
@@ -335,10 +340,10 @@ jobs:
         uses: snok/install-poetry@v1
         with:
           version: latest
-          virutalenvs-in-project: false
+          virtualenvs-in-project: true
           virtualenvs-create: true
           installer-parallel: true
-          virtualenvs-path: ~/.virtualenvs
+
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
@@ -352,6 +357,7 @@ jobs:
         run: ls -R
       - name: build the package
         run: |
+          source .venv/bin/activate
           invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}}
       - name: perist packages
         uses: actions/upload-artifact@v2
@@ -409,10 +415,10 @@ jobs:
         uses: snok/install-poetry@v1
         with:
           version: latest
-          virutalenvs-in-project: false
+          virtualenvs-in-project: true
           virtualenvs-create: true
           installer-parallel: true
-          virtualenvs-path: ~/.virtualenvs
+
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
@@ -426,6 +432,7 @@ jobs:
         run: ls -R
       - name: build the package
         run: |
+          source .venv/bin/activate
           invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}}
       - name: perist packages
         uses: actions/upload-artifact@v2
@@ -474,10 +481,10 @@ jobs:
         uses: snok/install-poetry@v1
         with:
           version: latest
-          virutalenvs-in-project: false
+          virtualenvs-in-project: true
           virtualenvs-create: true
           installer-parallel: true
-          virtualenvs-path: ~/.virtualenvs
+
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
@@ -491,6 +498,7 @@ jobs:
         run: ls -R
       - name: build the package
         run: |
+          source .venv/bin/activate
           invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}}
       - name: perist packages
         uses: actions/upload-artifact@v2
