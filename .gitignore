@@ -5,6 +5,7 @@ bin
 dist
 out
 .venv
+__pycache__
 
 # packages
 *.deb

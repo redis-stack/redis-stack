@@ -7,16 +7,7 @@ import sys
 def build_redis(c, redis_repo_path="redis", build_args="all BUILD_TLS=yes"):
     """compile redis"""
     redispath = os.path.join(os.getcwd(), redis_repo_path, "src")
-
-    fnames = [os.path.join(redispath, "server.c")]
-    # build redis
-    for fname in fnames:
-        with open(fname, "r") as fp:
-            data = fp.read()
-            contents = data.replace("redis-server", "redis-stack")
-        with open(fname, "w+") as fp:
-            fp.write(contents)
-    run(f"make -C {redispath} REDIS_SERVER_NAME=redis-stack -j `nproc` {build_args}")
+    run(f"make -C {redispath} -j `nproc` {build_args}")
 
 
 @task
