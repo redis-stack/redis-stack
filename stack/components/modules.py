@@ -20,7 +20,7 @@ class Modules(object):
         "REDISGEARS": "1.2.2",
         "REDISBLOOM": "2.2.9",
         "REDISAI": None,
-        "REDISINSIGHT": None,
+        "REDISINSIGHT": "2.0.5",
     }
 
     def __init__(self, osnick: str, arch: str = "x86_64", osname: str = "Linux"):
@@ -57,6 +57,7 @@ class Modules(object):
             os.path.join(self.__PATHS__.DESTDIR, "rejson.so"),
             os.path.join(self.__PATHS__.LIBDIR, "rejson.so"),
         )
+        os.chmod(os.path.join(self.__PATHS__.LIBDIR, "rejson.so"), mode=0o755)
 
     def redisgraph(self, version: str = MODULE_VERSIONS["REDISGRAPH"]):
         """redisgraph specific fetch"""
@@ -71,6 +72,7 @@ class Modules(object):
             os.path.join(self.__PATHS__.DESTDIR, "redisgraph.so"),
             os.path.join(self.__PATHS__.LIBDIR, "redisgraph.so"),
         )
+        os.chmod(os.path.join(self.__PATHS__.LIBDIR, "redisgraph.so"), mode=0o755)
 
     def redisearch(self, version: str = MODULE_VERSIONS["REDISEARCH"]):
         """redisearch specific fetch"""
@@ -85,6 +87,7 @@ class Modules(object):
             os.path.join(self.__PATHS__.DESTDIR, "module-enterprise.so"),
             os.path.join(self.__PATHS__.LIBDIR, "redisearch.so"),
         )
+        os.chmod(os.path.join(self.__PATHS__.LIBDIR, "redisearch.so"), mode=0o755)
 
     def redistimeseries(self, version: str = MODULE_VERSIONS["REDISTIMESERIES"]):
         """redistimeseries specific fetch"""
@@ -99,32 +102,38 @@ class Modules(object):
             os.path.join(self.__PATHS__.DESTDIR, "redistimeseries.so"),
             os.path.join(self.__PATHS__.LIBDIR, "redistimeseries.so"),
         )
+        os.chmod(os.path.join(self.__PATHS__.LIBDIR, "redistimeseries.so"), mode=0o755)
 
-    def redisbloom(self, version: str = MODULE_VERSIONS["REDISBLOOM"]):
-        """bloom specific fetch"""
-        logger.info("Fetching redisbloom")
+    # def redisbloom(self, version: str = MODULE_VERSIONS["REDISBLOOM"]):
+    #     """bloom specific fetch"""
+    #     logger.info("Fetching redisbloom")
+    #     destfile = os.path.join(
+    #         self.__PATHS__.EXTERNAL,
+    #         f"redisbloom-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip",
+    #     )
+    #     url = self.generate_url("redisbloom", version)
+    #     self._fetch_and_unzip(url, destfile)
+    #     shutil.copyfile(
+    #         os.path.join(self.__PATHS__.DESTDIR, "redisbloom.so"),
+    #         os.path.join(self.__PATHS__.LIBDIR, "redisbloom.so"),
+    #     )
+    #     os.chmod(os.path.join(self.__PATHS__.LIBDIR, "redisbloom.so"), mode=0o755)
+
+    def redisinsight(self, version: str = MODULE_VERSIONS["REDISINSIGHT"]):
+        """redisinsight specific fetch"""
+        logger.info("Fetching redisinsight")
+        url = self.generate_url("RedisInsight", version)
         destfile = os.path.join(
             self.__PATHS__.EXTERNAL,
-            f"redisbloom-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip",
+            f"redisinsight-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip",
         )
-        url = self.generate_url("redisbloom", version)
-        self._fetch_and_unzip(url, destfile)
-        shutil.copyfile(
-            os.path.join(self.__PATHS__.DESTDIR, "redisbloom.so"),
-            os.path.join(self.__PATHS__.LIBDIR, "redisbloom.so"),
+        pkg_unzip_dest = os.path.join(self.__PATHS__.DESTDIR, "redisinsight")
+        self._fetch_and_unzip(url, destfile, pkg_unzip_dest)
+        shutil.copytree(
+            pkg_unzip_dest, os.path.join(self.__PATHS__.SHAREDIR, "redisinsight")
         )
 
-    # def redisinsight(self, version: str = self.MODULE_VERSIONS["REDISINSIGHT"]):
-    #     """bloom specific fetch"""
-    #     # logger.info("Fetching redisinsight")
-    #     URLS = {
-    #         "macos": "https://download.redisinsight.redis.com/latest/RedisInsight-preview-mac-x64.dmg",
-    #         "windows": "https://download.redisinsight.redis.com/latest/RedisInsight-preview-win-installer.exe",
-    #         "Linux": "https://d3fyopse48vfpi.cloudfront.net/latest/redisinsight-linux64",
-    #     }
-    #     pass
-
-    def _fetch_and_unzip(self, url: str, destfile: str):
+    def _fetch_and_unzip(self, url: str, destfile: str, custom_dest: str = None):
 
         logger.debug(f"Package URL: {url}")
 
@@ -137,9 +146,14 @@ class Modules(object):
             raise requests.HTTPError
         open(destfile, "wb").write(r.content)
 
+        if custom_dest is None:
+            dest = self.__PATHS__.DESTDIR
+        else:
+            dest = custom_dest
+
         logger.debug(f"Unzipping {destfile} and storing in {self.__PATHS__.DESTDIR}")
         with zipfile.ZipFile(destfile, "r") as zp:
-            zp.extractall(self.__PATHS__.DESTDIR)
+            zp.extractall(dest)
 
     # FUTURE include in the future, when gears is part of redis stack
     # def redisgears(self, version: str = MODULE_VERSIONS["REDISGEARS"]):

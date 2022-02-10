@@ -48,7 +48,7 @@ if __name__ == "__main__":
         "--build-number",
         dest="BUILD_NUMBER",
         help="[optional] build number",
-        metavar=int,
+        metavar="INT",
         default=1,
     )
     p.add_option(

@@ -27,9 +27,8 @@ class Paths:
 
         # package paths
         self.BASEDIR = os.path.join(self.WORKDIR, "opt", "redis-stack")
-        self.USRBINDIR = os.path.join(self.WORKDIR, "usr", "bin")
         self.LIBDIR = os.path.join(self.BASEDIR, "lib")
         self.BINDIR = os.path.join(self.BASEDIR, "bin")
+        self.SHAREDIR = os.path.join(self.BASEDIR, "share")
         self.ETCDIR = os.path.join(self.BASEDIR, "etc")
         self.SVCDIR = os.path.join(self.ETCDIR, "systemd", "system")
-        self.CONFDIR = os.path.join(self.ETCDIR, "redis-stack")

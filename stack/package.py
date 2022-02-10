@@ -62,7 +62,7 @@ class Package:
             self.__PATHS__.DESTDIR,
             self.__PATHS__.LIBDIR,
             self.__PATHS__.BINDIR,
-            self.__PATHS__.USRBINDIR,
+            self.__PATHS__.SHAREDIR,
         ]:
             os.makedirs(i, exist_ok=True, mode=0o755)
 
@@ -103,7 +103,7 @@ class Package:
             # copy configuration files
             shutil.copytree(
                 os.path.join(self.__PATHS__.SCRIPTDIR, "conf"),
-                self.__PATHS__.CONFDIR,
+                self.__PATHS__.ETCDIR,
                 dirs_exist_ok=True,
             )
 
