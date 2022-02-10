@@ -4,14 +4,14 @@ This repository builds redis, and downloads various components (modules, RedisIn
 
 ## Development Requirements
 
-* Python > 3.6 (for invoke)
-* Ruby > 2.7 (for fpm)
+* Python > 3.6 (for this toolkit) and poetry
+* Ruby > 2.7 (for [fpm](https://github.com/jordansissel/fpm))
 * Docker (to build a docker)
 
 ## How to Build
 
-1. Create a virtualenv and install dependencies *pip install -r requirements.txt*
-1. Install the ruby fpm gem: *gem install fpm*
+1. Create a virtualenv and install dependencies *poetry install*
+1. Install the fpm gem: *gem install fpm*
 1. Clone [redis](https://github.com/redis/redis).
 1. Use invoke -l to execute the various tasks you need
 

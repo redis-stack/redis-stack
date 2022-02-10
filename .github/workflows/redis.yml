@@ -27,6 +27,14 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: "${{ env.pythonversion }}"
+    - name: install poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-in-project: true
+        virtualenvs-create: true
+        installer-parallel: true
+
     - name: checkout sources
       uses: actions/checkout@v2
       with:
@@ -41,15 +49,18 @@ jobs:
       run: |
         brew install openssl
         gem install fpm -v ${{env.fpmversion}}
-        pip install --user -r redis-stack/requirements.txt
+        cd redis-stack
+        poetry install
     - name: build redis from source
       run: |
         cd redis-stack
-        /Users/runner/.local/bin/invoke build-redis -r ../redis
+        source .venv/bin/activate
+        invoke build-redis -r ../redis
     - name: build the package
       run: |
         cd redis-stack
-        /Users/runner/.local/bin/invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -p ${{env.target}}
+        source .venv/bin/activate
+        invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -p ${{env.target}}
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:
@@ -112,10 +123,18 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
-          sudo pip install -r requirements.txt
+          poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
@@ -125,6 +144,7 @@ jobs:
         run: ls -R
       - name: build the package
         run: |
+          source .venv/bin/activate
           invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}}
       - name: perist packages
         uses: actions/upload-artifact@v2
@@ -176,10 +196,17 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
-          sudo pip install -r requirements.txt
+          poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
@@ -189,6 +216,7 @@ jobs:
         run: ls -R
       - name: build the package
         run: |
+          source .venv/bin/activate
           invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}}
       - name: perist packages
         uses: actions/upload-artifact@v2
@@ -240,10 +268,18 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
-          sudo pip install -r requirements.txt
+          poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
@@ -253,6 +289,7 @@ jobs:
         run: ls -R
       - name: build the package
         run: |
+          source .venv/bin/activate
           invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}}
       - name: perist packages
         uses: actions/upload-artifact@v2
@@ -306,10 +343,18 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
-          sudo pip install -r requirements.txt
+          poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
@@ -319,6 +364,7 @@ jobs:
         run: ls -R
       - name: build the package
         run: |
+          source .venv/bin/activate
           invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}}
       - name: perist packages
         uses: actions/upload-artifact@v2
@@ -372,10 +418,18 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
-          sudo pip install -r requirements.txt
+          poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
@@ -385,6 +439,7 @@ jobs:
         run: ls -R
       - name: build the package
         run: |
+          source .venv/bin/activate
           invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}}
       - name: perist packages
         uses: actions/upload-artifact@v2
@@ -429,10 +484,18 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
-          sudo pip install -r requirements.txt
+          poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
@@ -442,6 +505,7 @@ jobs:
         run: ls -R
       - name: build the package
         run: |
+          source .venv/bin/activate
           invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -p ${{env.target}}
       - name: perist packages
         uses: actions/upload-artifact@v2

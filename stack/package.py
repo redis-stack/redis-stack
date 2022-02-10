@@ -121,6 +121,7 @@ class Package:
         fpmargs.append(f"--iteration {build_number}")
 
         if package_type == "deb":
+            fpmargs.append("--depends libssl-dev")
             fpmargs.append(
                 f"-p {PRODUCT}-{VERSION}-{build_number}.{distribution}.{self.ARCH}.deb"
             )
@@ -140,6 +141,8 @@ class Package:
             )
 
         elif package_type == "rpm":
+            fpmargs.append("--depends openssl-devel")
+            fpmargs.append("--depends jemalloc-devel")
             fpmargs.append(
                 f"-p {PRODUCT}-{VERSION}-{build_number}.{distribution}.{self.ARCH}.rpm"
             )

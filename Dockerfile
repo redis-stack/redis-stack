@@ -2,6 +2,7 @@ FROM debian:bullseye-slim
 
 RUN apt-get update -qqy
 RUN apt-get upgrade -qqy
+RUN apt-get install -y libssl-dev
 ADD ./redis-stack /var/cache/apt/redis-stack/
 COPY ./scripts/entrypoint.sh /entrypoint.sh
 RUN chmod a+x /entrypoint.sh
