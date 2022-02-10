@@ -27,6 +27,14 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: "${{ env.pythonversion }}"
+    - name: install poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virutalenvs-in-project: false
+        virtualenvs-create: true
+        installer-parallel: true
+        virtualenvs-path: ~/.virtualenvs
     - name: checkout sources
       uses: actions/checkout@v2
       with:
@@ -41,7 +49,8 @@ jobs:
       run: |
         brew install openssl
         gem install fpm -v ${{env.fpmversion}}
-        pip install --user -r redis-stack/requirements.txt
+        cd redis-stack
+        poetry install
     - name: build redis from source
       run: |
         cd redis-stack
@@ -112,10 +121,18 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virutalenvs-in-project: false
+          virtualenvs-create: true
+          installer-parallel: true
+          virtualenvs-path: ~/.virtualenvs
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
-          sudo pip install -r requirements.txt
+          poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
@@ -179,7 +196,7 @@ jobs:
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
-          sudo pip install -r requirements.txt
+          poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
@@ -240,10 +257,18 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virutalenvs-in-project: false
+          virtualenvs-create: true
+          installer-parallel: true
+          virtualenvs-path: ~/.virtualenvs
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
-          sudo pip install -r requirements.txt
+          poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
@@ -306,10 +331,18 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virutalenvs-in-project: false
+          virtualenvs-create: true
+          installer-parallel: true
+          virtualenvs-path: ~/.virtualenvs
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
-          sudo pip install -r requirements.txt
+          poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
@@ -372,10 +405,18 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virutalenvs-in-project: false
+          virtualenvs-create: true
+          installer-parallel: true
+          virtualenvs-path: ~/.virtualenvs
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
-          sudo pip install -r requirements.txt
+          poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
@@ -429,10 +470,18 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virutalenvs-in-project: false
+          virtualenvs-create: true
+          installer-parallel: true
+          virtualenvs-path: ~/.virtualenvs
       - name: install packaging tools
         run: |
           sudo apt-get install -y rpm unzip
-          sudo pip install -r requirements.txt
+          poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
