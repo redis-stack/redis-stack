@@ -72,7 +72,7 @@ class Package:
             m.redisgraph,
             m.redistimeseries,
             m.rejson,
-            # self.redisbloom,
+            m.redisbloom,
             # self.redisinsight,
             # self.redisgears, self.redisai
         ]:
@@ -121,7 +121,7 @@ class Package:
         fpmargs.append(f"--iteration {build_number}")
 
         if package_type == "deb":
-            fpmargs.append("--depends libssl")
+            fpmargs.append("--depends libssl-dev")
             fpmargs.append(
                 f"-p {PRODUCT}-{VERSION}-{build_number}.{distribution}.{self.ARCH}.deb"
             )

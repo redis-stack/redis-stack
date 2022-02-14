@@ -14,11 +14,11 @@ class Modules(object):
     AWS_S3_BUCKET = "redismodules.s3.amazonaws.com"
     MODULE_VERSIONS = {
         "REJSON": "2.0.6",
-        "REDISGRAPH": "2.8.7",
+        "REDISGRAPH": "2.8.8",
         "REDISTIMESERIES": "1.6.7",
         "REDISEARCH": "2.2.7",
         "REDISGEARS": "1.2.2",
-        "REDISBLOOM": "2.2.9",
+        "REDISBLOOM": "2.2.12",
         "REDISAI": None,
         "REDISINSIGHT": "2.0.5",
     }
@@ -104,20 +104,20 @@ class Modules(object):
         )
         os.chmod(os.path.join(self.__PATHS__.LIBDIR, "redistimeseries.so"), mode=0o755)
 
-    # def redisbloom(self, version: str = MODULE_VERSIONS["REDISBLOOM"]):
-    #     """bloom specific fetch"""
-    #     logger.info("Fetching redisbloom")
-    #     destfile = os.path.join(
-    #         self.__PATHS__.EXTERNAL,
-    #         f"redisbloom-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip",
-    #     )
-    #     url = self.generate_url("redisbloom", version)
-    #     self._fetch_and_unzip(url, destfile)
-    #     shutil.copyfile(
-    #         os.path.join(self.__PATHS__.DESTDIR, "redisbloom.so"),
-    #         os.path.join(self.__PATHS__.LIBDIR, "redisbloom.so"),
-    #     )
-    #     os.chmod(os.path.join(self.__PATHS__.LIBDIR, "redisbloom.so"), mode=0o755)
+    def redisbloom(self, version: str = MODULE_VERSIONS["REDISBLOOM"]):
+        """bloom specific fetch"""
+        logger.info("Fetching redisbloom")
+        destfile = os.path.join(
+            self.__PATHS__.EXTERNAL,
+            f"redisbloom-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip",
+        )
+        url = self.generate_url("redisbloom", version)
+        self._fetch_and_unzip(url, destfile)
+        shutil.copyfile(
+            os.path.join(self.__PATHS__.DESTDIR, "redisbloom.so"),
+            os.path.join(self.__PATHS__.LIBDIR, "redisbloom.so"),
+        )
+        os.chmod(os.path.join(self.__PATHS__.LIBDIR, "redisbloom.so"), mode=0o755)
 
     def redisinsight(self, version: str = MODULE_VERSIONS["REDISINSIGHT"]):
         """redisinsight specific fetch"""
