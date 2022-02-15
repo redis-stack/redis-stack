@@ -123,6 +123,7 @@ class Package:
 
         if package_type == "deb":
             fpmargs.append("--depends libssl-dev")
+            fpmargs.append("--depends libgomp1")  # redisgraph
             fpmargs.append(
                 f"-p {PRODUCT}-{VERSION}-{build_number}.{distribution}.{self.ARCH}.deb"
             )
