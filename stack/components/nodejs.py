@@ -4,6 +4,7 @@ from loguru import logger
 import requests
 import tarfile
 import shutil
+from ..paths import Paths
 
 
 class NodeJS(object):
@@ -66,4 +67,8 @@ class NodeJS(object):
             self.__PATHS__.DESTDIR,
             f"node-{self.DEFAULT_NODE_VERSION}-{self.node_osname}-{self.node_arch}",
         )
-        shutil.copytree(node_base, os.path.join(self.__PATHS__.BASEDIR, "nodejs"))
+
+        destdir = os.path.join(self.__PATHS__.BASEDIR, "nodejs")
+        if os.path.isdir(destdir):
+            return
+        shutil.copytree(node_base, destdir)

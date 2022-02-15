@@ -11,6 +11,7 @@ from loguru import logger
 from stack.paths import Paths
 from stack.components.modules import Modules
 from stack.components.nodejs import NodeJS
+from stack.components.insight import RedisInsight
 
 
 # REDIS STACK PACKAGE RULES
@@ -72,8 +73,7 @@ class Package:
             m.redisgraph,
             m.redistimeseries,
             m.rejson,
-            # self.redisbloom,
-            # self.redisinsight,
+            m.redisbloom,
             # self.redisgears, self.redisai
         ]:
             try:
@@ -107,8 +107,9 @@ class Package:
                 dirs_exist_ok=True,
             )
 
-        n = NodeJS(self.OSNICK, self.ARCH, self.OSNAME)
-        n.prepare()
+        for i in [NodeJS, RedisInsight]:
+            n = i(self.OSNICK, self.ARCH, self.OSNAME)
+            n.prepare()
 
     def package(
         self,

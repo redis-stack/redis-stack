@@ -65,7 +65,6 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: redis-${{env.redisversion}}-osx
-        retention-days: 1
         path: |
           redis/src/redis-server
           redis/src/redis-sentinel
@@ -77,7 +76,6 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
-        retention-days: 5
         path: |
           redis-stack/*.osxpkg
 
@@ -98,7 +96,6 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: redis-${{env.redisversion}}-focal
-        retention-days: 5
         path: |
           redis/src/redis-server
           redis/src/redis-sentinel
@@ -150,7 +147,6 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
-          retention-days: 5
           path: |
             *.deb
 
@@ -171,7 +167,6 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: redis-${{env.redisversion}}-bionic
-        retention-days: 5
         path: |
           redis/src/redis-server
           redis/src/redis-sentinel
@@ -222,7 +217,6 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
-          retention-days: 5
           path: |
             *.deb
 
@@ -243,7 +237,6 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: redis-${{env.redisversion}}-xenial
-        retention-days: 5
         path: |
           redis/src/redis-server
           redis/src/redis-sentinel
@@ -295,7 +288,6 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
-          retention-days: 5
           path: |
             *.deb
 
@@ -318,7 +310,6 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: redis-${{env.redisversion}}-rhel7
-        retention-days: 1
         path: |
           redis/src/redis-server
           redis/src/redis-sentinel
@@ -370,7 +361,6 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
-          retention-days: 5
           path: |
             *.rpm
 
@@ -393,7 +383,6 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: redis-${{env.redisversion}}-rhel8
-        retention-days: 1
         path: |
           redis/src/redis-server
           redis/src/redis-sentinel
@@ -445,7 +434,6 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
-          retention-days: 5
           path: |
             *.rpm
 
@@ -511,6 +499,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
-          retention-days: 5
           path: |
             *.snap
