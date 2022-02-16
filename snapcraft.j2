@@ -6,7 +6,14 @@ description: |
 
 grade: {{SNAP_GRADE}}
 confinement: {{SNAP_CONFINEMENT}}
+base: core20
 
 apps:
     {{PRODUCT}}:
         command: /opt/redis-stack/bin/redis-server -p /opt/redis-stack/etc/redis-stack.conf
+        plugs:
+          - network
+    REDISINSIGHT:
+        command: /opt/redis-stack/nodejs/bin/node /opt/redis-stack/share/redisinsight/server/src/main.js
+        plugs:
+          - network

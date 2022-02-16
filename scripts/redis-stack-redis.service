@@ -1,0 +1,15 @@
+[Unit]
+Description=redis-stack-redis
+After=network.target
+PartOf=redis-stack.service
+
+[Service]
+Type=simple
+User=nobody
+Restart=always
+RestartSec=1
+User=nobody
+ExecStart=/opt/redis-stack/bin/redis-server /opt/redis-stack/etc/redis-stack.conf
+
+[Install]
+WantedBy=multi-user.target

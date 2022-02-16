@@ -20,8 +20,8 @@ VENDOR = "Redis Inc"
 VERSION = "1.0.0"
 EMAIL = "Redis OSS <oss@redislabs.com>"
 LICENSE = "MIT"
-PRODUCT_USER = "redis"
-PRODUCT_GROUP = "redis"
+PRODUCT_USER = "nobody"
+PRODUCT_GROUP = "nobody"
 
 # TODO need to edit these
 SUMMARY = "Some king od siummary, I too am a placeholder"
@@ -110,7 +110,7 @@ class Package:
         for i in [NodeJS, RedisInsight]:
             n = i(self.OSNICK, self.ARCH, self.OSNAME)
             n.prepare()
-
+            
     def package(
         self,
         package_type: str = "deb",
@@ -134,13 +134,15 @@ class Package:
 
             if not os.path.isdir(self.__PATHS__.SVCDIR):
                 os.makedirs(self.__PATHS__.SVCDIR)
-            shutil.copyfile(
-                os.path.join(self.__PATHS__.SCRIPTDIR, "redis-stack.service"),
-                os.path.join(self.__PATHS__.SVCDIR, "redis-stack.service"),
-            )
-            fpmargs.append(
-                f"--config-files {(os.path.join(self.__PATHS__.SVCDIR, 'redis-stack.service'))}"
-            )
+                
+            for i in ['redis-stack.service', 'redis-stack-redis.service', 'redisinsight.service']:
+                shutil.copyfile(
+                    os.path.join(self.__PATHS__.SCRIPTDIR, i),
+                    os.path.join(self.__PATHS__.SVCDIR, i),
+                )
+                fpmargs.append(
+                    f"--config-files {(os.path.join(self.__PATHS__.SVCDIR, 'i'))}"
+                )
 
         elif package_type == "rpm":
             fpmargs.append("--depends openssl-devel")
@@ -155,13 +157,15 @@ class Package:
 
             if not os.path.isdir(self.__PATHS__.SVCDIR):
                 os.makedirs(self.__PATHS__.SVCDIR)
-            shutil.copyfile(
-                os.path.join(self.__PATHS__.SCRIPTDIR, "redis-stack.service"),
-                os.path.join(self.__PATHS__.SVCDIR, "redis-stack.service"),
-            )
-            fpmargs.append(
-                f"--config-files {(os.path.join(self.__PATHS__.SVCDIR, 'redis-stack.service'))}"
-            )
+                
+            for i in ['redis-stack.service', 'redis-stack-redis.service', 'redisinsight.service']:
+                shutil.copyfile(os.path.join(self.__PATHS__.SCRIPTDIR, i),
+                    os.path.join(self.__PATHS__.SVCDIR, i),
+                )
+                fpmargs.append(
+                    f"--config-files {(os.path.join(self.__PATHS__.SVCDIR, 'i'))}"
+                )
+
         elif package_type == "osxpkg":
             fpmargs.append(
                 f"-p {PRODUCT}-{VERSION}-{build_number}.{distribution}.{self.ARCH}.osxpkg"
