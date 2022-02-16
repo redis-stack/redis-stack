@@ -17,21 +17,12 @@ class RedisInsight(object):
         self.OSNAME = osname
         self.__PATHS__ = Paths(osnick, arch, osname)
 
-    @property
-    def osname(self):
-        if self.OSNAME != "macos":
-            return self.OSNAME
-        return "Mac"
-
-    @property
-    def osnick(self):
-        if self.OSNICK != "catalina":
-            return self.OSNICK
-        return "10.15.5"
-
     def generate_url(self, version):
-        url = f"https://s3.amazonaws.com/redisinsight.test/public/rs-ri-builds/RedisInsight-{self.osname}.{self.osnick}.{version}.{self.ARCH}.zip"
-        return url
+        if self.OSNAME == "macos":
+            osname = "mac"
+        else:
+            osname = self.OSNAME
+        return f"https://s3.amazonaws.com/redisinsight.test/public/rs-ri-builds/RedisInsight-{osname}.{version}.{self.ARCH}.zip"
 
     def _fetch_and_unzip(self, url: str, destfile: str, custom_dest: str = None):
         logger.debug(f"Package URL: {url}")

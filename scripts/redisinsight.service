@@ -11,7 +11,7 @@ User=nobody
 Environment="SERVER_STATIC_CONTENT=1"
 Environment="API_PORT=8081"
 WorkingDirectory=/opt/redis-stack
-ExecStart=/opt/redis-stack/nodejs/bin/node share/redisinsight/server/src/main.js
+ExecStart=/opt/redis-stack/nodejs/bin/node share/redisinsight/api/dist/src/main.js
 
 [Install]
 WantedBy=multi-user.target

@@ -20,3 +20,13 @@ This repository builds redis, and downloads various components (modules, RedisIn
 Invoke wraps fpm, in order to provide a unified packaging interface on top of fpm.  The script [assemble.py](/redis/redis-stack/tree/master/assemble.py) provides support for building each target package.  To do so, you will need to execute packaging on the target operating system.
 
 While it's possible to build all Linux packages on Arch or Ubuntu, OSX packages must be built on a Mac.
+
+--------
+
+#### Modifying service initializations
+
+Today, to modify the way a service starts, the following files all need editing:
+
+* entrypoint.sh (for dockers)
+* snapcraft.j2 (for ubuntu snaps)
+* scripts/*.service (for systemd services on Linux)
