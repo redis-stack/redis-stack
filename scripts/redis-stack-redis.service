@@ -10,6 +10,7 @@ Restart=always
 RestartSec=1
 User=nobody
 ExecStart=/opt/redis-stack/bin/redis-server /opt/redis-stack/etc/redis-stack.conf
+ExecStop=/bin/kill -s TERM ${MAINPID}
 
 [Install]
 WantedBy=multi-user.target
