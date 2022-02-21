@@ -19,7 +19,7 @@ class RedisInsight(object):
 
     def generate_url(self, version):
         if self.OSNAME == "macos":
-            osname = "mac"
+            osname = "Mac"
         else:
             osname = self.OSNAME
         return f"https://s3.amazonaws.com/redisinsight.test/public/rs-ri-builds/RedisInsight-{osname}.{version}.{self.ARCH}.zip"
@@ -50,3 +50,6 @@ class RedisInsight(object):
         shutil.copytree(
             pkg_unzip_dest, os.path.join(self.__PATHS__.SHAREDIR, "redisinsight")
         )
+        with open (os.path.join(self.__PATHS__.SHAREDIR, 'redisinsight', '.env'), 'w+') as fp:
+            fp.write("SERVER_STATIC_CONTENT=1\n")
+            fp.write("API_PORT=8001\n")

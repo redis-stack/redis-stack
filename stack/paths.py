@@ -15,7 +15,7 @@ class Paths:
         self.EXTERNAL = os.path.join(self.HERE, "deps", "external")
         self.DISTDIR = os.path.join(self.HERE, "dist")
         self.BUILDROOT = os.path.join(self.HERE, "build")
-        self.SCRIPTDIR = os.path.join(self.HERE, "scripts")
+        self.SCRIPTDIR = os.path.join(self.HERE, "etc")
 
         # used throughout
         self.DESTDIR = os.path.join(

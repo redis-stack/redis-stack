@@ -9,9 +9,8 @@ Restart=always
 RestartSec=1
 User=nobody
 Environment="SERVER_STATIC_CONTENT=1"
-Environment="API_PORT=8081"
 WorkingDirectory=/opt/redis-stack
-ExecStart=/opt/redis-stack/nodejs/bin/node share/redisinsight/api/dist/src/main.js
+ExecStart=/opt/redis-stack/nodejs/bin/node -r /opt/redis-stack/share/redisinsight/api/node_modules/dotenv/config share/redisinsight/api/dist/src/main.js dotenv_config_path=/opt/redis-stack/share/redisinsight/.env
 
 [Install]
 WantedBy=multi-user.target

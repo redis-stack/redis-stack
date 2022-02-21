@@ -452,9 +452,19 @@ jobs:
           path: redis-stack
       - name: display structure
         run: ls -R
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+        env:
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN}}
       - name: build docker
         run: |
-          docker build -f Dockerfile -t redislabs/redis-stack:latest .
+          docker build -f Dockerfile -t ghcr.io/redislabs/redis-stack:latest .
+          docker tag ghcr.io/redislabs/redis-stack:latest ghcr.io/chayim/redis-stack:latest
+          docker push ghcr.io/chayim/redis-stack:latest
 
   package-snap:
     runs-on: ubuntu-latest

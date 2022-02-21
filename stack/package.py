@@ -53,6 +53,7 @@ class Package:
             f"--category server",
             f"--maintainer '{EMAIL}'",
             f"--description '{DESCRIPTION}'",
+            f"--directories '/opt/redis-stack'",
         ]
 
     def prepackage(
@@ -131,17 +132,20 @@ class Package:
             fpmargs.append(f"--deb-group {PRODUCT_GROUP}")
             fpmargs.append(f"--deb-dist {distribution}")
             fpmargs.append("-t deb")
+            fpmargs.append(f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}")
+            fpmargs.append(f"--after-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postremove')}")
+            fpmargs.append(f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}")
 
             if not os.path.isdir(self.__PATHS__.SVCDIR):
                 os.makedirs(self.__PATHS__.SVCDIR)
                 
             for i in ['redis-stack.service', 'redis-stack-redis.service', 'redisinsight.service']:
                 shutil.copyfile(
-                    os.path.join(self.__PATHS__.SCRIPTDIR, i),
+                    os.path.join(self.__PATHS__.SCRIPTDIR, "services", i),
                     os.path.join(self.__PATHS__.SVCDIR, i),
                 )
                 fpmargs.append(
-                    f"--config-files {(os.path.join(self.__PATHS__.SVCDIR, 'i'))}"
+                    f"--config-files {(os.path.join(self.__PATHS__.SVCDIR, i))}"
                 )
 
         elif package_type == "rpm":
@@ -154,16 +158,20 @@ class Package:
             fpmargs.append(f"--rpm-group {PRODUCT_GROUP}")
             fpmargs.append(f"--rpm-dist {distribution}")
             fpmargs.append("-t rpm")
+            fpmargs.append(f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}")
+            fpmargs.append(f"--after-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postremove')}")
+            fpmargs.append(f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}")
 
             if not os.path.isdir(self.__PATHS__.SVCDIR):
                 os.makedirs(self.__PATHS__.SVCDIR)
                 
             for i in ['redis-stack.service', 'redis-stack-redis.service', 'redisinsight.service']:
-                shutil.copyfile(os.path.join(self.__PATHS__.SCRIPTDIR, i),
+                shutil.copyfile(
+                    os.path.join(self.__PATHS__.SCRIPTDIR, "services", i),
                     os.path.join(self.__PATHS__.SVCDIR, i),
                 )
                 fpmargs.append(
-                    f"--config-files {(os.path.join(self.__PATHS__.SVCDIR, 'i'))}"
+                    f"--config-files {(os.path.join(self.__PATHS__.SVCDIR, i))}"
                 )
 
         elif package_type == "osxpkg":
@@ -173,6 +181,9 @@ class Package:
             fpmargs.append("-t osxpkg")
         elif package_type == "pacman":
             fpmargs.append(f"-p {PRODUCT}-{VERSION}-{build_number}.{self.ARCH}.pacman")
+            fpmargs.append(f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}")
+            fpmargs.append(f"--after-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postremove')}")
+            fpmargs.append(f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}")
             fpmargs.append(f"--pacman-user {PRODUCT_USER}")
             fpmargs.append(f"--pacman-group {PRODUCT_GROUP}")
             fpmargs.append("--pacman-compression gz")

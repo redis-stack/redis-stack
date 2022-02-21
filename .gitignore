@@ -6,6 +6,7 @@ dist
 out
 .venv
 __pycache__
+.vscode
 
 # packages
 *.deb
@@ -13,3 +14,6 @@ __pycache__
 *.osxpkg
 *.pacman
 *.snap
+
+*.rdb
+*.lock

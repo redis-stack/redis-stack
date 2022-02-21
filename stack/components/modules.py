@@ -16,11 +16,10 @@ class Modules(object):
         "REJSON": "2.0.6",
         "REDISGRAPH": "2.8.8",
         "REDISTIMESERIES": "1.6.7",
-        "REDISEARCH": "2.2.7",
+        "REDISEARCH": "2.4.0",
         "REDISGEARS": "1.2.2",
         "REDISBLOOM": "2.2.12",
         "REDISAI": None,
-        "REDISINSIGHT": "2.0.5",
     }
 
     def __init__(self, osnick: str, arch: str = "x86_64", osname: str = "Linux"):
@@ -81,10 +80,10 @@ class Modules(object):
             self.__PATHS__.EXTERNAL,
             f"redisearch-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip",
         )
-        url = self.generate_url("redisearch", version)
+        url = f"https://{self.AWS_S3_BUCKET}/redisearch-oss/redisearch-oss.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip"
         self._fetch_and_unzip(url, destfile)
         shutil.copyfile(
-            os.path.join(self.__PATHS__.DESTDIR, "module-enterprise.so"),
+            os.path.join(self.__PATHS__.DESTDIR, "redisearch.so"),
             os.path.join(self.__PATHS__.LIBDIR, "redisearch.so"),
         )
         os.chmod(os.path.join(self.__PATHS__.LIBDIR, "redisearch.so"), mode=0o755)

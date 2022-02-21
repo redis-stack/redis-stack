@@ -1,0 +1,6 @@
+#!/bin/sh
+
+if [ -f /usr/bin/systemctl ]; then
+    systemctl enable redis-stack
+    systemctl start redis-stack
+fi
