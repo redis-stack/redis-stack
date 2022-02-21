@@ -29,4 +29,4 @@ Today, to modify the way a service starts, the following files all need editing:
 
 * entrypoint.sh (for dockers)
 * snapcraft.j2 (for ubuntu snaps)
-* scripts/*.service (for systemd services on Linux)
+* etc/services/ (for systemd services on Linux)
