@@ -1,6 +1,7 @@
 import os
 import subprocess
-import requests
+from conftest import get_localhost_equiv, _in_docker
+from urllib.request import urlopen
 
 
 BASEPATH = "/opt/redis-stack"
@@ -8,8 +9,8 @@ BINDIR = os.path.join(BASEPATH, "bin")
 LIBDIR = os.path.join(BASEPATH, "lib")
 ETCDIR = os.path.join(BASEPATH, "etc")
 SHAREDIR = os.path.join(BASEPATH, "share")
-REDIS_UID = 999
-REDIS_GID = 999
+REDIS_UID = 65534
+REDIS_GID = 65534
 
 BINARIES = [
     "redis-server",
@@ -21,13 +22,20 @@ BINARIES = [
 ]
 
 
-class PackageTestMixin:
+def start_procs():
+    if _in_docker() is False:
+        subprocess.run(['systemctl', 'stop', 'redis-stack'], capture_output=False)  # in case started, and ignore the return code
+        cmd = ['systemctl', 'start', 'redis-stack']
+        proc = subprocess.run(cmd, capture_output=False)
+        assert proc.returncode == 0
 
-    # @classmethod
-    # def setup_class(cls):
-    #     cmd = ['dpkg', '-i', cls.PACKAGE_NAME]
-    #     r = subprocess.run(cmd)
-    #     assert r.returncode == 0
+    else:
+        cmd = ["/bin/bash", "/build/etc/entrypoint.sh"]
+        proc = subprocess.Popen(cmd)
+        # proc = subprocess.run(cmd, capture_output=False)
+        # assert proc.returncode == 0
+
+class PackageTestMixin:
 
     def test_paths_exist(self):
         for i in [BINDIR, LIBDIR, ETCDIR, SHAREDIR]:
@@ -41,11 +49,9 @@ class PackageTestMixin:
             assert os.path.isfile(fpath)
             assert os.path.getsize(fpath) > 0
 
-            # TODO once uid/gid is figured out re-enable
-            # stats = os.stat(fpath)
-            # assert stats.st_uid == REDIS_UID
-            # assert stats.st_gid == REDIS_GID
-            # assert os.access(binary, os.X_OK)
+            stats = os.stat(fpath)
+            assert stats.st_uid == REDIS_UID
+            assert stats.st_gid == REDIS_GID
 
         # otherwise we can't load the modules
         for mod in [
@@ -59,11 +65,9 @@ class PackageTestMixin:
             fpath = os.path.join(LIBDIR, mod)
             assert os.path.isfile(fpath)
 
-            # TODO once uid/gid is figured out re-enable
-            # stats = os.stat(fpath)
-            # assert stats.st_uid == REDIS_UID
-            # assert stats.st_gid == REDIS_GID
-            # assert os.access(mod, os.X_OK)
+            stats = os.stat(fpath)
+            assert stats.st_uid == REDIS_UID
+            assert stats.st_gid == REDIS_GID
 
     def test_binaries_execute(self):
         for binary in BINARIES:
@@ -81,7 +85,7 @@ class ServiceTestMixin:
         assert r.get("some") == "value"
 
     def test_redis_modules_loaded(self, r):
-        expected = ["rejson", "timeseries", "search", "graph", "bloom"]
+        expected = ["rejson", "timeseries", "search", "graph", "bf"]
         modules = [m.get("name").lower() for m in r.module_list()]
 
         modules.sort()
@@ -89,6 +93,6 @@ class ServiceTestMixin:
         assert modules == expected
 
     def test_basic_redisinsight(self):
-        r = requests.get("http://localhost:8081")
-        assert r.status_code == 200
-        assert r.content.decode().find("RedisInsight") != -1
+        c = urlopen(f"http://{get_localhost_equiv()}:8001")
+        content = c.read().decode()
+        assert content.lower().find('redisinsight') != -1

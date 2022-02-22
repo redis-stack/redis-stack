@@ -1,5 +1,6 @@
 import pytest
 import docker
+import time
 from helpers import ServiceTestMixin
 
 
@@ -16,9 +17,12 @@ class TestDocker(ServiceTestMixin):
             name=cls.DOCKER_NAME,
             detach=True,
             publish_all_ports=True,
-            ports={"6379/tcp": 6379, "8081/tcp": 8081},
+            ports={"6379/tcp": 6379, "8001/tcp": 8001},
         )
         container.reload()
+        
+        # time for the docker to settle
+        time.sleep(3)
 
     def teardown_class(cls):
         container = cls.env.containers.get(cls.DOCKER_NAME)

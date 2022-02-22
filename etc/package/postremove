@@ -1,8 +1,8 @@
 #!/bin/sh
 
 if [ -f /usr/bin/systemctl ]; then
-    rm -rf /opt/redis-stack
     rm -f /etc/systemd/system/redis-stack.service
     rm -f /etc/systemd/system/redis-stack-redis.service
     rm -f /etc/systemd/system/redisinsight.service
 fi
+rm -rf /opt/redis-stack
