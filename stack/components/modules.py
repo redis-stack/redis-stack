@@ -1,10 +1,14 @@
-import semantic_version
-from loguru import logger
-import zipfile
-import requests
+import os
 import shutil
 import urllib
-import os
+import zipfile
+from typing import Union
+
+import requests
+import semantic_version
+from loguru import logger
+
+from ..config import get_key
 from ..paths import Paths
 
 
@@ -12,15 +16,6 @@ class Modules(object):
     """Helper class for handling redis modules"""
 
     AWS_S3_BUCKET = "redismodules.s3.amazonaws.com"
-    MODULE_VERSIONS = {
-        "REJSON": "2.0.6",
-        "REDISGRAPH": "2.8.8",
-        "REDISTIMESERIES": "1.6.7",
-        "REDISEARCH": "2.4.0",
-        "REDISGEARS": "1.2.2",
-        "REDISBLOOM": "2.2.12",
-        "REDISAI": None,
-    }
 
     def __init__(self, osnick: str, arch: str = "x86_64", osname: str = "Linux"):
         self.OSNICK = osnick
@@ -43,80 +38,51 @@ class Modules(object):
                 f"{module}/snapshots/{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip",
             )
 
-    def rejson(self, version: str = MODULE_VERSIONS["REJSON"]):
+    def rejson(self, version: Union[str, None] = None):
         """rejson specific fetch"""
-        logger.info("Fetching rejson")
-        destfile = os.path.join(
-            self.__PATHS__.EXTERNAL,
-            f"rejson-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip",
-        )
-        url = self.generate_url("rejson", version)
-        self._fetch_and_unzip(url, destfile)
-        shutil.copyfile(
-            os.path.join(self.__PATHS__.DESTDIR, "rejson.so"),
-            os.path.join(self.__PATHS__.LIBDIR, "rejson.so"),
-        )
-        os.chmod(os.path.join(self.__PATHS__.LIBDIR, "rejson.so"), mode=0o755)
+        if version is None:
+            version = get_key("rejson")
+        self._run("redisgraph", None)
 
-    def redisgraph(self, version: str = MODULE_VERSIONS["REDISGRAPH"]):
+    def redisgraph(self, version: Union[str, None] = None):
         """redisgraph specific fetch"""
-        logger.info("Fetching redisgraph")
-        destfile = os.path.join(
-            self.__PATHS__.EXTERNAL,
-            f"redisgraph-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip",
-        )
-        url = self.generate_url("redisgraph", version)
-        self._fetch_and_unzip(url, destfile)
-        shutil.copyfile(
-            os.path.join(self.__PATHS__.DESTDIR, "redisgraph.so"),
-            os.path.join(self.__PATHS__.LIBDIR, "redisgraph.so"),
-        )
-        os.chmod(os.path.join(self.__PATHS__.LIBDIR, "redisgraph.so"), mode=0o755)
+        if version is None:
+            version = get_key("redisgraph")
+        self._run("redisgraph", version)
 
-    def redisearch(self, version: str = MODULE_VERSIONS["REDISEARCH"]):
+    def redisearch(self, version: Union[str, None] = None):
         """redisearch specific fetch"""
-        logger.info("Fetching redisearch")
-        destfile = os.path.join(
-            self.__PATHS__.EXTERNAL,
-            f"redisearch-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip",
-        )
+        if version is None:
+            version = get_key("redisearch")
         url = f"https://{self.AWS_S3_BUCKET}/redisearch-oss/redisearch-oss.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip"
-        self._fetch_and_unzip(url, destfile)
-        shutil.copyfile(
-            os.path.join(self.__PATHS__.DESTDIR, "redisearch.so"),
-            os.path.join(self.__PATHS__.LIBDIR, "redisearch.so"),
-        )
-        os.chmod(os.path.join(self.__PATHS__.LIBDIR, "redisearch.so"), mode=0o755)
+        self._run("redisearch", None, url)
 
-    def redistimeseries(self, version: str = MODULE_VERSIONS["REDISTIMESERIES"]):
+    def redistimeseries(self, version: Union[str, None] = None):
         """redistimeseries specific fetch"""
-        logger.info("Fetching redistimeseries")
-        destfile = os.path.join(
-            self.__PATHS__.EXTERNAL,
-            f"redistimeseries-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip",
-        )
-        url = self.generate_url("redistimeseries", version)
-        self._fetch_and_unzip(url, destfile)
-        shutil.copyfile(
-            os.path.join(self.__PATHS__.DESTDIR, "redistimeseries.so"),
-            os.path.join(self.__PATHS__.LIBDIR, "redistimeseries.so"),
-        )
-        os.chmod(os.path.join(self.__PATHS__.LIBDIR, "redistimeseries.so"), mode=0o755)
+        if version is None:
+            version = get_key("redistimeseries")
+        self._run("redistimeseries", version)
 
-    def redisbloom(self, version: str = MODULE_VERSIONS["REDISBLOOM"]):
+    def redisbloom(self, version: Union[str, None] = None):
         """bloom specific fetch"""
-        logger.info("Fetching redisbloom")
+        if version is None:
+            version = get_key("redisbloom")
+        self._run("redisbloom", version)
+
+    def _run(self, modulename: str, version: str, url: Union[str, None] = None):
+        if url is None:
+            url = self.generate_url(modulename, version)
+        logger.info(f"Fetching {modulename}")
         destfile = os.path.join(
             self.__PATHS__.EXTERNAL,
-            f"redisbloom-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip",
+            f"{modulename}-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip",
         )
-        url = self.generate_url("redisbloom", version)
         self._fetch_and_unzip(url, destfile)
         shutil.copyfile(
-            os.path.join(self.__PATHS__.DESTDIR, "redisbloom.so"),
-            os.path.join(self.__PATHS__.LIBDIR, "redisbloom.so"),
+            os.path.join(self.__PATHS__.DESTDIR, f"{modulename}.so"),
+            os.path.join(self.__PATHS__.LIBDIR, f"{modulename}.so"),
         )
-        os.chmod(os.path.join(self.__PATHS__.LIBDIR, "redisbloom.so"), mode=0o755)
+        os.chmod(os.path.join(self.__PATHS__.LIBDIR, f"{modulename}.so"), mode=0o755)
 
     def _fetch_and_unzip(self, url: str, destfile: str, custom_dest: str = None):
 
@@ -139,24 +105,3 @@ class Modules(object):
         logger.debug(f"Unzipping {destfile} and storing in {self.__PATHS__.DESTDIR}")
         with zipfile.ZipFile(destfile, "r") as zp:
             zp.extractall(dest)
-
-    # FUTURE include in the future, when gears is part of redis stack
-    # def redisgears(self, version: str = MODULE_VERSIONS["REDISGEARS"]):
-    #     """gears specific fetch"""
-    #     logger.info("Fetching redisgears")
-    #     destfile = os.path.join(
-    #         EXTERNAL, f"redisgears-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip"
-    #     )
-    #     url = self.generate_url("redisgears", version)
-    #     self._fetch_and_unzip(url, destfile)
-    #     shutil.copyfile(
-    #         os.path.join(self.DESTDIR, "redisgears.so"),
-    #         os.path.join(self.LIBDIR, "redisgears.so"),
-    #     )
-
-    # logger.info("Fetching redisbloom")
-
-    # def redisai(self, version: str = MODULE_VERSIONS["REDISAI"]):
-    #     """bloom specific fetch"""
-    #     # logger.info("Fetching redisai")
-    #     pass

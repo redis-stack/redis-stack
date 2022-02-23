@@ -1,15 +1,16 @@
-from ..paths import Paths
-import zipfile
-import requests
 import os
 import shutil
+import zipfile
+from typing import Union
+
+import requests
 from loguru import logger
+
+from ..config import get_key
+from ..paths import Paths
 
 
 class RedisInsight(object):
-
-    REDISINSIGHT_VERSION = "2.0.4-preview"
-
     def __init__(self, osnick: str, arch: str = "x86_64", osname: str = "Linux"):
 
         self.OSNICK = osnick
@@ -38,7 +39,9 @@ class RedisInsight(object):
         with zipfile.ZipFile(destfile, "r") as zp:
             zp.extractall(path=os.path.join(self.__PATHS__.DESTDIR, "redisinsight"))
 
-    def prepare(self, version: str = REDISINSIGHT_VERSION):
+    def prepare(self, version: Union[str, None] = None):
+        if version is None:
+            version = get_key("redisinsight")
         logger.info("Fetching redisinsight")
         url = self.generate_url(version)
         destfile = os.path.join(
@@ -50,6 +53,8 @@ class RedisInsight(object):
         shutil.copytree(
             pkg_unzip_dest, os.path.join(self.__PATHS__.SHAREDIR, "redisinsight")
         )
-        with open (os.path.join(self.__PATHS__.SHAREDIR, 'redisinsight', '.env'), 'w+') as fp:
+        with open(
+            os.path.join(self.__PATHS__.SHAREDIR, "redisinsight", ".env"), "w+"
+        ) as fp:
             fp.write("SERVER_STATIC_CONTENT=1\n")
             fp.write("API_PORT=8001\n")

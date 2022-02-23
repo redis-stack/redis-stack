@@ -1,0 +1,23 @@
+---
+
+# module versions
+rejson: 2.0.6
+redistimeseries: 1.6.7
+redisearch: 2.4.0
+redisgraph: 2.8.8
+redisbloom: 2.2.12
+redisinsight: 2.0.4-preview
+nodejs: v14.19.0
+
+# package rules
+version: 1.0.0
+product: redis-stack
+vendor: Redis Inc
+email: Redis OSS <oss@redislabs.com>
+license: MIT
+summary: Some king od siummary, I too am a placeholder
+description: A placeholder for some sort of description
+
+# uid/gid
+product_user: nobody
+product_group: nobody

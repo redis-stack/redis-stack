@@ -1,31 +1,19 @@
 #!/usr/bin/env python3
 
-from abc import abstractclassmethod
 import inspect
 import os
 import shutil
-import requests
-import jinja2
 import tempfile
+
+import jinja2
+import requests
 from loguru import logger
-from stack.paths import Paths
-from stack.components.modules import Modules
-from stack.components.nodejs import NodeJS
-from stack.components.insight import RedisInsight
 
-
-# REDIS STACK PACKAGE RULES
-PRODUCT = "redis-stack"
-VENDOR = "Redis Inc"
-VERSION = "1.0.0"
-EMAIL = "Redis OSS <oss@redislabs.com>"
-LICENSE = "MIT"
-PRODUCT_USER = "nobody"
-PRODUCT_GROUP = "nobody"
-
-# TODO need to edit these
-SUMMARY = "Some king od siummary, I too am a placeholder"
-DESCRIPTION = "A placeholder for some sort of description"
+from .components.insight import RedisInsight
+from .components.modules import Modules
+from .components.nodejs import NodeJS
+from .config import get_key
+from .paths import Paths
 
 
 class Package:
@@ -42,17 +30,17 @@ class Package:
             "fpm",
             "-s dir",
             f"-C {self.__PATHS__.WORKDIR}",
-            f"-n {PRODUCT}",
+            f"-n {get_key('product')}",
             "--provides redis",
             "--provides redis-server",
             f"--architecture {self.ARCH}",
-            f"--vendor '{VENDOR}'",
-            f"--version {VERSION}",
+            f"--vendor '{get_key('vendor')}'",
+            f"--version {get_key('version')}",
             f"--url 'https://redistack.io'",
-            f"--license {LICENSE}",
+            f"--license {get_key('license')}",
             f"--category server",
-            f"--maintainer '{EMAIL}'",
-            f"--description '{DESCRIPTION}'",
+            f"--maintainer '{get_key('email')}'",
+            f"--description '{get_key('description')}]'",
             f"--directories '/opt/redis-stack'",
         ]
 
@@ -111,7 +99,7 @@ class Package:
         for i in [NodeJS, RedisInsight]:
             n = i(self.OSNICK, self.ARCH, self.OSNAME)
             n.prepare()
-            
+
     def package(
         self,
         package_type: str = "deb",
@@ -126,20 +114,30 @@ class Package:
             fpmargs.append("--depends libssl-dev")
             fpmargs.append("--depends libgomp1")  # redisgraph
             fpmargs.append(
-                f"-p {PRODUCT}-{VERSION}-{build_number}.{distribution}.{self.ARCH}.deb"
+                f"-p {get_key('product')}-{get_key('version')}-{build_number}.{distribution}.{self.ARCH}.deb"
             )
-            fpmargs.append(f"--deb-user {PRODUCT_USER}")
-            fpmargs.append(f"--deb-group {PRODUCT_GROUP}")
+            fpmargs.append(f"--deb-user {get_key('product_user')}")
+            fpmargs.append(f"--deb-group {get_key('product_group')}")
             fpmargs.append(f"--deb-dist {distribution}")
             fpmargs.append("-t deb")
-            fpmargs.append(f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}")
-            fpmargs.append(f"--after-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postremove')}")
-            fpmargs.append(f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}")
+            fpmargs.append(
+                f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}"
+            )
+            fpmargs.append(
+                f"--after-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postremove')}"
+            )
+            fpmargs.append(
+                f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}"
+            )
 
             if not os.path.isdir(self.__PATHS__.SVCDIR):
                 os.makedirs(self.__PATHS__.SVCDIR)
-                
-            for i in ['redis-stack.service', 'redis-stack-redis.service', 'redisinsight.service']:
+
+            for i in [
+                "redis-stack.service",
+                "redis-stack-redis.service",
+                "redisinsight.service",
+            ]:
                 shutil.copyfile(
                     os.path.join(self.__PATHS__.SCRIPTDIR, "services", i),
                     os.path.join(self.__PATHS__.SVCDIR, i),
@@ -152,20 +150,30 @@ class Package:
             fpmargs.append("--depends openssl-devel")
             fpmargs.append("--depends jemalloc-devel")
             fpmargs.append(
-                f"-p {PRODUCT}-{VERSION}-{build_number}.{distribution}.{self.ARCH}.rpm"
+                f"-p {get_key('product')}-{get_key('version')}-{build_number}.{distribution}.{self.ARCH}.rpm"
             )
-            fpmargs.append(f"--rpm-user {PRODUCT_USER}")
-            fpmargs.append(f"--rpm-group {PRODUCT_GROUP}")
+            fpmargs.append(f"--rpm-user {get_key('product_user')}")
+            fpmargs.append(f"--rpm-group {get_key('product_group')}")
             fpmargs.append(f"--rpm-dist {distribution}")
             fpmargs.append("-t rpm")
-            fpmargs.append(f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}")
-            fpmargs.append(f"--after-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postremove')}")
-            fpmargs.append(f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}")
+            fpmargs.append(
+                f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}"
+            )
+            fpmargs.append(
+                f"--after-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postremove')}"
+            )
+            fpmargs.append(
+                f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}"
+            )
 
             if not os.path.isdir(self.__PATHS__.SVCDIR):
                 os.makedirs(self.__PATHS__.SVCDIR)
-                
-            for i in ['redis-stack.service', 'redis-stack-redis.service', 'redisinsight.service']:
+
+            for i in [
+                "redis-stack.service",
+                "redis-stack-redis.service",
+                "redisinsight.service",
+            ]:
                 shutil.copyfile(
                     os.path.join(self.__PATHS__.SCRIPTDIR, "services", i),
                     os.path.join(self.__PATHS__.SVCDIR, i),
@@ -176,16 +184,24 @@ class Package:
 
         elif package_type == "osxpkg":
             fpmargs.append(
-                f"-p {PRODUCT}-{VERSION}-{build_number}.{distribution}.{self.ARCH}.osxpkg"
+                f"-p {get_key('product')}-{get_key('version')}-{build_number}.{distribution}.osxpkg"
             )
             fpmargs.append("-t osxpkg")
         elif package_type == "pacman":
-            fpmargs.append(f"-p {PRODUCT}-{VERSION}-{build_number}.{self.ARCH}.pacman")
-            fpmargs.append(f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}")
-            fpmargs.append(f"--after-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postremove')}")
-            fpmargs.append(f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}")
-            fpmargs.append(f"--pacman-user {PRODUCT_USER}")
-            fpmargs.append(f"--pacman-group {PRODUCT_GROUP}")
+            fpmargs.append(
+                f"-p {get_key('product')}-{get_key('version')}-{build_number}.{self.ARCH}.pacman"
+            )
+            fpmargs.append(
+                f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}"
+            )
+            fpmargs.append(
+                f"--after-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postremove')}"
+            )
+            fpmargs.append(
+                f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}"
+            )
+            fpmargs.append(f"--pacman-user {get_key('product_user')}")
+            fpmargs.append(f"--pacman-group {get_key('product_group')}")
             fpmargs.append("--pacman-compression gz")
             fpmargs.append("-t pacman")
         elif package_type == "snap":
@@ -193,10 +209,10 @@ class Package:
             snap_confinement = "classic"
 
             vars = {
-                "PRODUCT": PRODUCT,
-                "VERSION": VERSION,
-                "SUMMARY": SUMMARY,
-                "DESCRIPTION": DESCRIPTION,
+                "PRODUCT": get_key("product"),
+                "VERSION": get_key("version"),
+                "SUMMARY": get_key("summary"),
+                "DESCRIPTION": get_key("description"),
                 "SNAP_GRADE": snap_grade,
                 "SNAP_CONFINEMENT": snap_confinement,
             }
@@ -213,7 +229,9 @@ class Package:
             with open(dest, "w+") as fp:
                 fp.write(generated)
 
-            fpmargs.append(f"-p {PRODUCT}-{VERSION}-{build_number}.{self.ARCH}.snap")
+            fpmargs.append(
+                f"-p {get_key('product')}-{get_key('version')}-{build_number}.{self.ARCH}.snap"
+            )
             fpmargs.append(f"--snap-confinement {snap_confinement}")
             fpmargs.append(f"--snap-grade {snap_grade}")
             fpmargs.append(f"--snap-yaml {dest}")
