@@ -204,38 +204,38 @@ class Package:
             fpmargs.append(f"--pacman-group {get_key('product_group')}")
             fpmargs.append("--pacman-compression gz")
             fpmargs.append("-t pacman")
-        elif package_type == "snap":
-            snap_grade = "stable"
-            snap_confinement = "classic"
+        # elif package_type == "snap":
+        #     snap_grade = "stable"
+        #     snap_confinement = "classic"
 
-            vars = {
-                "PRODUCT": get_key("product"),
-                "VERSION": get_key("version"),
-                "SUMMARY": get_key("summary"),
-                "DESCRIPTION": get_key("description"),
-                "SNAP_GRADE": snap_grade,
-                "SNAP_CONFINEMENT": snap_confinement,
-            }
+        #     vars = {
+        #         "PRODUCT": get_key("product"),
+        #         "VERSION": get_key("version"),
+        #         "SUMMARY": get_key("summary"),
+        #         "DESCRIPTION": get_key("description"),
+        #         "SNAP_GRADE": snap_grade,
+        #         "SNAP_CONFINEMENT": snap_confinement,
+        #     }
 
-            # generate the snapcraft.yaml from the template
-            dest = os.path.join(self.__PATHS__.HERE, "snapcraft.yaml")
-            dest = tempfile.mktemp(suffix=".yaml", prefix="snapcraft")
-            src = "snapcraft.j2"
+        #     # generate the snapcraft.yaml from the template
+        #     dest = os.path.join(self.__PATHS__.HERE, "snapcraft.yaml")
+        #     dest = tempfile.mktemp(suffix=".yaml", prefix="snapcraft")
+        #     src = "snapcraft.j2"
 
-            loader = jinja2.FileSystemLoader(self.__PATHS__.HERE)
-            env = jinja2.Environment(loader=loader)
-            tmpl = loader.load(name=src, environment=env)
-            generated = tmpl.render(vars)
-            with open(dest, "w+") as fp:
-                fp.write(generated)
+        #     loader = jinja2.FileSystemLoader(self.__PATHS__.HERE)
+        #     env = jinja2.Environment(loader=loader)
+        #     tmpl = loader.load(name=src, environment=env)
+        #     generated = tmpl.render(vars)
+        #     with open(dest, "w+") as fp:
+        #         fp.write(generated)
 
-            fpmargs.append(
-                f"-p {get_key('product')}-{get_key('version')}-{build_number}.{self.ARCH}.snap"
-            )
-            fpmargs.append(f"--snap-confinement {snap_confinement}")
-            fpmargs.append(f"--snap-grade {snap_grade}")
-            fpmargs.append(f"--snap-yaml {dest}")
-            fpmargs.append("-t snap")
+        #     fpmargs.append(
+        #         f"-p {get_key('product')}-{get_key('version')}-{build_number}.{self.ARCH}.snap"
+        #     )
+        #     fpmargs.append(f"--snap-confinement {snap_confinement}")
+        #     fpmargs.append(f"--snap-grade {snap_grade}")
+        #     fpmargs.append(f"--snap-yaml {dest}")
+        #     fpmargs.append("-t snap")
 
         else:
             raise AttributeError(f"{package_type} is an invalid package type")

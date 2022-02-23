@@ -58,7 +58,7 @@ if __name__ == "__main__":
         help="Target package type (eg dpkg)",
         default="deb",
         type="choice",
-        choices=["rpm", "deb", "osxpkg", "pacman", "snap"],
+        choices=["rpm", "deb", "osxpkg", "pacman"], # , "snap"],
     )
 
     # run time argumetns
