@@ -14,9 +14,9 @@ class RedisStack(Recipe):
     PACKAGE_NAME = "redis-stack"
     
     def __init__(self, osnick, arch="x86_64", osname="Linux"):
-        self.OSNICK = osnick
         self.ARCH = arch
         self.OSNAME = osname
+        self.OSNICK = osnick
         self.__PATHS__ = Paths(self.PACKAGE_NAME, osnick, arch, osname)
         self.C = Config()
         

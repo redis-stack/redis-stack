@@ -4,7 +4,9 @@ import os
 class Paths:
     """Paths used throughout"""
 
-    def __init__(self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux"):
+    def __init__(
+        self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux"
+    ):
 
         self.OSNICK = osnick
         self.ARCH = arch

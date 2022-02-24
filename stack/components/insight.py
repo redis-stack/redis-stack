@@ -11,7 +11,9 @@ from ..paths import Paths
 
 
 class RedisInsight(object):
-    def __init__(self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux"):
+    def __init__(
+        self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux"
+    ):
 
         self.OSNICK = osnick
         self.ARCH = arch

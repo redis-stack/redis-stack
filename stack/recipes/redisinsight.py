@@ -1,12 +1,41 @@
-import abc
+from . import Recipe
 from ..config import Config
-from loguru import logger
+from ..paths import Paths
+from ..components.nodejs import NodeJS
+from ..components.insight import RedisInsight as RI
 import os
 import shutil
+from loguru import logger
 
 
-class Recipe(object):
-    """A base class for building packages"""
+class RedisInsight(Recipe):
+    """A recipe to build a redisinsight package"""
+
+    PACKAGE_NAME = "redisinsight-web"
+
+    def __init__(self, osnick, arch="x86_64", osname="Linux"):
+        self.OSNICK = osnick
+        self.ARCH = arch
+        self.OSNAME = osname
+        self.__PATHS__ = Paths(self.PACKAGE_NAME, osnick, arch, osname)
+        self.C = Config()
+
+    def prepackage(
+        self, binary_dir: str, ignore: bool = False, version_override: str = None
+    ):
+        
+        for i in [
+            self.__PATHS__.EXTERNAL,
+            self.__PATHS__.DESTDIR,
+            self.__PATHS__.LIBDIR,
+            self.__PATHS__.BINDIR,
+            self.__PATHS__.SHAREDIR,
+        ]:
+            os.makedirs(i, exist_ok=True, mode=0o755)
+
+        for i in [NodeJS, RI]:
+            n = i(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
+            n.prepare()
 
     @property
     def __package_base_args__(self) -> list:
@@ -17,8 +46,6 @@ class Recipe(object):
             "-s dir",
             f"-C {self.__PATHS__.WORKDIR}",
             f"-n {c.get_key(self.PACKAGE_NAME)['product']}",
-            "--provides redis",
-            "--provides redis-server",
             f"--architecture {self.ARCH}",
             f"--vendor '{c.get_key('vendor')}'",
             f"--version {c.get_key(self.PACKAGE_NAME)['version']}",
@@ -27,12 +54,10 @@ class Recipe(object):
             f"--category server",
             f"--maintainer '{c.get_key('email')}'",
             f"--description '{c.get_key(self.PACKAGE_NAME)['description']}'",
-            f"--directories '/opt/redis-stack'",
+            f"--directories /opt/redis-stack",
         ]
 
     def deb(self, fpmargs, build_number, distribution):
-        fpmargs.append("--depends libssl-dev")
-        fpmargs.append("--depends libgomp1")  # redisgraph
         fpmargs.append(
             f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.C.get_key(self.PACKAGE_NAME)['version']}-{build_number}.{distribution}.{self.ARCH}.deb"
         )
@@ -54,8 +79,7 @@ class Recipe(object):
             os.makedirs(self.__PATHS__.SVCDIR)
 
         for i in [
-            # "redis-stack.service",
-            "redis-stack-server.service",
+            "redisinsight.service",
         ]:
             shutil.copyfile(
                 os.path.join(self.__PATHS__.SCRIPTDIR, "services", i),
@@ -66,8 +90,6 @@ class Recipe(object):
         return fpmargs
 
     def rpm(self, fpmargs, build_number, distribution):
-        fpmargs.append("--depends openssl-devel")
-        fpmargs.append("--depends jemalloc-devel")
         fpmargs.append(
             f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.C.get_key(self.PACKAGE_NAME)['version']}-{build_number}.{distribution}.{self.ARCH}.rpm"
         )
@@ -89,9 +111,7 @@ class Recipe(object):
             os.makedirs(self.__PATHS__.SVCDIR)
 
         for i in [
-            # "redis-stack.service",
-            "redis-stack-server.service",
-            # "redisinsight.service",
+            "redisinsight.service",
         ]:
             shutil.copyfile(
                 os.path.join(self.__PATHS__.SCRIPTDIR, "services", i),
@@ -117,6 +137,18 @@ class Recipe(object):
         fpmargs.append(f"--pacman-group {self.C.get_key('product_group')}")
         fpmargs.append("--pacman-compression gz")
         fpmargs.append("-t pacman")
+
+        if not os.path.isdir(self.__PATHS__.SVCDIR):
+            os.makedirs(self.__PATHS__.SVCDIR)
+        for i in [
+            "redisinsight.service",
+        ]:
+            shutil.copyfile(
+                os.path.join(self.__PATHS__.SCRIPTDIR, "services", i),
+                os.path.join(self.__PATHS__.SVCDIR, i),
+            )
+            fpmargs.append(f"--config-files {(os.path.join(self.__PATHS__.SVCDIR, i))}")
+
         return fpmargs
 
     def osxpkg(self, fpmargs, build_number, distribution):

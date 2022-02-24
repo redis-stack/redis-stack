@@ -127,7 +127,7 @@ jobs:
     needs: [build-ubuntu-focal]
     strategy:
       matrix:
-        package: ['redis-stack', 'redis-stack-server']
+        package: ['redis-stack', 'redis-stack-server', 'redisinsight']
     env:
       platform: focal
       osname: Linux
@@ -497,6 +497,10 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.deb
+          path: redis-stack
+      - uses: actions/download-artifact@v2
+        with:
+          name: redisinsight-${{env.platform}}-${{env.arch}}.deb
           path: redis-stack
       - name: display structure
         run: ls -R

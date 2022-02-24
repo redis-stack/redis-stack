@@ -17,7 +17,9 @@ class Modules(object):
 
     AWS_S3_BUCKET = "redismodules.s3.amazonaws.com"
 
-    def __init__(self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux"):
+    def __init__(
+        self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux"
+    ):
         self.OSNICK = osnick
         self.ARCH = arch
         self.OSNAME = osname

@@ -10,16 +10,16 @@ from loguru import logger
 
 class RedisStackServer(Recipe):
     """A recipe, to build the redis-stack-server package"""
-    
+
     PACKAGE_NAME = "redis-stack-server"
-    
+
     def __init__(self, osnick, arch="x86_64", osname="Linux"):
         self.OSNICK = osnick
         self.ARCH = arch
         self.OSNAME = osname
         self.__PATHS__ = Paths(self.PACKAGE_NAME, osnick, arch, osname)
         self.C = Config()
-        
+
     def prepackage(
         self, binary_dir: str, ignore: bool = False, version_override: str = None
     ):

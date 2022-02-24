@@ -15,7 +15,6 @@ license: MIT
 vendor: Redis Inc
 url: "https://redis.io"
 
-# redis-stack package
 redis-stack:
   version: 1.0.0
   product: redis-stack
@@ -27,6 +26,13 @@ redis-stack-server:
   product: redis-stack-server
   summary: I am a redis stack server
   description: I am a redis stack server description
+
+# note the version - no underscores or hyphens allowed
+redisinsight-web:
+  version: 2.0.4preview
+  product: redisinsight-web
+  summary: RI Web summary
+  description: RI Web placeholder
 
 # uid/gid
 product_user: nobody
