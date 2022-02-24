@@ -1,17 +1,17 @@
 from . import Recipe
-from ..paths import Paths
-from ..components.modules import Modules
 from ..config import Config
+from ..components.modules import Modules
+from ..paths import Paths
 import requests
-import os
-import shutil
 from loguru import logger
+import shutil
+import os
 
 
-class RedisStackServer(Recipe):
-    """A recipe, to build the redis-stack-server package"""
+class RedisStack(Recipe):
+    """A recipe to build the redis-stack package"""
     
-    PACKAGE_NAME = "redis-stack-server"
+    PACKAGE_NAME = "redis-stack"
     
     def __init__(self, osnick, arch="x86_64", osname="Linux"):
         self.OSNICK = osnick
@@ -23,6 +23,7 @@ class RedisStackServer(Recipe):
     def prepackage(
         self, binary_dir: str, ignore: bool = False, version_override: str = None
     ):
+        
         for i in [
             self.__PATHS__.EXTERNAL,
             self.__PATHS__.DESTDIR,

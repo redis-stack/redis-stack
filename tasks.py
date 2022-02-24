@@ -27,6 +27,7 @@ def clean(c):
     'target': 'target package type to build (eg: deb)',
     'arch': 'architecture (eg: x86_64)',
     'build_number': 'build number (defaults to 1)',
+    'package': 'packate to build {redis_stack|redis_stack_server}',
 })
 def package(
     c, osname='Linux', osnick='', dist='',
@@ -34,6 +35,7 @@ def package(
     target="deb",
     arch='x86_64',
     build_number=1,
+    package='redis-stack-server',
 ):
     """Create a redis-stack package"""
 
@@ -48,6 +50,7 @@ def package(
         f"-r {redis_bin}",
         f"-b {build_number}",
         f"-t {target}",
+        f"-p {package}",
         f"-x",
         f"-I",
     ]

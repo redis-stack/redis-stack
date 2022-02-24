@@ -1,21 +1,11 @@
 import abc
 from ..config import Config
 from loguru import logger
+import os
+import shutil
 
 class Recipe(object):
-    
-    @abc.abstractmethod
-    def prepackage(self):
-        raise NotImplementedError("To be implemented in child classes.")
-    
-    @abc.abstractmethod
-    def package(
-        self,
-        package_type: str = "deb",
-        build_number: int = 1,
-        distribution: str = "bionic",
-    ):
-        raise NotImplementedError("To be implemented in child classes.")
+    """A base class for building packages"""
     
     @property
     def __package_base_args__(self) -> list:
@@ -38,3 +28,131 @@ class Recipe(object):
             f"--description '{c.get_key(self.PACKAGE_NAME)['description']}'",
             f"--directories '/opt/redis-stack'",
         ]
+        
+    def deb(self, fpmargs, build_number, distribution):
+        fpmargs.append("--depends libssl-dev")
+        fpmargs.append("--depends libgomp1")  # redisgraph
+        fpmargs.append(
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.C.get_key(self.PACKAGE_NAME)['version']}-{build_number}.{distribution}.{self.ARCH}.deb"
+        )
+        fpmargs.append(f"--deb-user {self.C.get_key('product_user')}")
+        fpmargs.append(f"--deb-group {self.C.get_key('product_group')}")
+        fpmargs.append(f"--deb-dist {distribution}")
+        fpmargs.append("-t deb")
+        fpmargs.append(
+            f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}"
+        )
+        fpmargs.append(
+            f"--after-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postremove')}"
+        )
+        fpmargs.append(
+            f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}"
+        )
+
+        if not os.path.isdir(self.__PATHS__.SVCDIR):
+            os.makedirs(self.__PATHS__.SVCDIR)
+
+        for i in [
+            # "redis-stack.service",
+            "redis-stack-server.service",
+        ]:
+            shutil.copyfile(
+                os.path.join(self.__PATHS__.SCRIPTDIR, "services", i),
+                os.path.join(self.__PATHS__.SVCDIR, i),
+            )
+            fpmargs.append(
+                f"--config-files {(os.path.join(self.__PATHS__.SVCDIR, i))}"
+            )
+
+        return fpmargs
+    
+    def rpm(self, fpmargs, build_number, distribution):
+        fpmargs.append("--depends openssl-devel")
+        fpmargs.append("--depends jemalloc-devel")
+        fpmargs.append(
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.C.get_key(self.PACKAGE_NAME)['version']}-{build_number}.{distribution}.{self.ARCH}.rpm"
+        )
+        fpmargs.append(f"--rpm-user {self.C.get_key('product_user')}")
+        fpmargs.append(f"--rpm-group {self.C.get_key('product_group')}")
+        fpmargs.append(f"--rpm-dist {distribution}")
+        fpmargs.append("-t rpm")
+        fpmargs.append(
+            f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}"
+        )
+        fpmargs.append(
+            f"--after-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postremove')}"
+        )
+        fpmargs.append(
+            f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}"
+        )
+
+        if not os.path.isdir(self.__PATHS__.SVCDIR):
+            os.makedirs(self.__PATHS__.SVCDIR)
+
+        for i in [
+            # "redis-stack.service",
+            "redis-stack-server.service",
+            # "redisinsight.service",
+        ]:
+            shutil.copyfile(
+                os.path.join(self.__PATHS__.SCRIPTDIR, "services", i),
+                os.path.join(self.__PATHS__.SVCDIR, i),
+            )
+            fpmargs.append(
+                f"--config-files {(os.path.join(self.__PATHS__.SVCDIR, i))}"
+            )
+        return fpmargs
+    
+    def pacman(self, fpmargs, build_number, distribution):
+        fpmargs.append(
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.C.get_key(self.PACKAGE_NAME)['version']}-{build_number}.{distribution}.{self.ARCH}.pacman"
+        )
+        fpmargs.append(
+            f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}"
+        )
+        fpmargs.append(
+            f"--after-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postremove')}"
+        )
+        fpmargs.append(
+            f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}"
+        )
+        fpmargs.append(f"--pacman-user {self.C.get_key('product_user')}")
+        fpmargs.append(f"--pacman-group {self.C.get_key('product_group')}")
+        fpmargs.append("--pacman-compression gz")
+        fpmargs.append("-t pacman")
+        return fpmargs
+    
+    def osxpkg(self, fpmargs, build_number, distribution):
+        fpmargs.append(
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.C.get_key(self.PACKAGE_NAME)['version']}-{build_number}.{distribution}.osxpkg"
+        )
+        fpmargs.append("-t osxpkg")
+        return fpmargs
+
+    def package(
+        self,
+        package_type: str = "deb",
+        build_number: int = 1,
+        distribution: str = "bionic",
+    ):
+        logger.info(f"Building {package_type} package")
+        fpmargs = self.__package_base_args__
+        fpmargs.append(f"--iteration {build_number}")
+
+        if package_type == "deb":
+            fpmargs = self.deb(fpmargs, build_number, distribution)
+
+        elif package_type == "rpm":
+            fpmargs = self.rpm(fpmargs, build_number, distribution)
+            
+        elif package_type == "osxpkg":
+            fpmargs = self.osxpkg(fpmargs, build_number, distribution)
+            
+        elif package_type == "pacman":
+            fpmargs = self.pacman()(fpmargs, build_number, distribution)
+        else:
+            raise AttributeError(f"{package_type} is an invalid package type")
+
+        cmd = " ".join(fpmargs)
+        logger.debug(f"Packaging: {cmd}")
+        return os.system(cmd)
