@@ -7,7 +7,7 @@ ADD ./redis-stack /var/cache/apt/redis-stack/
 COPY ./etc/entrypoint.sh /entrypoint.sh
 RUN chmod a+x /entrypoint.sh
 RUN touch /.dockerenv
-RUN dpkg -i /var/cache/apt/redis-stack/*.deb
+RUN dpkg -i /var/cache/apt/redis-stack/redis-stack-server*.deb
 RUN rm -rf /var/cache/apt
 
 EXPOSE 6379 8001

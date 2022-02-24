@@ -6,17 +6,18 @@ from typing import Union
 import requests
 from loguru import logger
 
-from ..config import get_key
+from ..config import Config
 from ..paths import Paths
 
 
 class RedisInsight(object):
-    def __init__(self, osnick: str, arch: str = "x86_64", osname: str = "Linux"):
+    def __init__(self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux"):
 
         self.OSNICK = osnick
         self.ARCH = arch
         self.OSNAME = osname
-        self.__PATHS__ = Paths(osnick, arch, osname)
+        self.__PATHS__ = Paths(package, osnick, arch, osname)
+        self.C = Config()
 
     def generate_url(self, version):
         if self.OSNAME == "macos":
@@ -41,7 +42,7 @@ class RedisInsight(object):
 
     def prepare(self, version: Union[str, None] = None):
         if version is None:
-            version = get_key("redisinsight")
+            version = self.C.get_key("redisinsight")
         logger.info("Fetching redisinsight")
         url = self.generate_url(version)
         destfile = os.path.join(

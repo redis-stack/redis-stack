@@ -2,7 +2,7 @@
 Description=redis-stack
 After=network.target
 Wants=redisinsight.service
-Wants=redis-stack-redis.service
+Wants=redis-stack-server.service
 
 [Service]
 ExecStart=/bin/true

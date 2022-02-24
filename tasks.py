@@ -24,14 +24,14 @@ def clean(c):
     'osnick': 'osnick for packages to fetch (eg: ubuntu18.04)',
     'dist': 'package distribution to generate (eg: bionic)',
     'redis_bin': 'path to pre-build redis binaries',
-    'package': 'package type to build (eg: deb)',
+    'target': 'target package type to build (eg: deb)',
     'arch': 'architecture (eg: x86_64)',
     'build_number': 'build number (defaults to 1)',
 })
 def package(
     c, osname='Linux', osnick='', dist='',
     redis_bin='../redis',
-    package="deb",
+    target="deb",
     arch='x86_64',
     build_number=1,
 ):
@@ -47,7 +47,7 @@ def package(
         f"-a {arch}",
         f"-r {redis_bin}",
         f"-b {build_number}",
-        f"-p {package}",
+        f"-t {target}",
         f"-x",
         f"-I",
     ]

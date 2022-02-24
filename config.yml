@@ -9,14 +9,24 @@ redisbloom: 2.2.12
 redisinsight: 2.0.4-preview
 nodejs: v14.19.0
 
-# package rules
-version: 1.0.0
-product: redis-stack
-vendor: Redis Inc
+# common package variables
 email: Redis OSS <oss@redislabs.com>
 license: MIT
-summary: Some king od siummary, I too am a placeholder
-description: A placeholder for some sort of description
+vendor: Redis Inc
+url: "https://redis.io"
+
+# redis-stack package
+redis-stack:
+  version: 1.0.0
+  product: redis-stack
+  summary: I am a redis stack
+  description: I am a redis stack description
+
+redis-stack-server:
+  version: 1.0.0
+  product: redis-stack-server
+  summary: I am a redis stack server
+  description: I am a redis stack server description
 
 # uid/gid
 product_user: nobody

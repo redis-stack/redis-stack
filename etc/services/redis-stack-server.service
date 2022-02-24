@@ -1,7 +1,7 @@
 [Unit]
-Description=redis-stack-redis
+Description=redis-stack-server
 After=network.target
-PartOf=redis-stack.service
+#PartOf=redis-stack.service
 
 [Service]
 Type=simple

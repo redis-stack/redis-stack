@@ -8,7 +8,7 @@ import requests
 import semantic_version
 from loguru import logger
 
-from ..config import get_key
+from ..config import Config
 from ..paths import Paths
 
 
@@ -17,11 +17,12 @@ class Modules(object):
 
     AWS_S3_BUCKET = "redismodules.s3.amazonaws.com"
 
-    def __init__(self, osnick: str, arch: str = "x86_64", osname: str = "Linux"):
+    def __init__(self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux"):
         self.OSNICK = osnick
         self.ARCH = arch
         self.OSNAME = osname
-        self.__PATHS__ = Paths(osnick, arch, osname)
+        self.__PATHS__ = Paths(package, osnick, arch, osname)
+        self.C = Config()
 
     def generate_url(self, module: str, version: str):
         """Assuming the module follows the standard, return the URL from
@@ -41,32 +42,32 @@ class Modules(object):
     def rejson(self, version: Union[str, None] = None):
         """rejson specific fetch"""
         if version is None:
-            version = get_key("rejson")
+            version = self.C.get_key("rejson")
         self._run("redisgraph", None)
 
     def redisgraph(self, version: Union[str, None] = None):
         """redisgraph specific fetch"""
         if version is None:
-            version = get_key("redisgraph")
+            version = self.C.get_key("redisgraph")
         self._run("redisgraph", version)
 
     def redisearch(self, version: Union[str, None] = None):
         """redisearch specific fetch"""
         if version is None:
-            version = get_key("redisearch")
+            version = self.C.get_key("redisearch")
         url = f"https://{self.AWS_S3_BUCKET}/redisearch-oss/redisearch-oss.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip"
         self._run("redisearch", None, url)
 
     def redistimeseries(self, version: Union[str, None] = None):
         """redistimeseries specific fetch"""
         if version is None:
-            version = get_key("redistimeseries")
+            version = self.C.get_key("redistimeseries")
         self._run("redistimeseries", version)
 
     def redisbloom(self, version: Union[str, None] = None):
         """bloom specific fetch"""
         if version is None:
-            version = get_key("redisbloom")
+            version = self.C.get_key("redisbloom")
         self._run("redisbloom", version)
 
     def _run(self, modulename: str, version: str, url: Union[str, None] = None):

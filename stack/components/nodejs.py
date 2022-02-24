@@ -6,19 +6,20 @@ from typing import Union
 import requests
 from loguru import logger
 
-from ..config import get_key
+from ..config import Config
 from ..paths import Paths
 
 
 class NodeJS(object):
     """Helper class for handling nodejs"""
 
-    def __init__(self, osnick: str, arch: str = "x86_64", osname: str = "Linux"):
+    def __init__(self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux"):
 
         self.OSNICK = osnick
         self.ARCH = arch
         self.OSNAME = osname
-        self.__PATHS__ = Paths(osnick, arch, osname)
+        self.__PATHS__ = Paths(package, osnick, arch, osname)
+        self.C = Config()
 
     @property
     def node_arch(self):
@@ -63,7 +64,7 @@ class NodeJS(object):
             f"nodejs-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.tar.gz",
         )
         if version is None:
-            version = get_key("nodejs")
+            version = self.C.get_key("nodejs")
         self._fetch_and_unzip(self.generate_url(version), destfile)
 
         node_base = os.path.join(

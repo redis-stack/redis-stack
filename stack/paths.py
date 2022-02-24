@@ -4,16 +4,16 @@ import os
 class Paths:
     """Paths used throughout"""
 
-    def __init__(self, osnick: str, arch: str = "x86_64", osname: str = "Linux"):
+    def __init__(self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux"):
 
         self.OSNICK = osnick
         self.ARCH = arch
         self.OSNAME = osname
+        self.PACKAGE = package
 
         # general pathing
         self.HERE = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         self.EXTERNAL = os.path.join(self.HERE, "deps", "external")
-        self.DISTDIR = os.path.join(self.HERE, "dist")
         self.BUILDROOT = os.path.join(self.HERE, "build")
         self.SCRIPTDIR = os.path.join(self.HERE, "etc")
 
@@ -22,7 +22,7 @@ class Paths:
             self.EXTERNAL, f"{self.OSNAME}-{self.OSNICK}-{self.ARCH}"
         )
         self.WORKDIR = os.path.join(
-            self.BUILDROOT, f"{self.OSNAME}-{self.OSNICK}-{self.ARCH}"
+            self.BUILDROOT, f"{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{self.PACKAGE}"
         )
 
         # package paths

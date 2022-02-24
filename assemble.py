@@ -1,7 +1,6 @@
 from optparse import OptionParser
 import sys
 from loguru import logger
-from stack.package import Package
 import os
 
 
@@ -52,13 +51,22 @@ if __name__ == "__main__":
         default=1,
     )
     p.add_option(
-        "-p",
-        "--package-type",
+        "-t",
+        "--target",
         dest="TARGET",
         help="Target package type (eg dpkg)",
         default="deb",
         type="choice",
         choices=["rpm", "deb", "osxpkg", "pacman"], # , "snap"],
+    )
+    p.add_option(
+        "-p",
+        "--package",
+        dest="PACKAGE",
+        help="Package recipe to build",
+        default="redis-stack-server",
+        type="choice",
+        choices=["redis-stack", "redis-stack-server"]
     )
 
     # run time argumetns
@@ -103,7 +111,16 @@ if __name__ == "__main__":
     else:
         logger.add(sys.stderr, level="INFO")
 
-    a = Package(opts.OSNICK, opts.ARCH, opts.OSNAME)
+    # a = Package(opts.OSNICK, opts.ARCH, opts.OSNAME)
+    if opts.PACKAGE == "redis-stack-server":
+        from stack.recipes.redis_stack_server import RedisStackServer as pkgklass
+    # elif opts.PACKAGE == "redis-stack":
+    #     from stack.recipes.redis_stack import RedisStack as pkgklass
+    else:
+        sys.stderr.write(f"{opts.PACKAGE} is an unsupported package recipe.\n")
+        sys.exit(3)
+    
+    a = pkgklass(opts.OSNICK, opts.ARCH, opts.OSNAME)
 
     if opts.SKIP is None or opts.SKIP != "fetch":
         a.prepackage(opts.REDISBIN, opts.IGNORE, opts.VERSION_OVERRIDE)
