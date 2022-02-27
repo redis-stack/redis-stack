@@ -103,11 +103,11 @@ jobs:
     - name: upload snapshots
       if: startsWith(github.ref, 'refs/tags/') != true
       run: |
-        s3cmd put redis-stack/*.${{env.target}} s3://redismodules/redis-stack/snapshots/
+        s3cmd put -P redis-stack/*.${{env.target}} s3://redismodules/redis-stack/snapshots/
     - name: upload release
       if: startsWith(github.ref, 'refs/tags/')
       run: |
-        s3cmd put redis-stack/*.${{env.target}} s3://redismodules/redis-stack/
+        s3cmd put -P redis-stack/*.${{env.target}} s3://redismodules/redis-stack/
 
 
   build-ubuntu-focal:
@@ -195,11 +195,11 @@ jobs:
       - name: upload snapshots
         if: startsWith(github.ref, 'refs/tags/') != true
         run: |
-          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
       - name: upload release
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
 
 
   build-ubuntu-bionic:
@@ -285,11 +285,11 @@ jobs:
       - name: upload snapshots
         if: startsWith(github.ref, 'refs/tags/') != true
         run: |
-          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
       - name: upload release
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
 
 
   build-ubuntu-xenial:
@@ -376,11 +376,11 @@ jobs:
       - name: upload snapshots
         if: startsWith(github.ref, 'refs/tags/') != true
         run: |
-          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
       - name: upload release
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
 
 
   build-rhel-7:
@@ -469,11 +469,11 @@ jobs:
       - name: upload snapshots
         if: startsWith(github.ref, 'refs/tags/') != true
         run: |
-          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
       - name: upload release
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
 
 
   build-rhel-8:
@@ -562,11 +562,11 @@ jobs:
       - name: upload snapshots
         if: startsWith(github.ref, 'refs/tags/') != true
         run: |
-          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
       - name: upload release
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
 
   dockers:
     name: redis-stack-server docker
