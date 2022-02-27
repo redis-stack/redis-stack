@@ -5,6 +5,6 @@ def get_version(product):
         from .recipes.redis_stack_server import RedisStackServer as recipe
     elif product == 'redisinsight':
         from .recipes.redisinsight import RedisInsight as recipe
-        
+
     r = recipe("Linux")
     return r.version

@@ -36,13 +36,15 @@ def package(
     arch='x86_64',
     build_number=1,
     package='redis-stack-server',
+    skip='',
 ):
     """Create a redis-stack package"""
 
-    # TODO remove the -I once all modules are stable
+    # TODO remove the -I once all modules are stable on all platforms
     cmd = [
         sys.executable,
-        "assemble.py",
+        "-m",
+        "stack",
         f"-o {osname}",
         f"-s {osnick}",
         f"-d {dist}",
@@ -55,7 +57,7 @@ def package(
         f"-I",
     ]
     run(' '.join(cmd))
-    
+
 @task(help={
     'package': 'package to build {redis_stack|redis_stack_server}'
 })

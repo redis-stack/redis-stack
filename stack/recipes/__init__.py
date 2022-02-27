@@ -145,6 +145,17 @@ class Recipe(object):
         )
         fpmargs.append("-t osxpkg")
         return fpmargs
+    
+    def zip(self, fpmargs, build_number, distribution):
+        
+        # zipfiles really just include the root of the package
+        fpmargs.remove(f"-C {self.__PATHS__.WORKDIR}")
+        fpmargs.append(f"-C {self.__PATHS__.BASEDIR}")
+        fpmargs.append(
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.zip"
+        )
+        fpmargs.append("-t zip")
+        return fpmargs
 
     def package(
         self,
@@ -166,7 +177,9 @@ class Recipe(object):
             fpmargs = self.osxpkg(fpmargs, build_number, distribution)
 
         elif package_type == "pacman":
-            fpmargs = self.pacman()(fpmargs, build_number, distribution)
+            fpmargs = self.pacman(fpmargs, build_number, distribution)
+        elif package_type == "zip":
+            fpmargs = self.zip(fpmargs, build_number, distribution)
         else:
             raise AttributeError(f"{package_type} is an invalid package type")
 

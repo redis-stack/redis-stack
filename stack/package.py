@@ -220,7 +220,7 @@ class Package:
         #     # generate the snapcraft.yaml from the template
         #     dest = os.path.join(self.__PATHS__.HERE, "snapcraft.yaml")
         #     dest = tempfile.mktemp(suffix=".yaml", prefix="snapcraft")
-        #     src = "snapcraft.j2"
+        #     src = os.path.join(self.SCRIPTDIR, "snapcraft.j2")
 
         #     loader = jinja2.FileSystemLoader(self.__PATHS__.HERE)
         #     env = jinja2.Environment(loader=loader)
