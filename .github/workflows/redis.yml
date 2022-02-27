@@ -91,7 +91,6 @@ jobs:
         rm -f *.osxpkg
         invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t ${{env.target}} -p redis-stack
         cp *.${{env.target}} s3dist
-    - name: perist redis-stack-server package
     - name: perist redis-stack package
       uses: actions/upload-artifact@v2
       with:
