@@ -87,7 +87,7 @@ jobs:
         cd redis-stack
         source .venv/bin/activate
         rm -f *.osxpkg
-        invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t ${{env.target}} -p redis-stack
+        invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t ${{env.target}} -p redis-stack
     - name: perist redis-stack package
       uses: actions/upload-artifact@v2
       with:
@@ -269,7 +269,7 @@ jobs:
       - name: build redis-stack-server
         run: |
           source .venv/bin/activate
-          invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
+          invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
       - name: perist packages
         uses: actions/upload-artifact@v2
         with:
@@ -360,7 +360,7 @@ jobs:
       - name: build redis-stack-server
         run: |
           source .venv/bin/activate
-          invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
+          invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
       - name: perist packages
         uses: actions/upload-artifact@v2
         with:
@@ -453,7 +453,7 @@ jobs:
       - name: build redis-stack-server
         run: |
           source .venv/bin/activate
-          invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
+          invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
       - name: perist packages
         uses: actions/upload-artifact@v2
         with:
@@ -546,7 +546,7 @@ jobs:
       - name: build ${{ matrix.package }}
         run: |
           source .venv/bin/activate
-          invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
+          invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
       - name: perist packages
         uses: actions/upload-artifact@v2
         with:
@@ -660,7 +660,7 @@ jobs:
   #     - name: build the package
   #       run: |
   #         source .venv/bin/activate
-  #         invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}}
+  #         invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}}
   #     - name: perist packages
   #       uses: actions/upload-artifact@v2
   #       with:
