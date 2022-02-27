@@ -3,6 +3,8 @@ from ..config import Config
 from loguru import logger
 import os
 import shutil
+from semver.version import Version
+import subprocess
 
 
 class Recipe(object):
@@ -21,7 +23,7 @@ class Recipe(object):
             "--provides redis-server",
             f"--architecture {self.ARCH}",
             f"--vendor '{c.get_key('vendor')}'",
-            f"--version {c.get_key(self.PACKAGE_NAME)['version']}",
+            f"--version {self.version}",
             f"--url '{c.get_key('url')}'",
             f"--license {c.get_key('license')}",
             f"--category server",
@@ -30,11 +32,29 @@ class Recipe(object):
             f"--directories '/opt/redis-stack'",
         ]
 
+    @property
+    def version(self):
+        r = subprocess.run(["git", "branch", "--show-current"], stdout=subprocess.PIPE, text=True)
+        branch = r.stdout.strip()
+        if branch in ["master", "main"]:
+            return "99.99.99"
+        
+        # get the current tag
+        tagcmd = ["git", "tag", "--points-at", "HEAD"]
+        r = subprocess.run(tagcmd, stdout=subprocess.PIPE, text=True)
+        version = r.stdout.strip().replace('v', '')
+        if version != "":
+            return version
+       
+        # any branch - just takes the version
+        config = Config()
+        return config.get_key(self.PACKAGE_NAME)['version']
+
     def deb(self, fpmargs, build_number, distribution):
         fpmargs.append("--depends libssl-dev")
         fpmargs.append("--depends libgomp1")  # redisgraph
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.C.get_key(self.PACKAGE_NAME)['version']}-{build_number}.{distribution}.{self.ARCH}.deb"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.deb"
         )
         fpmargs.append(f"--deb-user {self.C.get_key('product_user')}")
         fpmargs.append(f"--deb-group {self.C.get_key('product_group')}")
@@ -69,7 +89,7 @@ class Recipe(object):
         fpmargs.append("--depends openssl-devel")
         fpmargs.append("--depends jemalloc-devel")
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.C.get_key(self.PACKAGE_NAME)['version']}-{build_number}.{distribution}.{self.ARCH}.rpm"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.rpm"
         )
         fpmargs.append(f"--rpm-user {self.C.get_key('product_user')}")
         fpmargs.append(f"--rpm-group {self.C.get_key('product_group')}")
@@ -102,7 +122,7 @@ class Recipe(object):
 
     def pacman(self, fpmargs, build_number, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.C.get_key(self.PACKAGE_NAME)['version']}-{build_number}.{distribution}.{self.ARCH}.pacman"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.pacman"
         )
         fpmargs.append(
             f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}"
@@ -121,7 +141,7 @@ class Recipe(object):
 
     def osxpkg(self, fpmargs, build_number, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.C.get_key(self.PACKAGE_NAME)['version']}-{build_number}.{distribution}.osxpkg"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.osxpkg"
         )
         fpmargs.append("-t osxpkg")
         return fpmargs

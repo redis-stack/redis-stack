@@ -8,6 +8,7 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.6"
 PyYAML = "^6.0"
+semver = "3.0.0dev3"
 
 [tool.poetry.dev-dependencies]
 invoke = "^1.6.0"

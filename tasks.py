@@ -27,7 +27,7 @@ def clean(c):
     'target': 'target package type to build (eg: deb)',
     'arch': 'architecture (eg: x86_64)',
     'build_number': 'build number (defaults to 1)',
-    'package': 'packate to build {redis_stack|redis_stack_server}',
+    'package': 'package to build {redis_stack|redis_stack_server}',
 })
 def package(
     c, osname='Linux', osnick='', dist='',
@@ -55,3 +55,11 @@ def package(
         f"-I",
     ]
     run(' '.join(cmd))
+    
+@task(help={
+    'package': 'package to build {redis_stack|redis_stack_server}'
+})
+def version(c, package='redis-stack-server'):
+    """Return the version, according to our rules"""
+    from stack import get_version
+    print(get_version(package))

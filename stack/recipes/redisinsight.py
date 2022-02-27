@@ -48,7 +48,7 @@ class RedisInsight(Recipe):
             f"-n {c.get_key(self.PACKAGE_NAME)['product']}",
             f"--architecture {self.ARCH}",
             f"--vendor '{c.get_key('vendor')}'",
-            f"--version {c.get_key(self.PACKAGE_NAME)['version']}",
+            f"--version {self.version}",
             f"--url '{c.get_key('url')}'",
             f"--license {c.get_key('license')}",
             f"--category server",
@@ -59,7 +59,7 @@ class RedisInsight(Recipe):
 
     def deb(self, fpmargs, build_number, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.C.get_key(self.PACKAGE_NAME)['version']}-{build_number}.{distribution}.{self.ARCH}.deb"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.deb"
         )
         fpmargs.append(f"--deb-user {self.C.get_key('product_user')}")
         fpmargs.append(f"--deb-group {self.C.get_key('product_group')}")
@@ -91,7 +91,7 @@ class RedisInsight(Recipe):
 
     def rpm(self, fpmargs, build_number, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.C.get_key(self.PACKAGE_NAME)['version']}-{build_number}.{distribution}.{self.ARCH}.rpm"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.rpm"
         )
         fpmargs.append(f"--rpm-user {self.C.get_key('product_user')}")
         fpmargs.append(f"--rpm-group {self.C.get_key('product_group')}")
@@ -122,7 +122,7 @@ class RedisInsight(Recipe):
 
     def pacman(self, fpmargs, build_number, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.C.get_key(self.PACKAGE_NAME)['version']}-{build_number}.{distribution}.{self.ARCH}.pacman"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.pacman"
         )
         fpmargs.append(
             f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}"
@@ -153,7 +153,7 @@ class RedisInsight(Recipe):
 
     def osxpkg(self, fpmargs, build_number, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.C.get_key(self.PACKAGE_NAME)['version']}-{build_number}.{distribution}.osxpkg"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.osxpkg"
         )
         fpmargs.append("-t osxpkg")
         return fpmargs

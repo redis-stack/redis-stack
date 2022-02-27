@@ -73,14 +73,14 @@ jobs:
       run: |
         cd redis-stack
         source .venv/bin/activate
-        rm -f *.osxpkg
-        invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t ${{env.target}} -p redis-stack-server
+        rm -f *.${{env.target}}
+        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t ${{env.target}} -p redis-stack-server
     - name: perist redis-stack-server package
       uses: actions/upload-artifact@v2
       with:
         name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
         path: |
-          redis-stack/redis-stack-server*.osxpkg
+          redis-stack/redis-stack-server*.${{env.target}}
 
     - name: build redis-stack package
       run: |
@@ -93,7 +93,22 @@ jobs:
       with:
         name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
         path: |
-          redis-stack/redis-stack-*.osxpkg
+          redis-stack/redis-stack-*.${{env.target}}
+    - uses: s3-actions/s3cmd@v1.1
+      with:
+        provider: aws
+        region: us-east-1
+        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    - name: upload snapshots
+      if: startsWith(github.ref, 'refs/tags/') != true
+      run: |
+        s3cmd put redis-stack/*.${{env.target}} s3://redismodules/redis-stack/snapshots/
+    - name: upload release
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        s3cmd put redis-stack/*.${{env.target}} s3://redismodules/redis-stack/
+
 
   build-ubuntu-focal:
     name: Focal (x86_64) Build
@@ -163,13 +178,29 @@ jobs:
       - name: build redis-stack-server
         run: |
           source .venv/bin/activate
-          invoke package -b ${{github.run_id}} -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
+          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
       - name: perist packages
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
           path: |
-            ${{ matrix.package }}*.deb
+            ${{ matrix.package }}*.${{env.target}}
+
+      - uses: s3-actions/s3cmd@v1.1
+        with:
+          provider: aws
+          region: us-east-1
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: upload snapshots
+        if: startsWith(github.ref, 'refs/tags/') != true
+        run: |
+          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+      - name: upload release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/
+
 
   build-ubuntu-bionic:
     name: Bionic (x86_64) Build
@@ -244,7 +275,21 @@ jobs:
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
           path: |
-            ${{ matrix.package }}*.deb
+            ${{ matrix.package }}*.${{env.target}}
+      - uses: s3-actions/s3cmd@v1.1
+        with:
+          provider: aws
+          region: us-east-1
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: upload snapshots
+        if: startsWith(github.ref, 'refs/tags/') != true
+        run: |
+          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+      - name: upload release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/
 
 
   build-ubuntu-xenial:
@@ -321,7 +366,21 @@ jobs:
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
           path: |
-            ${{ matrix.package }}*.deb
+            ${{ matrix.package }}*.${{env.target}}
+      - uses: s3-actions/s3cmd@v1.1
+        with:
+          provider: aws
+          region: us-east-1
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: upload snapshots
+        if: startsWith(github.ref, 'refs/tags/') != true
+        run: |
+          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+      - name: upload release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/
 
 
   build-rhel-7:
@@ -400,7 +459,21 @@ jobs:
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
           path: |
-            ${{ matrix.package }}*.rpm
+            ${{ matrix.package }}*.${{env.target}}
+      - uses: s3-actions/s3cmd@v1.1
+        with:
+          provider: aws
+          region: us-east-1
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: upload snapshots
+        if: startsWith(github.ref, 'refs/tags/') != true
+        run: |
+          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+      - name: upload release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/
 
 
   build-rhel-8:
@@ -479,7 +552,21 @@ jobs:
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
           path: |
-            ${{ matrix.package }}*.rpm
+            ${{ matrix.package }}*.${{env.target}}
+      - uses: s3-actions/s3cmd@v1.1
+        with:
+          provider: aws
+          region: us-east-1
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: upload snapshots
+        if: startsWith(github.ref, 'refs/tags/') != true
+        run: |
+          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+      - name: upload release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          s3cmd put *.${{env.target}} s3://redismodules/redis-stack/
 
   dockers:
     name: redis-stack-server docker
@@ -494,6 +581,18 @@ jobs:
     needs: [package-focal]
     steps:
       - uses: actions/checkout@v2
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+
       - uses: actions/download-artifact@v2
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.deb
@@ -504,6 +603,14 @@ jobs:
           path: redis-stack
       - name: display structure
         run: ls -R
+
+      - name: get package version
+        id: get_version
+        run: |
+          poetry install
+          source .venv/bin/activate
+          realversion=`invoke version -p ${{ matrix.package }}`
+          echo "::set-output name=VERSION::$realversion"
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -511,8 +618,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: build docker
         run: |
-          docker build -f Dockerfile.${{ matrix.package }} -t redislabs/${{ matrix.package }}:latest .
-          docker push redislabs/${{ matrix.package }}:latest
+          docker build -f Dockerfile.${{ matrix.package }} -t redislabs/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} .
+          docker push redislabs/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
 
 
   # package-snap:
