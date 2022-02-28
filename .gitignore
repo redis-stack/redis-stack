@@ -14,6 +14,7 @@ __pycache__
 *.osxpkg
 *.pacman
 *.snap
+*.zip
 
 *.rdb
 *.lock

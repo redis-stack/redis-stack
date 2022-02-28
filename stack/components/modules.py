@@ -45,7 +45,7 @@ class Modules(object):
         """rejson specific fetch"""
         if version is None:
             version = self.C.get_key("rejson")
-        self._run("redisgraph", None)
+        self._run("rejson", version)
 
     def redisgraph(self, version: Union[str, None] = None):
         """redisgraph specific fetch"""

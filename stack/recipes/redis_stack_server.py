@@ -39,7 +39,6 @@ class RedisStackServer(Recipe):
             m.redistimeseries,
             m.rejson,
             m.redisbloom,
-            # self.redisgears, self.redisai
         ]:
             try:
                 if version_override is None:
