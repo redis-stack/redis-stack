@@ -4,8 +4,8 @@
 BASEDIR=/opt/redis-stack
 cd ${BASEDIR}
 
-if [ -f /redis-stack.conf ]; then
 CMD=${BASEDIR}/bin/redis-server
+if [ -f /redis-stack.conf ]; then
     CONFFILE=/redis-stack.conf
 fi
 

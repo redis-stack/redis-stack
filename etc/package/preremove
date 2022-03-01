@@ -3,3 +3,10 @@
 if [ -f /usr/bin/systemctl ]; then
     systemctl stop redis-stack redis-stack-redis redisinsight
 fi
+
+for i in redis-cli redis-benchmark redis-check-aof redis-check-rdb redis-cli redis-sentinel redis-server; do
+    RES=`readlink /usr/bin/$i`
+    if [ ${RES} == /opt/redis-stack/bin/$i ]; then
+        rm /usr/bin/$i
+    fi
+done
