@@ -68,9 +68,10 @@ def package(
     run(' '.join(cmd))
 
 @task(help={
-    'package': 'package to build {redis_stack|redis_stack_server}'
+    'package': 'package to build {redis_stack|redis_stack_server}',
+    'docker': 'if set to any value replace 99.99.99 for docker version with edge'
 })
-def version(c, package='redis-stack-server'):
+def version(c, package='redis-stack-server', docker=None):
     """Return the version, according to our rules"""
     from stack import get_version
-    print(get_version(package))
+    print(get_version(package, docker))
