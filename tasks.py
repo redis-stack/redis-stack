@@ -2,21 +2,30 @@ from invoke import run, task
 import os
 import shutil
 import sys
+import jinja2
 
 @task
 def build_redis(c, redis_repo_path="redis", build_args="all BUILD_TLS=yes"):
     """compile redis"""
     redispath = os.path.join(os.getcwd(), redis_repo_path, "src")
     run(f"make -C {redispath} -j `nproc` {build_args}")
-
-
-@task
-def clean(c):
-    from assemble import DISTDIR, EXTERNAL, WORKDIR
-
-    for i in [DISTDIR, EXTERNAL, WORKDIR]:
-        shutil.rmtree(i, ignore_errors=True)
-    run("rm *.deb *.rpm *.ospkg")
+    
+    
+@task(help={
+    'docker_type': 'docker type [redis-stack, redis-stack-server]',
+})
+def dockergen(c, docker_type='redis-stack'):
+    """Generate docker compile files"""
+    here = os.path.abspath(os.path.dirname(__file__))
+    src = os.path.join('dockers', 'dockerfile.tmpl')
+    dest = os.path.join(here, 'dockers', f'Dockerfile.{docker_type}')
+    loader = jinja2.FileSystemLoader(here)
+    env = jinja2.Environment(loader=loader)
+    tmpl = loader.load(name=src, environment=env)
+    
+    vars = {'docker_type': docker_type}
+    with open(dest, 'w+') as fp:
+        fp.write(tmpl.render(vars))
 
 
 @task(help={

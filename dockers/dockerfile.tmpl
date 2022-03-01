@@ -1,0 +1,35 @@
+FROM ubuntu:focal
+
+RUN apt-get update -qqy
+RUN apt-get upgrade -qqy
+RUN apt-get install -y libssl-dev libgomp1
+ADD ./redis-stack /var/cache/apt/redis-stack/
+{% if docker_type == 'redis-stack-server' %}
+COPY ./etc/entrypoint.redis-stack-server.sh /entrypoint.sh
+{% elif docker_type == 'redis-stack' %}
+COPY ./etc/entrypoint.redis-stack.sh /entrypoint.sh
+{% endif %}
+RUN chmod a+x /entrypoint.sh
+RUN touch /.dockerenv
+
+{% if docker_type == 'redis-stack-server' %}
+RUN dpkg -i /var/cache/apt/redis-stack/redis-stack-server*.deb
+{% elif docker_type == 'redis-stack' %}
+RUN dpkg -i /var/cache/apt/redis-stack/redis-stack*.deb
+RUN dpkg -i /var/cache/apt/redis-stack/redisinsight*.deb
+{% endif %}
+RUN rm -rf /var/cache/apt
+
+{% if docker_type == 'redis-stack-server' %}
+EXPOSE 6379
+{% elif docker_type == 'redis-stack' %}
+EXPOSE 6379 8001
+{% endif %}
+
+ENV REDISBLOOM_ARGS ""
+ENV REDISEARCH_ARGS ""
+ENV REJSON_ARGS ""
+ENV REDISTIMESERIES_ARGS ""
+ENV REDISGRAPH_ARGS ""
+
+CMD ["/entrypoint.sh"]

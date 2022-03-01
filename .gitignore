@@ -7,6 +7,7 @@ out
 .venv
 __pycache__
 .vscode
+dockers/Docker*
 
 # packages
 *.deb

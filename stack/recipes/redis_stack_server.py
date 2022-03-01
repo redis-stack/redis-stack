@@ -29,6 +29,7 @@ class RedisStackServer(Recipe):
             self.__PATHS__.LIBDIR,
             self.__PATHS__.BINDIR,
             self.__PATHS__.SHAREDIR,
+            self.__PATHS__.USRBINDIR,
         ]:
             os.makedirs(i, exist_ok=True, mode=0o755)
 
@@ -51,6 +52,11 @@ class RedisStackServer(Recipe):
                 else:
                     raise
 
+        logger.debug("Copying redis-stack-server script")
+        stackdest = os.path.join(self.__PATHS__.USRBINDIR, "redis-stack-server")
+        shutil.copyfile(os.path.join(self.__PATHS__.SCRIPTDIR, "redis-stack-server"), stackdest)
+        os.chmod(stackdest, mode=0o755)
+        
         logger.debug(f"Copying redis binaries from {binary_dir}")
         for i in [
             "redis-benchmark",

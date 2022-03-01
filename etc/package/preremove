@@ -1,6 +1,5 @@
 #!/bin/sh
 
 if [ -f /usr/bin/systemctl ]; then
-    systemctl stop redis-stack
-    systemctl disable redis-stack
+    systemctl stop redis-stack redis-stack-redis redisinsight
 fi
