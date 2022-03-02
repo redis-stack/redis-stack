@@ -22,6 +22,7 @@ ${REDISTIMESERIES_ARGS} \
 --loadmodule /opt/redis-stack/lib/rejson.so \
 ${REJSON_ARGS} \
 --loadmodule /opt/redis-stack/lib/redisbloom.so \
-${REDISBLOOM_ARGS}
+${REDISBLOOM_ARGS} \
+${REDIS_ARGS}
 
 ${BASEDIR}/nodejs/bin/node -r ${BASEDIR}/share/redisinsight/api/node_modules/dotenv/config share/redisinsight/api/dist/src/main.js dotenv_config_path=${BASEDIR}/share/redisinsight/.env

@@ -21,4 +21,5 @@ ${REDISTIMESERIES_ARGS} \
 --loadmodule /opt/redis-stack/lib/rejson.so \
 ${REJSON_ARGS} \
 --loadmodule /opt/redis-stack/lib/redisbloom.so \
-${REDISBLOOM_ARGS}
+${REDISBLOOM_ARGS} \
+${REDIS_ARGS}
