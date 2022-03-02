@@ -2,6 +2,11 @@
 
 There are two dockers that we build:
 
+* redis-stack - redis, the modules, and redisinsight
+* redis-stack-server - redis and the modules
+
+Examples below highlight redis-stack, but the only actual difference is a lack of port *8001*
+
 
 Environment variables that can be set on the docker image:
 
