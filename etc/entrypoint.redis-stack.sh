@@ -9,10 +9,12 @@ if [ -f /redis-stack.conf ]; then
     CONFFILE=/redis-stack.conf
 fi
 
+${BASEDIR}/nodejs/bin/node -r ${BASEDIR}/share/redisinsight/api/node_modules/dotenv/config share/redisinsight/api/dist/src/main.js dotenv_config_path=${BASEDIR}/share/redisinsight/.env 2>&1>/dev/null &
+
 ${CMD} \
 ${CONFFILE} -- \
 --protected-mode no \
---daemonize yes \
+--daemonize no \
 --loadmodule /opt/redis-stack/lib/redisearch.so \
 ${REDISEARCH_ARGS} \
 --loadmodule /opt/redis-stack/lib/redisgraph.so \
@@ -24,5 +26,3 @@ ${REJSON_ARGS} \
 --loadmodule /opt/redis-stack/lib/redisbloom.so \
 ${REDISBLOOM_ARGS} \
 ${REDIS_ARGS}
-
-${BASEDIR}/nodejs/bin/node -r ${BASEDIR}/share/redisinsight/api/node_modules/dotenv/config share/redisinsight/api/dist/src/main.js dotenv_config_path=${BASEDIR}/share/redisinsight/.env
