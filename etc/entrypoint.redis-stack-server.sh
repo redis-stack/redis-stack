@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/dumb-init /bin/sh
 
 ### docker entrypoint script, for starting redis stack
 BASEDIR=/opt/redis-stack

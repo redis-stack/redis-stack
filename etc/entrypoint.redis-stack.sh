@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/dumb-init /bin/sh
 
 ### docker entrypoint script, for starting redis stack
 BASEDIR=/opt/redis-stack
@@ -9,7 +9,7 @@ if [ -f /redis-stack.conf ]; then
     CONFFILE=/redis-stack.conf
 fi
 
-${BASEDIR}/nodejs/bin/node -r ${BASEDIR}/share/redisinsight/api/node_modules/dotenv/config share/redisinsight/api/dist/src/main.js dotenv_config_path=${BASEDIR}/share/redisinsight/.env 2>&1>/dev/null &
+${BASEDIR}/nodejs/bin/node -r ${BASEDIR}/share/redisinsight/api/node_modules/dotenv/config share/redisinsight/api/dist/src/main.js dotenv_config_path=${BASEDIR}/share/redisinsight/.env &
 
 ${CMD} \
 ${CONFFILE} -- \

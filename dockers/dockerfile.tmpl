@@ -2,6 +2,7 @@ FROM ubuntu:focal
 
 RUN apt-get update -qqy
 RUN apt-get upgrade -qqy
+RUN apt-get install dumb-init
 RUN apt-get install -y libssl-dev libgomp1
 ADD ./redis-stack /var/cache/apt/redis-stack/
 RUN touch /.dockerenv
