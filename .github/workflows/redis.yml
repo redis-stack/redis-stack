@@ -83,122 +83,124 @@ jobs:
       osnick: rhel8
       arch: x86_64
       target: rpm
-      build_deps: dnf install -y oracle-epel-release-el8 gcc make jemalloc-devel openssl-devel tar git
+      build_deps: |
+        dnf install -y oracle-epel-release-el8 
+        dnf install -y gcc make jemalloc-devel openssl-devel tar git
       packaging_deps: sudo apt-get install -y rpm unzip
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-#   build-package-osx:
-#     name: Mac (x86_64) Build
-#     env:
-#       arch: x86_64
-#       osnick: catalina
-#       target: osxpkg
-#       platform: catalina
-#       osname: macos
+  build-package-osx:
+    name: Mac (x86_64) Build
+    env:
+      arch: x86_64
+      osnick: catalina
+      target: osxpkg
+      platform: catalina
+      osname: macos
 
-#     runs-on: macos-latest
-#     steps:
-#     - uses: ruby/setup-ruby@v1
-#       with:
-#         ruby-version: ${{env.rubyversion}}
-#     - name: install python
-#       uses: actions/setup-python@v2
-#       with:
-#         python-version: "${{ env.pythonversion }}"
-#     - name: install poetry
-#       uses: snok/install-poetry@v1
-#       with:
-#         version: latest
-#         virtualenvs-in-project: true
-#         virtualenvs-create: true
-#         installer-parallel: true
+    runs-on: macos-latest
+    steps:
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{env.rubyversion}}
+    - name: install python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "${{ env.pythonversion }}"
+    - name: install poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-in-project: true
+        virtualenvs-create: true
+        installer-parallel: true
 
-#     - name: checkout sources
-#       uses: actions/checkout@v2
-#       with:
-#         path: redis-stack
-#     - name: clone redis
-#       uses: actions/checkout@v2
-#       with:
-#         repository: redis/redis
-#         path: redis
-#         ref: ${{env.redisversion}}
-#     - name: install dependencies
-#       run: |
-#         brew install openssl
-#         gem install fpm -v ${{env.fpmversion}}
-#         cd redis-stack
-#         poetry install
-#     - name: build redis from source
-#       run: |
-#         cd redis-stack
-#         source .venv/bin/activate
-#         invoke build-redis -r ../redis
-#     - name: perist redis
-#       uses: actions/upload-artifact@v2
-#       with:
-#         name: redis-${{env.redisversion}}-osx
-#         path: |
-#           redis/src/redis-server
-#           redis/src/redis-sentinel
-#           redis/src/redis-check-aof
-#           redis/src/redis-check-rdb
-#           redis/src/redis-benchmark
-#           redis/src/redis-cli
+    - name: checkout sources
+      uses: actions/checkout@v2
+      with:
+        path: redis-stack
+    - name: clone redis
+      uses: actions/checkout@v2
+      with:
+        repository: redis/redis
+        path: redis
+        ref: ${{env.redisversion}}
+    - name: install dependencies
+      run: |
+        brew install openssl
+        gem install fpm -v ${{env.fpmversion}}
+        cd redis-stack
+        poetry install
+    - name: build redis from source
+      run: |
+        cd redis-stack
+        source .venv/bin/activate
+        invoke build-redis -r ../redis
+    - name: perist redis
+      uses: actions/upload-artifact@v2
+      with:
+        name: redis-${{env.redisversion}}-osx
+        path: |
+          redis/src/redis-server
+          redis/src/redis-sentinel
+          redis/src/redis-check-aof
+          redis/src/redis-check-rdb
+          redis/src/redis-benchmark
+          redis/src/redis-cli
 
-#     - name: build redis-stack-server package
-#       run: |
-#         cd redis-stack
-#         source .venv/bin/activate
-#         rm -f *.${{env.target}}
-#         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t ${{env.target}} -p redis-stack-server
-#         mkdir s3dist
-#         cp *.${{env.target}} s3dist
-#     - name: perist redis-stack-server package
-#       uses: actions/upload-artifact@v2
-#       with:
-#         name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
-#         path: |
-#           redis-stack/redis-stack-server*.${{env.target}}
+    - name: build redis-stack-server package
+      run: |
+        cd redis-stack
+        source .venv/bin/activate
+        rm -f *.${{env.target}}
+        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t ${{env.target}} -p redis-stack-server
+        mkdir s3dist
+        cp *.${{env.target}} s3dist
+    - name: perist redis-stack-server package
+      uses: actions/upload-artifact@v2
+      with:
+        name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
+        path: |
+          redis-stack/redis-stack-server*.${{env.target}}
 
-#     - name: build redis-stack package
-#       run: |
-#         cd redis-stack
-#         source .venv/bin/activate
-#         rm -f *.osxpkg
-#         invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t ${{env.target}} -p redis-stack
-#         cp *.${{env.target}} s3dist
+    - name: build redis-stack package
+      run: |
+        cd redis-stack
+        source .venv/bin/activate
+        rm -f *.osxpkg
+        invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t ${{env.target}} -p redis-stack
+        cp *.${{env.target}} s3dist
 
-#     - name: build the redis-stack-server zipfile (for homebrew)
-#       run: |
-#         cd redis-stack
-#         source .venv/bin/activate
-#         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server
-#         cp *.zip s3dist
-#     - name: perist redis-stack package
-#       uses: actions/upload-artifact@v2
-#       with:
-#         name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
-#         path: |
-#           redis-stack/redis-stack-*.${{env.target}}
-#     - uses: s3-actions/s3cmd@v1.1
-#       with:
-#         provider: aws
-#         region: us-east-1
-#         access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#     - name: upload snapshots
-#       if: startsWith(github.ref, 'refs/tags/') != true
-#       run: |
-#         s3cmd put -P redis-stack/s3dist/*.${{env.target}} s3://redismodules/redis-stack/snapshots/
-#         s3cmd put -P redis-stack/s3dist/*.zip s3://redismodules/redis-stack/snapshots/
-#     - name: upload release
-#       if: startsWith(github.ref, 'refs/tags/')
-#       run: |
-#         s3cmd put -P redis-stack/s3dist/*.${{env.target}} s3://redismodules/redis-stack/
-#         s3cmd put -P redis-stack/s3dist/*.zip s3://redismodules/redis-stack/
+    - name: build the redis-stack-server zipfile (for homebrew)
+      run: |
+        cd redis-stack
+        source .venv/bin/activate
+        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server
+        cp *.zip s3dist
+    - name: perist redis-stack package
+      uses: actions/upload-artifact@v2
+      with:
+        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
+        path: |
+          redis-stack/redis-stack-*.${{env.target}}
+    - uses: s3-actions/s3cmd@v1.1
+      with:
+        provider: aws
+        region: us-east-1
+        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    - name: upload snapshots
+      if: startsWith(github.ref, 'refs/tags/') != true
+      run: |
+        s3cmd put -P redis-stack/s3dist/*.${{env.target}} s3://redismodules/redis-stack/snapshots/
+        s3cmd put -P redis-stack/s3dist/*.zip s3://redismodules/redis-stack/snapshots/
+    - name: upload release
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        s3cmd put -P redis-stack/s3dist/*.${{env.target}} s3://redismodules/redis-stack/
+        s3cmd put -P redis-stack/s3dist/*.zip s3://redismodules/redis-stack/
 
 
 #   build-ubuntu-focal:
