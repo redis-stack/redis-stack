@@ -15,7 +15,7 @@ on:
 
 jobs:
   focal:
-    uses: redislabs/redis-stack/.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
     with:
       image_name: ubuntu:focal
       platform: focal
