@@ -53,7 +53,7 @@ on:
 jobs:
 
    build-redis:
-    name: ${{inputs.platform}} (${{inputs.arch}}) Build
+    name: Build ${{inputs.platform}} (${{inputs.arch}})
 
     env:
       redisversion: ${{inputs.redisversion}}
@@ -76,7 +76,7 @@ jobs:
         path: |
           /var/cache/apt
           /var/cache/yum
-        key: cache-${{inputs.osnick}}-${{inputs.arch}}-build
+        key: cache-${{hashFiles('**/redis.yml')}}-${{inputs.platform}}-${{inputs.arch}}-build
     - name: make
       run: make -C redis/src all BUILD_TLS=yes
     - name: perist redis
@@ -92,7 +92,7 @@ jobs:
           redis/src/redis-cli
 
    package:
-    name: ${{inputs.platform}} (${{inputs.arch}}) Package
+    name: Package ${{inputs.platform}} (${{inputs.arch}}) ${{matrix.package}}
     env:
       redisversion: ${{inputs.redisversion}}
       pythonversion: ${{inputs.pythonversion}}
@@ -121,7 +121,7 @@ jobs:
             ~/.cache/pip
             ~/.cache/pypoetry
             ~/.local/share/gem
-          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{inputs.osnick}}-${{inputs.arch}}-package
+          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{inputs.platform}}-${{inputs.arch}}-package
 
       - uses: ruby/setup-ruby@v1
       - name: install python

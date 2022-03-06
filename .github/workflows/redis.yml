@@ -132,6 +132,7 @@ jobs:
         repository: redis/redis
         path: redis
         ref: ${{env.redisversion}}
+
     - name: install dependencies
       run: |
         brew install openssl
@@ -207,6 +208,73 @@ jobs:
         s3cmd put -P redis-stack/s3dist/*.${{env.target}} s3://redismodules/redis-stack/
         s3cmd put -P redis-stack/s3dist/*.zip s3://redismodules/redis-stack/
 
+  dockers:
+    name: ${{matrix.package}} docker
+    strategy:
+      matrix:
+        package: ['redis-stack-server', 'redis-stack']
+    env:
+      platform: focal
+      arch: x86_64
+
+    runs-on: ubuntu-latest
+    needs: [focal]
+    steps:
+      - uses: actions/checkout@v2
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            /var/cache/apt
+            /var/cache/yum
+            ~/.cache/pip
+            ~/.cache/pypoetry
+            ~/.local/share/gem
+          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{inputs.platform}}-${{inputs.arch}}-package
+
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.deb
+          path: redis-stack
+      - uses: actions/download-artifact@v2
+        with:
+          name: redisinsight-${{env.platform}}-${{env.arch}}.deb
+          path: redis-stack
+      - name: display structure
+        run: ls -R
+
+      - name: get package version
+        id: get_version
+        run: |
+          poetry install
+          source .venv/bin/activate
+          realversion=`invoke version -p ${{ matrix.package }} -d true`
+          echo "::set-output name=VERSION::$realversion"
+      - name: generate docker file
+        run: |
+          source .venv/bin/activate
+          invoke dockergen -d ${{ matrix.package }}
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: build docker
+        run: |
+          docker build -f dockers/Dockerfile.${{ matrix.package }} -t redislabs/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} .
+          docker push redislabs/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
 #   # package-snap:
 #   #   runs-on: ubuntu-latest
 #   #   needs: [build-ubuntu-focal]
