@@ -120,7 +120,7 @@ jobs:
 
       - name: install packaging tools
         run: |
-          sudo ${{input.packaging_deps}}
+          sudo ${{inputs.packaging_deps}}
           poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
