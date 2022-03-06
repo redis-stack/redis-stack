@@ -1,0 +1,173 @@
+name: Build and Publish
+
+on:
+  workflow_call:
+    inputs:
+      image_name:
+        required: true
+        type: string
+      arch:
+        required: false
+        type: string
+        default: x86_64
+      osnick:
+        required: true
+        type: string
+      target:
+        required: true
+        type: string
+      platform:
+        required: true
+        type: string
+      osname:
+        required: true
+        type: string
+      build_deps:
+        required: true
+        type: string
+      packaging_deps:
+        required: true
+        type: string
+      redisversion: 
+        required: false
+        type: string
+        default: 6.2.6
+      pythonversion: 
+        required: false
+        type: string
+        default: 3.9
+      rubyversion:
+        required: false
+        type: string
+        default: 2.7.2
+      fpmversion:
+        required: false
+        type: string
+        default: 1.14.1
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+
+jobs:
+
+   build-redis:
+    name: Build ${{inputs.platform}} (${{inputs.arch}})
+
+    env:
+      redisversion: ${{inputs.redisversion}}
+      pythonversion: ${{inputs.pythonversion}}
+      fpmversion: ${{inputs.fpmversion}}
+      rubyversion: ${{inputs.rubyversion}}
+    runs-on: ubuntu-latest
+    container: ${{inputs.image_name}}
+    steps:
+    - name: install dependencies
+      run: ${{inputs.build_deps}}
+    - uses: actions/checkout@v2
+      with:
+        repository: redis/redis
+        path: redis
+        ref: ${{env.redisversion}}
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          /var/cache/apt
+          /var/cache/yum
+        key: cache-${{hashFiles('**/redis.yml')}}-${{inputs.platform}}-${{inputs.arch}}-build
+    - name: make
+      run: make -C redis/src all BUILD_TLS=yes
+    - name: perist redis
+      uses: actions/upload-artifact@v2
+      with:
+        name: redis-${{env.redisversion}}-${{inputs.platform}}
+        path: |
+          redis/src/redis-server
+          redis/src/redis-sentinel
+          redis/src/redis-check-aof
+          redis/src/redis-check-rdb
+          redis/src/redis-benchmark
+          redis/src/redis-cli
+
+   package:
+    name: Package ${{inputs.platform}} (${{inputs.arch}}) ${{matrix.package}}
+    env:
+      redisversion: ${{inputs.redisversion}}
+      pythonversion: ${{inputs.pythonversion}}
+      fpmversion: ${{inputs.fpmversion}}
+      rubyversion: ${{inputs.rubyversion}}
+      platform: ${{inputs.platform}}
+      osname: ${{inputs.osname}}
+      osnick: ${{inputs.osnick}}
+      arch: ${{inputs.arch}}
+      target: ${{inputs.target}}
+
+    runs-on: ubuntu-latest
+    needs: [build-redis]
+    strategy:
+      matrix:
+        package: ['redis-stack', 'redis-stack-server', 'redisinsight']
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            /var/cache/apt
+            /var/cache/yum
+            ~/.cache/pip
+            ~/.cache/pypoetry
+            ~/.local/share/gem
+          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{inputs.platform}}-${{inputs.arch}}-package
+
+      - uses: ruby/setup-ruby@v1
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+
+      - name: install packaging tools
+        run: |
+          sudo ${{inputs.packaging_deps}}
+          poetry install
+      - run: gem install fpm -v ${{env.fpmversion}}
+      - uses: actions/download-artifact@v2
+        with:
+          name: redis-${{env.redisversion}}-${{env.platform}}
+          path: deps/redis-${{env.redisversion}}-${{env.platform}}
+      - name: display structure
+        run: ls -R
+      - name: build ${{matrix.package}}
+        run: |
+          source .venv/bin/activate
+          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
+      - name: perist packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
+          path: |
+            ${{ matrix.package }}*.${{env.target}}
+      - uses: s3-actions/s3cmd@v1.1
+        with:
+          provider: aws
+          region: us-east-1
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: upload snapshots
+        if: startsWith(github.ref, 'refs/tags/') != true
+        run: |
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+      - name: upload release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
