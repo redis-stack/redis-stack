@@ -25,7 +25,7 @@ on:
       build_deps:
         required: true
         type: string
-      packging_deps:
+      packaging_deps:
         required: true
         type: string
       redisversion: 
