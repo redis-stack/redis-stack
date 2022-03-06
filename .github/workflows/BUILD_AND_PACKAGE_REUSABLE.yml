@@ -19,9 +19,6 @@ on:
       platform:
         required: true
         type: string
-      package_type:
-        required: true
-        type: string
       osname:
         required: true
         type: string
