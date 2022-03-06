@@ -5,8 +5,9 @@ BASEDIR=/opt/redis-stack
 cd ${BASEDIR}
 
 CMD=${BASEDIR}/bin/redis-server
-if [ -f /redis-stack.conf ]; then
-    CONFFILE=/redis-stack.conf
+if [ -f $1 ]; then
+    CONFFILE=$1
+    shift
 fi
 
 ${CMD} \
@@ -21,4 +22,5 @@ ${REDISTIMESERIES_ARGS} \
 --loadmodule /opt/redis-stack/lib/rejson.so \
 ${REJSON_ARGS} \
 --loadmodule /opt/redis-stack/lib/redisbloom.so \
-${REDISBLOOM_ARGS}
+${REDISBLOOM_ARGS} \
+S*
