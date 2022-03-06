@@ -30,7 +30,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   bionic:
-    uses: redislabs/redis-stack/.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
     with:
       image_name: ubuntu:bionic
       platform: bionic
