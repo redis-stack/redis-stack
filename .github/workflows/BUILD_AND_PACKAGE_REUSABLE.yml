@@ -19,6 +19,9 @@ on:
       platform:
         required: true
         type: string
+      package_type:
+        required: true
+        type: string
       osname:
         required: true
         type: string
@@ -59,7 +62,7 @@ jobs:
       redisversion: ${{inputs.redisversion}}
       pythonversion: ${{inputs.pythonversion}}
       fpmversion: ${{inputs.fpmversion}}
-      rubyversion: ${{iinputs.rubyversion}}
+      rubyversion: ${{inputs.rubyversion}}
     runs-on: ubuntu-latest
     container: ${{inputs.image_name}}
     steps:
@@ -90,7 +93,7 @@ jobs:
       redisversion: ${{inputs.redisversion}}
       pythonversion: ${{inputs.pythonversion}}
       fpmversion: ${{inputs.fpmversion}}
-      rubyversion: ${{iinputs.rubyversion}}
+      rubyversion: ${{inputs.rubyversion}}
       platform: ${{inputs.platform}}
       osname: ${{inputs.osname}}
       osnick: ${{inputs.osnick}}
