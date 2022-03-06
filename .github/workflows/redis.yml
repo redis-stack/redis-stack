@@ -13,772 +13,795 @@ on:
       - master
       - '[0-9].[0-9]'
 
-env:
-  redisversion: 6.2.6
-  pythonversion: 3.9
-  fpmversion: 1.14.1
-  rubyversion: 2.7.2
-
 jobs:
-
-  build-package-osx:
-    name: Mac (x86_64) Build
-    env:
-      arch: x86_64
-      osnick: catalina
-      target: osxpkg
-      platform: catalina
-      osname: macos
-
-    runs-on: macos-latest
-    steps:
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{env.rubyversion}}
-    - name: install python
-      uses: actions/setup-python@v2
-      with:
-        python-version: "${{ env.pythonversion }}"
-    - name: install poetry
-      uses: snok/install-poetry@v1
-      with:
-        version: latest
-        virtualenvs-in-project: true
-        virtualenvs-create: true
-        installer-parallel: true
-
-    - name: checkout sources
-      uses: actions/checkout@v2
-      with:
-        path: redis-stack
-    - name: clone redis
-      uses: actions/checkout@v2
-      with:
-        repository: redis/redis
-        path: redis
-        ref: ${{env.redisversion}}
-    - name: install dependencies
-      run: |
-        brew install openssl
-        gem install fpm -v ${{env.fpmversion}}
-        cd redis-stack
-        poetry install
-    - name: build redis from source
-      run: |
-        cd redis-stack
-        source .venv/bin/activate
-        invoke build-redis -r ../redis
-    - name: perist redis
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-${{env.redisversion}}-osx
-        path: |
-          redis/src/redis-server
-          redis/src/redis-sentinel
-          redis/src/redis-check-aof
-          redis/src/redis-check-rdb
-          redis/src/redis-benchmark
-          redis/src/redis-cli
-
-    - name: build redis-stack-server package
-      run: |
-        cd redis-stack
-        source .venv/bin/activate
-        rm -f *.${{env.target}}
-        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t ${{env.target}} -p redis-stack-server
-        mkdir s3dist
-        cp *.${{env.target}} s3dist
-    - name: perist redis-stack-server package
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
-        path: |
-          redis-stack/redis-stack-server*.${{env.target}}
-
-    - name: build redis-stack package
-      run: |
-        cd redis-stack
-        source .venv/bin/activate
-        rm -f *.osxpkg
-        invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t ${{env.target}} -p redis-stack
-        cp *.${{env.target}} s3dist
-
-    - name: build the redis-stack-server zipfile (for homebrew)
-      run: |
-        cd redis-stack
-        source .venv/bin/activate
-        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server
-        cp *.zip s3dist
-    - name: perist redis-stack package
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
-        path: |
-          redis-stack/redis-stack-*.${{env.target}}
-    - uses: s3-actions/s3cmd@v1.1
-      with:
-        provider: aws
-        region: us-east-1
-        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    - name: upload snapshots
-      if: startsWith(github.ref, 'refs/tags/') != true
-      run: |
-        s3cmd put -P redis-stack/s3dist/*.${{env.target}} s3://redismodules/redis-stack/snapshots/
-        s3cmd put -P redis-stack/s3dist/*.zip s3://redismodules/redis-stack/snapshots/
-    - name: upload release
-      if: startsWith(github.ref, 'refs/tags/')
-      run: |
-        s3cmd put -P redis-stack/s3dist/*.${{env.target}} s3://redismodules/redis-stack/
-        s3cmd put -P redis-stack/s3dist/*.zip s3://redismodules/redis-stack/
-
-
-  build-ubuntu-focal:
-    name: Focal (x86_64) Build
-    runs-on: ubuntu-latest
-    container: ubuntu:focal
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        repository: redis/redis
-        path: redis
-        ref: ${{env.redisversion}}
-    - name: install dependencies
-      run: apt-get update && apt-get install -y build-essential libssl-dev
-    - name: make
-      run: make -C redis/src all BUILD_TLS=yes
-    - name: perist redis
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-${{env.redisversion}}-focal
-        path: |
-          redis/src/redis-server
-          redis/src/redis-sentinel
-          redis/src/redis-check-aof
-          redis/src/redis-check-rdb
-          redis/src/redis-benchmark
-          redis/src/redis-cli
-
-  package-focal:
-    name: Focal (x86_64) Package
-    runs-on: ubuntu-latest
-    needs: [build-ubuntu-focal]
-    strategy:
-      matrix:
-        package: ['redis-stack', 'redis-stack-server', 'redisinsight']
-    env:
+  focal:
+    uses: redislabs/redis-stack/.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+    with:
+      image_name: ubuntu:focal
       platform: focal
       osname: Linux
       osnick: ubuntu20.04
       arch: x86_64
       target: deb
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-      - name: install python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{env.pythonversion}}
-      - name: install poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: latest
-          virtualenvs-in-project: true
-          virtualenvs-create: true
-          installer-parallel: true
+      build_deps: apt-get update && apt-get install -y build-essential libssl-dev
+      packaging_deps: sudo apt-get install -y rpm unzip
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: install packaging tools
-        run: |
-          sudo apt-get install -y rpm unzip
-          poetry install
-      - run: gem install fpm -v ${{env.fpmversion}}
-      - uses: actions/download-artifact@v2
-        with:
-          name: redis-${{env.redisversion}}-${{env.platform}}
-          path: deps/redis-${{env.redisversion}}-${{env.platform}}
-      - name: display structure
-        run: ls -R
-      - name: build redis-stack-server
-        run: |
-          source .venv/bin/activate
-          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
-      - name: perist packages
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
-          path: |
-            ${{ matrix.package }}*.${{env.target}}
-
-      - uses: s3-actions/s3cmd@v1.1
-        with:
-          provider: aws
-          region: us-east-1
-          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: upload snapshots
-        if: startsWith(github.ref, 'refs/tags/') != true
-        run: |
-          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
-      - name: upload release
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
-
-  build-buster:
-    name: Buster (x86_64) Build
-    runs-on: ubuntu-latest
-    container: debian:buster-slim
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        repository: redis/redis
-        path: redis
-        ref: ${{env.redisversion}}
-    - name: install dependencies
-      run: apt-get update && apt-get install -y build-essential libssl-dev
-    - name: make
-      run: make -C redis/src all BUILD_TLS=yes
-    - name: perist redis
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-${{env.redisversion}}-buster
-        path: |
-          redis/src/redis-server
-          redis/src/redis-sentinel
-          redis/src/redis-check-aof
-          redis/src/redis-check-rdb
-          redis/src/redis-benchmark
-          redis/src/redis-cli
-
-  package-buster:
-    name: Buster (x86_64) Package
-    runs-on: ubuntu-latest
-    needs: [build-buster]
-    strategy:
-      matrix:
-        package: ['redis-stack', 'redis-stack-server']
-    env:
-      platform: buster
-      osname: Linux
-      osnick: buster
-      arch: x86_64
-      target: deb
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-      - name: install python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{env.pythonversion}}
-      - name: install poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: latest
-          virtualenvs-in-project: true
-          virtualenvs-create: true
-          installer-parallel: true
-      - name: install packaging tools
-        run: |
-          sudo apt-get install -y rpm unzip
-          poetry install
-      - run: gem install fpm -v ${{env.fpmversion}}
-      - uses: actions/download-artifact@v2
-        with:
-          name: redis-${{env.redisversion}}-${{env.platform}}
-          path: deps/redis-${{env.redisversion}}-${{env.platform}}
-      - name: display structure
-        run: ls -R
-      - name: build redis-stack-server
-        run: |
-          source .venv/bin/activate
-          invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
-      - name: perist packages
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
-          path: |
-            ${{ matrix.package }}*.${{env.target}}
-      - uses: s3-actions/s3cmd@v1.1
-        with:
-          provider: aws
-          region: us-east-1
-          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: upload snapshots
-        if: startsWith(github.ref, 'refs/tags/') != true
-        run: |
-          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
-      - name: upload release
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
-
-  build-ubuntu-bionic:
-    name: Bionic (x86_64) Build
-    runs-on: ubuntu-latest
-    container: ubuntu:bionic
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        repository: redis/redis
-        path: redis
-        ref: ${{env.redisversion}}
-    - name: install dependencies
-      run: apt-get update && apt-get install -y build-essential libssl-dev
-    - name: make
-      run: make -C redis/src all BUILD_TLS=yes
-    - name: perist redis
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-${{env.redisversion}}-bionic
-        path: |
-          redis/src/redis-server
-          redis/src/redis-sentinel
-          redis/src/redis-check-aof
-          redis/src/redis-check-rdb
-          redis/src/redis-benchmark
-          redis/src/redis-cli
-
-  package-bionic:
-    name: Bionic (x86_64) Package
-    runs-on: ubuntu-latest
-    needs: [build-ubuntu-bionic]
-    strategy:
-      matrix:
-        package: ['redis-stack', 'redis-stack-server']
-    env:
+  bionic:
+    uses: redislabs/redis-stack/.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+    with:
+      image_name: ubuntu:bionic
       platform: bionic
       osname: Linux
       osnick: ubuntu18.04
       arch: x86_64
       target: deb
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-      - name: install python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{env.pythonversion}}
-      - name: install poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: latest
-          virtualenvs-in-project: true
-          virtualenvs-create: true
-          installer-parallel: true
-      - name: install packaging tools
-        run: |
-          sudo apt-get install -y rpm unzip
-          poetry install
-      - run: gem install fpm -v ${{env.fpmversion}}
-      - uses: actions/download-artifact@v2
-        with:
-          name: redis-${{env.redisversion}}-${{env.platform}}
-          path: deps/redis-${{env.redisversion}}-${{env.platform}}
-      - name: display structure
-        run: ls -R
-      - name: build redis-stack-server
-        run: |
-          source .venv/bin/activate
-          invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
-      - name: perist packages
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
-          path: |
-            ${{ matrix.package }}*.${{env.target}}
-      - uses: s3-actions/s3cmd@v1.1
-        with:
-          provider: aws
-          region: us-east-1
-          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: upload snapshots
-        if: startsWith(github.ref, 'refs/tags/') != true
-        run: |
-          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
-      - name: upload release
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
+      build_deps: apt-get update && apt-get install -y build-essential libssl-dev
+      packaging_deps: sudo apt-get install -y rpm unzip
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+#   build-package-osx:
+#     name: Mac (x86_64) Build
+#     env:
+#       arch: x86_64
+#       osnick: catalina
+#       target: osxpkg
+#       platform: catalina
+#       osname: macos
+
+#     runs-on: macos-latest
+#     steps:
+#     - uses: ruby/setup-ruby@v1
+#       with:
+#         ruby-version: ${{env.rubyversion}}
+#     - name: install python
+#       uses: actions/setup-python@v2
+#       with:
+#         python-version: "${{ env.pythonversion }}"
+#     - name: install poetry
+#       uses: snok/install-poetry@v1
+#       with:
+#         version: latest
+#         virtualenvs-in-project: true
+#         virtualenvs-create: true
+#         installer-parallel: true
+
+#     - name: checkout sources
+#       uses: actions/checkout@v2
+#       with:
+#         path: redis-stack
+#     - name: clone redis
+#       uses: actions/checkout@v2
+#       with:
+#         repository: redis/redis
+#         path: redis
+#         ref: ${{env.redisversion}}
+#     - name: install dependencies
+#       run: |
+#         brew install openssl
+#         gem install fpm -v ${{env.fpmversion}}
+#         cd redis-stack
+#         poetry install
+#     - name: build redis from source
+#       run: |
+#         cd redis-stack
+#         source .venv/bin/activate
+#         invoke build-redis -r ../redis
+#     - name: perist redis
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: redis-${{env.redisversion}}-osx
+#         path: |
+#           redis/src/redis-server
+#           redis/src/redis-sentinel
+#           redis/src/redis-check-aof
+#           redis/src/redis-check-rdb
+#           redis/src/redis-benchmark
+#           redis/src/redis-cli
+
+#     - name: build redis-stack-server package
+#       run: |
+#         cd redis-stack
+#         source .venv/bin/activate
+#         rm -f *.${{env.target}}
+#         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t ${{env.target}} -p redis-stack-server
+#         mkdir s3dist
+#         cp *.${{env.target}} s3dist
+#     - name: perist redis-stack-server package
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
+#         path: |
+#           redis-stack/redis-stack-server*.${{env.target}}
+
+#     - name: build redis-stack package
+#       run: |
+#         cd redis-stack
+#         source .venv/bin/activate
+#         rm -f *.osxpkg
+#         invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t ${{env.target}} -p redis-stack
+#         cp *.${{env.target}} s3dist
+
+#     - name: build the redis-stack-server zipfile (for homebrew)
+#       run: |
+#         cd redis-stack
+#         source .venv/bin/activate
+#         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server
+#         cp *.zip s3dist
+#     - name: perist redis-stack package
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
+#         path: |
+#           redis-stack/redis-stack-*.${{env.target}}
+#     - uses: s3-actions/s3cmd@v1.1
+#       with:
+#         provider: aws
+#         region: us-east-1
+#         access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#     - name: upload snapshots
+#       if: startsWith(github.ref, 'refs/tags/') != true
+#       run: |
+#         s3cmd put -P redis-stack/s3dist/*.${{env.target}} s3://redismodules/redis-stack/snapshots/
+#         s3cmd put -P redis-stack/s3dist/*.zip s3://redismodules/redis-stack/snapshots/
+#     - name: upload release
+#       if: startsWith(github.ref, 'refs/tags/')
+#       run: |
+#         s3cmd put -P redis-stack/s3dist/*.${{env.target}} s3://redismodules/redis-stack/
+#         s3cmd put -P redis-stack/s3dist/*.zip s3://redismodules/redis-stack/
 
 
-  build-ubuntu-xenial:
-    name: Xenial (x86_64) Build
-    runs-on: ubuntu-latest
-    container: ubuntu:xenial
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        repository: redis/redis
-        path: redis
-        ref: ${{env.redisversion}}
-    - name: install dependencies
-      run: apt-get update && apt-get install -y build-essential libssl-dev
-    - name: make
-      run: make -C redis/src all BUILD_TLS=yes
-    - name: perist redis
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-${{env.redisversion}}-xenial
-        path: |
-          redis/src/redis-server
-          redis/src/redis-sentinel
-          redis/src/redis-check-aof
-          redis/src/redis-check-rdb
-          redis/src/redis-benchmark
-          redis/src/redis-cli
+#   build-ubuntu-focal:
+#     name: Focal (x86_64) Build
+#     runs-on: ubuntu-latest
+#     container: ubuntu:focal
+#     steps:
+#     - uses: actions/checkout@v2
+#       with:
+#         repository: redis/redis
+#         path: redis
+#         ref: ${{env.redisversion}}
+#     - name: install dependencies
+#       run: apt-get update && apt-get install -y build-essential libssl-dev
+#     - name: make
+#       run: make -C redis/src all BUILD_TLS=yes
+#     - name: perist redis
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: redis-${{env.redisversion}}-focal
+#         path: |
+#           redis/src/redis-server
+#           redis/src/redis-sentinel
+#           redis/src/redis-check-aof
+#           redis/src/redis-check-rdb
+#           redis/src/redis-benchmark
+#           redis/src/redis-cli
 
-  package-xenial:
-    name: Xenial (x86_64) Package
-    runs-on: ubuntu-latest
-    needs: [build-ubuntu-xenial]
-    strategy:
-      matrix:
-        package: ['redis-stack', 'redis-stack-server']
-    env:
-      platform: xenial
-      osname: Linux
-      osnick: ubuntu16.04
-      arch: x86_64
-      target: deb
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-      - name: install python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{env.pythonversion}}
-      - name: install poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: latest
-          virtualenvs-in-project: true
-          virtualenvs-create: true
-          installer-parallel: true
+#   package-focal:
+#     name: Focal (x86_64) Package
+#     runs-on: ubuntu-latest
+#     needs: [build-ubuntu-focal]
+#     strategy:
+#       matrix:
+#         package: ['redis-stack', 'redis-stack-server', 'redisinsight']
+#     env:
+#       platform: focal
+#       osname: Linux
+#       osnick: ubuntu20.04
+#       arch: x86_64
+#       target: deb
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: ruby/setup-ruby@v1
+#       - name: install python
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: ${{env.pythonversion}}
+#       - name: install poetry
+#         uses: snok/install-poetry@v1
+#         with:
+#           version: latest
+#           virtualenvs-in-project: true
+#           virtualenvs-create: true
+#           installer-parallel: true
 
-      - name: install packaging tools
-        run: |
-          sudo apt-get install -y rpm unzip
-          poetry install
-      - run: gem install fpm -v ${{env.fpmversion}}
-      - uses: actions/download-artifact@v2
-        with:
-          name: redis-${{env.redisversion}}-${{env.platform}}
-          path: deps/redis-${{env.redisversion}}-${{env.platform}}
-      - name: display structure
-        run: ls -R
-      - name: build redis-stack-server
-        run: |
-          source .venv/bin/activate
-          invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
-      - name: perist packages
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
-          path: |
-            ${{ matrix.package }}*.${{env.target}}
-      - uses: s3-actions/s3cmd@v1.1
-        with:
-          provider: aws
-          region: us-east-1
-          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: upload snapshots
-        if: startsWith(github.ref, 'refs/tags/') != true
-        run: |
-          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
-      - name: upload release
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
+#       - name: install packaging tools
+#         run: |
+#           sudo apt-get install -y rpm unzip
+#           poetry install
+#       - run: gem install fpm -v ${{env.fpmversion}}
+#       - uses: actions/download-artifact@v2
+#         with:
+#           name: redis-${{env.redisversion}}-${{env.platform}}
+#           path: deps/redis-${{env.redisversion}}-${{env.platform}}
+#       - name: display structure
+#         run: ls -R
+#       - name: build redis-stack-server
+#         run: |
+#           source .venv/bin/activate
+#           invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
+#       - name: perist packages
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
+#           path: |
+#             ${{ matrix.package }}*.${{env.target}}
 
+#       - uses: s3-actions/s3cmd@v1.1
+#         with:
+#           provider: aws
+#           region: us-east-1
+#           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#       - name: upload snapshots
+#         if: startsWith(github.ref, 'refs/tags/') != true
+#         run: |
+#           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+#       - name: upload release
+#         if: startsWith(github.ref, 'refs/tags/')
+#         run: |
+#           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
 
-  build-rhel-7:
-    name: RHEL7 (x86_64) Build
-    runs-on: ubuntu-latest
-    container: centos:7
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        repository: redis/redis
-        path: redis
-        ref: ${{env.redisversion}}
-    - name: install dependencies
-      run: |
-        yum -y install epel-release
-        yum -y install gcc make jemalloc-devel openssl-devel
-    - name: make
-      run: make -C redis/src all BUILD_TLS=yes
-    - name: perist redis
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-${{env.redisversion}}-rhel7
-        path: |
-          redis/src/redis-server
-          redis/src/redis-sentinel
-          redis/src/redis-check-aof
-          redis/src/redis-check-rdb
-          redis/src/redis-benchmark
-          redis/src/redis-cli
+#   build-buster:
+#     name: Buster (x86_64) Build
+#     runs-on: ubuntu-latest
+#     container: debian:buster-slim
+#     steps:
+#     - uses: actions/checkout@v2
+#       with:
+#         repository: redis/redis
+#         path: redis
+#         ref: ${{env.redisversion}}
+#     - name: install dependencies
+#       run: apt-get update && apt-get install -y build-essential libssl-dev
+#     - name: make
+#       run: make -C redis/src all BUILD_TLS=yes
+#     - name: perist redis
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: redis-${{env.redisversion}}-buster
+#         path: |
+#           redis/src/redis-server
+#           redis/src/redis-sentinel
+#           redis/src/redis-check-aof
+#           redis/src/redis-check-rdb
+#           redis/src/redis-benchmark
+#           redis/src/redis-cli
 
-  package-rhel7:
-    name: RHEL7 (x86_64) Package
-    runs-on: ubuntu-latest
-    needs: [build-rhel-7]
-    strategy:
-      matrix:
-        package: ['redis-stack', 'redis-stack-server']
-    env:
-      platform: rhel7
-      osname: Linux
-      osnick: rhel7
-      arch: x86_64
-      target: rpm
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-      - name: install python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{env.pythonversion}}
-      - name: install poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: latest
-          virtualenvs-in-project: true
-          virtualenvs-create: true
-          installer-parallel: true
+#   package-buster:
+#     name: Buster (x86_64) Package
+#     runs-on: ubuntu-latest
+#     needs: [build-buster]
+#     strategy:
+#       matrix:
+#         package: ['redis-stack', 'redis-stack-server']
+#     env:
+#       platform: buster
+#       osname: Linux
+#       osnick: buster
+#       arch: x86_64
+#       target: deb
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: ruby/setup-ruby@v1
+#       - name: install python
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: ${{env.pythonversion}}
+#       - name: install poetry
+#         uses: snok/install-poetry@v1
+#         with:
+#           version: latest
+#           virtualenvs-in-project: true
+#           virtualenvs-create: true
+#           installer-parallel: true
+#       - name: install packaging tools
+#         run: |
+#           sudo apt-get install -y rpm unzip
+#           poetry install
+#       - run: gem install fpm -v ${{env.fpmversion}}
+#       - uses: actions/download-artifact@v2
+#         with:
+#           name: redis-${{env.redisversion}}-${{env.platform}}
+#           path: deps/redis-${{env.redisversion}}-${{env.platform}}
+#       - name: display structure
+#         run: ls -R
+#       - name: build redis-stack-server
+#         run: |
+#           source .venv/bin/activate
+#           invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
+#       - name: perist packages
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
+#           path: |
+#             ${{ matrix.package }}*.${{env.target}}
+#       - uses: s3-actions/s3cmd@v1.1
+#         with:
+#           provider: aws
+#           region: us-east-1
+#           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#       - name: upload snapshots
+#         if: startsWith(github.ref, 'refs/tags/') != true
+#         run: |
+#           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+#       - name: upload release
+#         if: startsWith(github.ref, 'refs/tags/')
+#         run: |
+#           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
 
-      - name: install packaging tools
-        run: |
-          sudo apt-get install -y rpm unzip
-          poetry install
-      - run: gem install fpm -v ${{env.fpmversion}}
-      - uses: actions/download-artifact@v2
-        with:
-          name: redis-${{env.redisversion}}-${{env.platform}}
-          path: deps/redis-${{env.redisversion}}-${{env.platform}}
-      - name: display structure
-        run: ls -R
-      - name: build redis-stack-server
-        run: |
-          source .venv/bin/activate
-          invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
-      - name: perist packages
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
-          path: |
-            ${{ matrix.package }}*.${{env.target}}
-      - uses: s3-actions/s3cmd@v1.1
-        with:
-          provider: aws
-          region: us-east-1
-          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: upload snapshots
-        if: startsWith(github.ref, 'refs/tags/') != true
-        run: |
-          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
-      - name: upload release
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
+#   build-ubuntu-bionic:
+#     name: Bionic (x86_64) Build
+#     runs-on: ubuntu-latest
+#     container: ubuntu:bionic
+#     steps:
+#     - uses: actions/checkout@v2
+#       with:
+#         repository: redis/redis
+#         path: redis
+#         ref: ${{env.redisversion}}
+#     - name: install dependencies
+#       run: apt-get update && apt-get install -y build-essential libssl-dev
+#     - name: make
+#       run: make -C redis/src all BUILD_TLS=yes
+#     - name: perist redis
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: redis-${{env.redisversion}}-bionic
+#         path: |
+#           redis/src/redis-server
+#           redis/src/redis-sentinel
+#           redis/src/redis-check-aof
+#           redis/src/redis-check-rdb
+#           redis/src/redis-benchmark
+#           redis/src/redis-cli
 
-
-  build-rhel-8:
-    name: RHEL8 (x86_64) Build
-    runs-on: ubuntu-latest
-    container: oraclelinux:8
-    steps:
-    - name: install dependencies
-      run: |
-        dnf install -y oracle-epel-release-el8
-        dnf install -y gcc make jemalloc-devel openssl-devel tar git
-    - uses: actions/checkout@v2
-      with:
-        repository: redis/redis
-        path: redis
-        ref: ${{env.redisversion}}
-    - name: make
-      run: make -C redis/src all BUILD_TLS=yes
-    - name: perist redis
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-${{env.redisversion}}-rhel8
-        path: |
-          redis/src/redis-server
-          redis/src/redis-sentinel
-          redis/src/redis-check-aof
-          redis/src/redis-check-rdb
-          redis/src/redis-benchmark
-          redis/src/redis-cli
-
-  package-rhel8:
-    name: RHEL8 (x86_64) Package
-    runs-on: ubuntu-latest
-    needs: [build-rhel-8]
-    strategy:
-      matrix:
-        package: ['redis-stack', 'redis-stack-server']
-    env:
-      platform: rhel8
-      osname: Linux
-      osnick: rhel8
-      arch: x86_64
-      target: rpm
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ruby/setup-ruby@v1
-      - name: install python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{env.pythonversion}}
-      - name: install poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: latest
-          virtualenvs-in-project: true
-          virtualenvs-create: true
-          installer-parallel: true
-
-      - name: install packaging tools
-        run: |
-          sudo apt-get install -y rpm unzip
-          poetry install
-      - run: gem install fpm -v ${{env.fpmversion}}
-      - uses: actions/download-artifact@v2
-        with:
-          name: redis-${{env.redisversion}}-${{env.platform}}
-          path: deps/redis-${{env.redisversion}}-${{env.platform}}
-      - name: display structure
-        run: ls -R
-      - name: build ${{ matrix.package }}
-        run: |
-          source .venv/bin/activate
-          invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
-      - name: perist packages
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
-          path: |
-            ${{ matrix.package }}*.${{env.target}}
-      - uses: s3-actions/s3cmd@v1.1
-        with:
-          provider: aws
-          region: us-east-1
-          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: upload snapshots
-        if: startsWith(github.ref, 'refs/tags/') != true
-        run: |
-          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
-      - name: upload release
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
-
-  dockers:
-    name: redis-stack-server docker
-    strategy:
-      matrix:
-        package: ['redis-stack-server', 'redis-stack']
-    env:
-      platform: focal
-      arch: x86_64
-
-    runs-on: ubuntu-latest
-    needs: [package-focal]
-    steps:
-      - uses: actions/checkout@v2
-      - name: install python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{env.pythonversion}}
-      - name: install poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: latest
-          virtualenvs-in-project: true
-          virtualenvs-create: true
-          installer-parallel: true
-
-      - uses: actions/download-artifact@v2
-        with:
-          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.deb
-          path: redis-stack
-      - uses: actions/download-artifact@v2
-        with:
-          name: redisinsight-${{env.platform}}-${{env.arch}}.deb
-          path: redis-stack
-      - name: display structure
-        run: ls -R
-
-      - name: get package version
-        id: get_version
-        run: |
-          poetry install
-          source .venv/bin/activate
-          realversion=`invoke version -p ${{ matrix.package }} -d true`
-          echo "::set-output name=VERSION::$realversion"
-      - name: generate docker file
-        run: |
-          source .venv/bin/activate
-          invoke dockergen -d ${{ matrix.package }}
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: build docker
-        run: |
-          docker build -f dockers/Dockerfile.${{ matrix.package }} -t redislabs/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} .
-          docker push redislabs/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
+#   package-bionic:
+#     name: Bionic (x86_64) Package
+#     runs-on: ubuntu-latest
+#     needs: [build-ubuntu-bionic]
+#     strategy:
+#       matrix:
+#         package: ['redis-stack', 'redis-stack-server']
+#     env:
+#       platform: bionic
+#       osname: Linux
+#       osnick: ubuntu18.04
+#       arch: x86_64
+#       target: deb
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: ruby/setup-ruby@v1
+#       - name: install python
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: ${{env.pythonversion}}
+#       - name: install poetry
+#         uses: snok/install-poetry@v1
+#         with:
+#           version: latest
+#           virtualenvs-in-project: true
+#           virtualenvs-create: true
+#           installer-parallel: true
+#       - name: install packaging tools
+#         run: |
+#           sudo apt-get install -y rpm unzip
+#           poetry install
+#       - run: gem install fpm -v ${{env.fpmversion}}
+#       - uses: actions/download-artifact@v2
+#         with:
+#           name: redis-${{env.redisversion}}-${{env.platform}}
+#           path: deps/redis-${{env.redisversion}}-${{env.platform}}
+#       - name: display structure
+#         run: ls -R
+#       - name: build redis-stack-server
+#         run: |
+#           source .venv/bin/activate
+#           invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
+#       - name: perist packages
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
+#           path: |
+#             ${{ matrix.package }}*.${{env.target}}
+#       - uses: s3-actions/s3cmd@v1.1
+#         with:
+#           provider: aws
+#           region: us-east-1
+#           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#       - name: upload snapshots
+#         if: startsWith(github.ref, 'refs/tags/') != true
+#         run: |
+#           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+#       - name: upload release
+#         if: startsWith(github.ref, 'refs/tags/')
+#         run: |
+#           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
 
 
-  # package-snap:
-  #   runs-on: ubuntu-latest
-  #   needs: [build-ubuntu-focal]
-  #   env:
-  #     platform: focal
-  #     osname: Linux
-  #     osnick: ubuntu20.04
-  #     arch: x86_64
-  #     target: snap
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: ruby/setup-ruby@v1
-  #     - name: install python
-  #       uses: actions/setup-python@v2
-  #       with:
-  #         python-version: ${{env.pythonversion}}
-  #     - name: install poetry
-  #       uses: snok/install-poetry@v1
-  #       with:
-  #         version: latest
-  #         virtualenvs-in-project: true
-  #         virtualenvs-create: true
-  #         installer-parallel: true
+#   build-ubuntu-xenial:
+#     name: Xenial (x86_64) Build
+#     runs-on: ubuntu-latest
+#     container: ubuntu:xenial
+#     steps:
+#     - uses: actions/checkout@v2
+#       with:
+#         repository: redis/redis
+#         path: redis
+#         ref: ${{env.redisversion}}
+#     - name: install dependencies
+#       run: apt-get update && apt-get install -y build-essential libssl-dev
+#     - name: make
+#       run: make -C redis/src all BUILD_TLS=yes
+#     - name: perist redis
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: redis-${{env.redisversion}}-xenial
+#         path: |
+#           redis/src/redis-server
+#           redis/src/redis-sentinel
+#           redis/src/redis-check-aof
+#           redis/src/redis-check-rdb
+#           redis/src/redis-benchmark
+#           redis/src/redis-cli
 
-  #     - name: install packaging tools
-  #       run: |
-  #         sudo apt-get install -y rpm unzip
-  #         poetry install
-  #     - run: gem install fpm -v ${{env.fpmversion}}
-  #     - uses: actions/download-artifact@v2
-  #       with:
-  #         name: redis-${{env.redisversion}}-${{env.platform}}
-  #         path: deps/redis-${{env.redisversion}}-${{env.platform}}
-  #     - name: display structure
-  #       run: ls -R
-  #     - name: build the package
-  #       run: |
-  #         source .venv/bin/activate
-  #         invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}}
-  #     - name: perist packages
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
-  #         path: |
-  #           *.snap
+#   package-xenial:
+#     name: Xenial (x86_64) Package
+#     runs-on: ubuntu-latest
+#     needs: [build-ubuntu-xenial]
+#     strategy:
+#       matrix:
+#         package: ['redis-stack', 'redis-stack-server']
+#     env:
+#       platform: xenial
+#       osname: Linux
+#       osnick: ubuntu16.04
+#       arch: x86_64
+#       target: deb
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: ruby/setup-ruby@v1
+#       - name: install python
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: ${{env.pythonversion}}
+#       - name: install poetry
+#         uses: snok/install-poetry@v1
+#         with:
+#           version: latest
+#           virtualenvs-in-project: true
+#           virtualenvs-create: true
+#           installer-parallel: true
+
+#       - name: install packaging tools
+#         run: |
+#           sudo apt-get install -y rpm unzip
+#           poetry install
+#       - run: gem install fpm -v ${{env.fpmversion}}
+#       - uses: actions/download-artifact@v2
+#         with:
+#           name: redis-${{env.redisversion}}-${{env.platform}}
+#           path: deps/redis-${{env.redisversion}}-${{env.platform}}
+#       - name: display structure
+#         run: ls -R
+#       - name: build redis-stack-server
+#         run: |
+#           source .venv/bin/activate
+#           invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
+#       - name: perist packages
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
+#           path: |
+#             ${{ matrix.package }}*.${{env.target}}
+#       - uses: s3-actions/s3cmd@v1.1
+#         with:
+#           provider: aws
+#           region: us-east-1
+#           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#       - name: upload snapshots
+#         if: startsWith(github.ref, 'refs/tags/') != true
+#         run: |
+#           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+#       - name: upload release
+#         if: startsWith(github.ref, 'refs/tags/')
+#         run: |
+#           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
+
+
+#   build-rhel-7:
+#     name: RHEL7 (x86_64) Build
+#     runs-on: ubuntu-latest
+#     container: centos:7
+#     steps:
+#     - uses: actions/checkout@v2
+#       with:
+#         repository: redis/redis
+#         path: redis
+#         ref: ${{env.redisversion}}
+#     - name: install dependencies
+#       run: |
+#         yum -y install epel-release
+#         yum -y install gcc make jemalloc-devel openssl-devel
+#     - name: make
+#       run: make -C redis/src all BUILD_TLS=yes
+#     - name: perist redis
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: redis-${{env.redisversion}}-rhel7
+#         path: |
+#           redis/src/redis-server
+#           redis/src/redis-sentinel
+#           redis/src/redis-check-aof
+#           redis/src/redis-check-rdb
+#           redis/src/redis-benchmark
+#           redis/src/redis-cli
+
+#   package-rhel7:
+#     name: RHEL7 (x86_64) Package
+#     runs-on: ubuntu-latest
+#     needs: [build-rhel-7]
+#     strategy:
+#       matrix:
+#         package: ['redis-stack', 'redis-stack-server']
+#     env:
+#       platform: rhel7
+#       osname: Linux
+#       osnick: rhel7
+#       arch: x86_64
+#       target: rpm
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: ruby/setup-ruby@v1
+#       - name: install python
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: ${{env.pythonversion}}
+#       - name: install poetry
+#         uses: snok/install-poetry@v1
+#         with:
+#           version: latest
+#           virtualenvs-in-project: true
+#           virtualenvs-create: true
+#           installer-parallel: true
+
+#       - name: install packaging tools
+#         run: |
+#           sudo apt-get install -y rpm unzip
+#           poetry install
+#       - run: gem install fpm -v ${{env.fpmversion}}
+#       - uses: actions/download-artifact@v2
+#         with:
+#           name: redis-${{env.redisversion}}-${{env.platform}}
+#           path: deps/redis-${{env.redisversion}}-${{env.platform}}
+#       - name: display structure
+#         run: ls -R
+#       - name: build redis-stack-server
+#         run: |
+#           source .venv/bin/activate
+#           invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
+#       - name: perist packages
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
+#           path: |
+#             ${{ matrix.package }}*.${{env.target}}
+#       - uses: s3-actions/s3cmd@v1.1
+#         with:
+#           provider: aws
+#           region: us-east-1
+#           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#       - name: upload snapshots
+#         if: startsWith(github.ref, 'refs/tags/') != true
+#         run: |
+#           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+#       - name: upload release
+#         if: startsWith(github.ref, 'refs/tags/')
+#         run: |
+#           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
+
+
+#   build-rhel-8:
+#     name: RHEL8 (x86_64) Build
+#     runs-on: ubuntu-latest
+#     container: oraclelinux:8
+#     steps:
+#     - name: install dependencies
+#       run: |
+#         dnf install -y oracle-epel-release-el8
+#         dnf install -y gcc make jemalloc-devel openssl-devel tar git
+#     - uses: actions/checkout@v2
+#       with:
+#         repository: redis/redis
+#         path: redis
+#         ref: ${{env.redisversion}}
+#     - name: make
+#       run: make -C redis/src all BUILD_TLS=yes
+#     - name: perist redis
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: redis-${{env.redisversion}}-rhel8
+#         path: |
+#           redis/src/redis-server
+#           redis/src/redis-sentinel
+#           redis/src/redis-check-aof
+#           redis/src/redis-check-rdb
+#           redis/src/redis-benchmark
+#           redis/src/redis-cli
+
+#   package-rhel8:
+#     name: RHEL8 (x86_64) Package
+#     runs-on: ubuntu-latest
+#     needs: [build-rhel-8]
+#     strategy:
+#       matrix:
+#         package: ['redis-stack', 'redis-stack-server']
+#     env:
+#       platform: rhel8
+#       osname: Linux
+#       osnick: rhel8
+#       arch: x86_64
+#       target: rpm
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: ruby/setup-ruby@v1
+#       - name: install python
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: ${{env.pythonversion}}
+#       - name: install poetry
+#         uses: snok/install-poetry@v1
+#         with:
+#           version: latest
+#           virtualenvs-in-project: true
+#           virtualenvs-create: true
+#           installer-parallel: true
+
+#       - name: install packaging tools
+#         run: |
+#           sudo apt-get install -y rpm unzip
+#           poetry install
+#       - run: gem install fpm -v ${{env.fpmversion}}
+#       - uses: actions/download-artifact@v2
+#         with:
+#           name: redis-${{env.redisversion}}-${{env.platform}}
+#           path: deps/redis-${{env.redisversion}}-${{env.platform}}
+#       - name: display structure
+#         run: ls -R
+#       - name: build ${{ matrix.package }}
+#         run: |
+#           source .venv/bin/activate
+#           invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
+#       - name: perist packages
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
+#           path: |
+#             ${{ matrix.package }}*.${{env.target}}
+#       - uses: s3-actions/s3cmd@v1.1
+#         with:
+#           provider: aws
+#           region: us-east-1
+#           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#       - name: upload snapshots
+#         if: startsWith(github.ref, 'refs/tags/') != true
+#         run: |
+#           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+#       - name: upload release
+#         if: startsWith(github.ref, 'refs/tags/')
+#         run: |
+#           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
+
+#   dockers:
+#     name: redis-stack-server docker
+#     strategy:
+#       matrix:
+#         package: ['redis-stack-server', 'redis-stack']
+#     env:
+#       platform: focal
+#       arch: x86_64
+
+#     runs-on: ubuntu-latest
+#     needs: [package-focal]
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: install python
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: ${{env.pythonversion}}
+#       - name: install poetry
+#         uses: snok/install-poetry@v1
+#         with:
+#           version: latest
+#           virtualenvs-in-project: true
+#           virtualenvs-create: true
+#           installer-parallel: true
+
+#       - uses: actions/download-artifact@v2
+#         with:
+#           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.deb
+#           path: redis-stack
+#       - uses: actions/download-artifact@v2
+#         with:
+#           name: redisinsight-${{env.platform}}-${{env.arch}}.deb
+#           path: redis-stack
+#       - name: display structure
+#         run: ls -R
+
+#       - name: get package version
+#         id: get_version
+#         run: |
+#           poetry install
+#           source .venv/bin/activate
+#           realversion=`invoke version -p ${{ matrix.package }} -d true`
+#           echo "::set-output name=VERSION::$realversion"
+#       - name: generate docker file
+#         run: |
+#           source .venv/bin/activate
+#           invoke dockergen -d ${{ matrix.package }}
+#       - name: Log in to GitHub Container Registry
+#         uses: docker/login-action@v1
+#         with:
+#           username: ${{ secrets.DOCKERHUB_USERNAME }}
+#           password: ${{ secrets.DOCKERHUB_TOKEN }}
+#       - name: build docker
+#         run: |
+#           docker build -f dockers/Dockerfile.${{ matrix.package }} -t redislabs/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} .
+#           docker push redislabs/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
+
+
+#   # package-snap:
+#   #   runs-on: ubuntu-latest
+#   #   needs: [build-ubuntu-focal]
+#   #   env:
+#   #     platform: focal
+#   #     osname: Linux
+#   #     osnick: ubuntu20.04
+#   #     arch: x86_64
+#   #     target: snap
+#   #   steps:
+#   #     - uses: actions/checkout@v2
+#   #     - uses: ruby/setup-ruby@v1
+#   #     - name: install python
+#   #       uses: actions/setup-python@v2
+#   #       with:
+#   #         python-version: ${{env.pythonversion}}
+#   #     - name: install poetry
+#   #       uses: snok/install-poetry@v1
+#   #       with:
+#   #         version: latest
+#   #         virtualenvs-in-project: true
+#   #         virtualenvs-create: true
+#   #         installer-parallel: true
+
+#   #     - name: install packaging tools
+#   #       run: |
+#   #         sudo apt-get install -y rpm unzip
+#   #         poetry install
+#   #     - run: gem install fpm -v ${{env.fpmversion}}
+#   #     - uses: actions/download-artifact@v2
+#   #       with:
+#   #         name: redis-${{env.redisversion}}-${{env.platform}}
+#   #         path: deps/redis-${{env.redisversion}}-${{env.platform}}
+#   #     - name: display structure
+#   #       run: ls -R
+#   #     - name: build the package
+#   #       run: |
+#   #         source .venv/bin/activate
+#   #         invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}}
+#   #     - name: perist packages
+#   #       uses: actions/upload-artifact@v2
+#   #       with:
+#   #         name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
+#   #         path: |
+#   #           *.snap
