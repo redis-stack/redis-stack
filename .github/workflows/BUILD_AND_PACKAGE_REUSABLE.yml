@@ -7,7 +7,7 @@ on:
         required: true
         type: string
       arch:
-        required: true
+        required: false
         type: string
         default: x86_64
       osnick:
@@ -29,19 +29,19 @@ on:
         required: true
         type: string
       redisversion: 
-        required: true
+        required: false
         type: string
         default: 6.2.6
       pythonversion: 
-        required: true
+        required: false
         type: string
         default: 3.9
       rubyversion:
-        required: true
+        required: false
         type: string
         default: 2.7.2
       fpmversion:
-        required: true
+        required: false
         type: string
         default: 1.14.1
     secrets:
