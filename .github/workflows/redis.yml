@@ -83,7 +83,7 @@ jobs:
       osnick: rhel8
       arch: x86_64
       target: rpm
-      build_deps: yum install -y epel-release gcc make jemalloc-devel openssl-devel
+      build_deps: dnf install -y oracle-epel-release gcc make jemalloc-devel openssl-devel tar git
       packaging_deps: sudo apt-get install -y rpm unzip
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

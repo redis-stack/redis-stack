@@ -63,6 +63,8 @@ jobs:
     runs-on: ubuntu-latest
     container: ${{inputs.image_name}}
     steps:
+    - name: install dependencies
+      run: ${{inputs.build_deps}}
     - uses: actions/checkout@v2
       with:
         repository: redis/redis
@@ -75,9 +77,6 @@ jobs:
           /var/cache/apt
           /var/cache/yum
         key: cache-${{inputs.osnick}}-${{inputs.arch}}-build
-
-    - name: install dependencies
-      run: ${{inputs.build_deps}}
     - name: make
       run: make -C redis/src all BUILD_TLS=yes
     - name: perist redis
