@@ -68,6 +68,14 @@ jobs:
         repository: redis/redis
         path: redis
         ref: ${{env.redisversion}}
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          /var/cache/apt
+          /var/cache/yum
+        key: cache-${{inputs.osnick}}-${{inputs.arch}}-build
+
     - name: install dependencies
       run: ${{inputs.build_deps}}
     - name: make
@@ -105,6 +113,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            /var/cache/apt
+            /var/cache/yum
+            ~/.cache/pip
+            ~/.cache/pypoetry
+            ~/.local/share/gem
+          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{inputs.osnick}}-${{inputs.arch}}-package
+
       - uses: ruby/setup-ruby@v1
       - name: install python
         uses: actions/setup-python@v2

@@ -44,6 +44,51 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+  xenial:
+    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+    with:
+      image_name: ubuntu:xenial
+      platform: xenial
+      osname: Linux
+      osnick: ubuntu16.04
+      arch: x86_64
+      target: deb
+      build_deps: apt-get update && apt-get install -y build-essential libssl-dev
+      packaging_deps: sudo apt-get install -y rpm unzip
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  rhel7:
+    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+    with:
+      image_name: centos:7
+      platform: rhel7
+      osname: Linux
+      osnick: rhel7
+      arch: x86_64
+      target: rpm
+      build_deps: yum install -y epel-release gcc make jemalloc-devel openssl-devel
+      packaging_deps: sudo apt-get install -y rpm unzip
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  rhel8:
+    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+    with:
+      image_name: oraclelinux:8
+      platform: rhel8
+      osname: Linux
+      osnick: rhel8
+      arch: x86_64
+      target: rpm
+      build_deps: yum install -y epel-release gcc make jemalloc-devel openssl-devel
+      packaging_deps: sudo apt-get install -y rpm unzip
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
 #   build-package-osx:
 #     name: Mac (x86_64) Build
 #     env:
