@@ -63,7 +63,7 @@ def package(
         f"-t {target}",
         f"-p {package}",
         f"-x",
-        f"-I",
+#        f"-I",
     ]
     run(' '.join(cmd))
 
