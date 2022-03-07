@@ -3,6 +3,7 @@ import os
 import shutil
 import sys
 import jinja2
+from stack.paths import Paths
 
 @task
 def build_redis(c, redis_repo_path="redis", build_args="all BUILD_TLS=yes"):
@@ -23,7 +24,8 @@ def dockergen(c, docker_type='redis-stack'):
     env = jinja2.Environment(loader=loader)
     tmpl = loader.load(name=src, environment=env)
     
-    vars = {'docker_type': docker_type}
+    p = Paths(None, None)
+    vars = {'docker_type': docker_type, 'SHAREDIR': p.SHAREDIR}
     with open(dest, 'w+') as fp:
         fp.write(tmpl.render(vars))
 
@@ -36,7 +38,7 @@ def dockergen(c, docker_type='redis-stack'):
     'target': 'target package type to build (eg: deb)',
     'arch': 'architecture (eg: x86_64)',
     'build_number': 'build number (defaults to 1)',
-    'package': 'package to build {redis_stack|redis_stack_server}',
+    'package': 'package to build {redis_stack|redis_stack_server|redisinsight|redisinsight-web}',
 })
 def package(
     c, osname='Linux', osnick='', dist='',

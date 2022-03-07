@@ -9,10 +9,15 @@ if [ -f /redis-stack.conf ]; then
     CONFFILE=/redis-stack.conf
 fi
 
+if [ -z ${REDIS_DATA_DIR} ]; then
+    REDIS_DATA_DIR=/data/redis
+fi
+
 ${BASEDIR}/nodejs/bin/node -r ${BASEDIR}/share/redisinsight/api/node_modules/dotenv/config share/redisinsight/api/dist/src/main.js dotenv_config_path=${BASEDIR}/share/redisinsight/.env &
 
 ${CMD} \
 ${CONFFILE} -- \
+--dir ${REDIS_DATA_DIR} \
 --protected-mode no \
 --daemonize no \
 --loadmodule /opt/redis-stack/lib/redisearch.so \

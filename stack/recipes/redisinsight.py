@@ -2,16 +2,11 @@ from . import Recipe
 from ..config import Config
 from ..paths import Paths
 from ..components.nodejs import NodeJS
-from ..components.insight import RedisInsight as RI
 import os
 import shutil
 from loguru import logger
 
-
-class RedisInsight(Recipe):
-    """A recipe to build a redisinsight package"""
-
-    PACKAGE_NAME = "redisinsight-web"
+class RedisInsightBase(Recipe):
 
     def __init__(self, osnick, arch="x86_64", osname="Linux"):
         self.OSNICK = osnick
@@ -19,24 +14,7 @@ class RedisInsight(Recipe):
         self.OSNAME = osname
         self.__PATHS__ = Paths(self.PACKAGE_NAME, osnick, arch, osname)
         self.C = Config()
-
-    def prepackage(
-        self, binary_dir: str, ignore: bool = False, version_override: str = None
-    ):
         
-        for i in [
-            self.__PATHS__.EXTERNAL,
-            self.__PATHS__.DESTDIR,
-            self.__PATHS__.LIBDIR,
-            self.__PATHS__.BINDIR,
-            self.__PATHS__.SHAREDIR,
-        ]:
-            os.makedirs(i, exist_ok=True, mode=0o755)
-
-        for i in [NodeJS, RI]:
-            n = i(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
-            n.prepare()
-
     @property
     def __package_base_args__(self) -> list:
         """Return base arguments for the package."""
@@ -185,3 +163,53 @@ class RedisInsight(Recipe):
         cmd = " ".join(fpmargs)
         logger.debug(f"Packaging: {cmd}")
         return os.system(cmd)
+
+class RedisInsight(RedisInsightBase):
+    """A recipe to build a redisinsight package from the native app"""
+
+    PACKAGE_NAME = "redisinsight"
+    
+    def prepackage(
+        self, binary_dir: str, ignore: bool = False, version_override: str = None
+    ):
+        
+        for i in [
+            self.__PATHS__.EXTERNAL,
+            self.__PATHS__.DESTDIR,
+            self.__PATHS__.LIBDIR,
+            self.__PATHS__.BINDIR,
+            self.__PATHS__.SHAREDIR,
+        ]:
+            os.makedirs(i, exist_ok=True, mode=0o755)
+            
+        from ..components.insight import RedisInsight as RI
+
+ 
+        for i in [NodeJS, RI]:
+            n = i(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
+            n.prepare()
+    
+class RedisInsightWeb(RedisInsightBase):
+    """A recipe to build a redisinsight package for the web application"""
+
+    PACKAGE_NAME = "redisinsight-web"
+    
+    def prepackage(
+        self, binary_dir: str, ignore: bool = False, version_override: str = None
+    ):
+        
+        for i in [
+            self.__PATHS__.EXTERNAL,
+            self.__PATHS__.DESTDIR,
+            self.__PATHS__.LIBDIR,
+            self.__PATHS__.BINDIR,
+            self.__PATHS__.SHAREDIR,
+        ]:
+            os.makedirs(i, exist_ok=True, mode=0o755)
+            
+        from ..components.insight import RedisInsightWeb as RI
+
+ 
+        for i in [NodeJS, RI]:
+            n = i(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
+            n.prepare()

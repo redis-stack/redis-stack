@@ -1,6 +1,7 @@
 import os
 import shutil
-import zipfile
+# import zipfile
+import tarfile
 from typing import Union
 
 import requests
@@ -9,8 +10,8 @@ from loguru import logger
 from ..config import Config
 from ..paths import Paths
 
-
-class RedisInsight(object):
+class RedisInsightBase(object):
+    
     def __init__(
         self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux"
     ):
@@ -20,15 +21,19 @@ class RedisInsight(object):
         self.OSNAME = osname
         self.__PATHS__ = Paths(package, osnick, arch, osname)
         self.C = Config()
-
+        
     def generate_url(self, version):
         if self.OSNAME == "macos":
-            osname = "Mac"
+            osname = "darwin"
         else:
-            osname = self.OSNAME
-        return f"https://s3.amazonaws.com/redisinsight.test/public/rs-ri-builds/RedisInsight-{osname}.{version}.{self.ARCH}.zip"
+            osname = self.OSNAME.lower()
+        if self.ARCH == 'x86_64':
+            arch = 'x64'
+        else:
+            arch = self.ARCH
+        return f"https://s3.amazonaws.com/redisinsight.test/public/rs-ri-builds/{version}/redisstack/RedisInsight-preview-{self.APPTYPE}-{osname}.{arch}.tar.gz"
 
-    def _fetch_and_unzip(self, url: str, destfile: str, custom_dest: str = None):
+    def _fetch_and_unzip(self, url: str, destfile: str):
         logger.debug(f"Package URL: {url}")
 
         if not os.path.isfile(destfile):
@@ -38,26 +43,35 @@ class RedisInsight(object):
                 raise requests.HTTPError
             open(destfile, "wb").write(r.content)
 
-        logger.debug(f"Unzipping {destfile} and storing in {self.__PATHS__.DESTDIR}")
-        with zipfile.ZipFile(destfile, "r") as zp:
-            zp.extractall(path=os.path.join(self.__PATHS__.DESTDIR, "redisinsight"))
-
+        # logger.debug(f"Unzipping {destfile} and storing in {self.__PATHS__.DESTDIR}")
+        # with zipfile.ZipFile(destfile, "r") as zp:
+        #     zp.extractall(path=os.path.join(self.__PATHS__.DESTDIR, "redisinsight"))
+        logger.debug(f"Untarring {destfile} and storing in {self.__PATHS__.DESTDIR}")
+        with tarfile.open(destfile) as f:
+             f.extractall(path=os.path.join(self.__PATHS__.DESTDIR, "redisinsight"))
+ 
     def prepare(self, version: Union[str, None] = None):
         if version is None:
-            version = self.C.get_key("redisinsight")
+            version = self.C.get_key("versions")["redisinsight"]
         logger.info("Fetching redisinsight")
         url = self.generate_url(version)
         destfile = os.path.join(
             self.__PATHS__.EXTERNAL,
-            f"redisinsight-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip",
+            f"redisinsight-{self.OSNAME}-{self.OSNICK}-{self.ARCH}-{self.APPTYPE}.zip",
         )
+        if os.path.isfile(destfile):
+            return
         pkg_unzip_dest = os.path.join(self.__PATHS__.DESTDIR, "redisinsight")
-        self._fetch_and_unzip(url, destfile, pkg_unzip_dest)
+        self._fetch_and_unzip(url, destfile) #, pkg_unzip_dest)
         shutil.copytree(
             pkg_unzip_dest, os.path.join(self.__PATHS__.SHAREDIR, "redisinsight")
         )
-        with open(
-            os.path.join(self.__PATHS__.SHAREDIR, "redisinsight", ".env"), "w+"
-        ) as fp:
-            fp.write("SERVER_STATIC_CONTENT=1\n")
-            fp.write("API_PORT=8001\n")
+        
+class RedisInsight(RedisInsightBase):
+
+    APPTYPE = "app"
+    
+
+class RedisInsightWeb(RedisInsightBase):
+    
+    APPTYPE = "web"

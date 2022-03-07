@@ -66,7 +66,7 @@ class NodeJS(object):
             f"nodejs-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.tar.gz",
         )
         if version is None:
-            version = self.C.get_key("nodejs")
+            version = self.C.get_key("versions")["nodejs"]
         self._fetch_and_unzip(self.generate_url(version), destfile)
 
         node_base = os.path.join(

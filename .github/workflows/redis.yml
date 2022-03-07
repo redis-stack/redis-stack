@@ -273,8 +273,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: build docker
         run: |
-          docker build -f dockers/Dockerfile.${{ matrix.package }} -t redislabs/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} .
-          docker push redislabs/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
+          docker build -f dockers/Dockerfile.${{ matrix.package }} -t redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} .
+          docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
 #   # package-snap:
 #   #   runs-on: ubuntu-latest
 #   #   needs: [build-ubuntu-focal]
