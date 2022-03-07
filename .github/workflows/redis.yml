@@ -161,6 +161,7 @@ jobs:
         cd redis-stack
         source .venv/bin/activate
         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server
+        mkdir s3dist
         cp *.zip s3dist
     - name: perist redis-stack package
       uses: actions/upload-artifact@v2
