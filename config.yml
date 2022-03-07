@@ -17,7 +17,7 @@ vendor: Redis Inc
 url: "https://redis.io"
 
 redis-stack:
-  version: 1.0.0
+  version: 1.0.1
   product: redis-stack
   summary: redis-stack installs a Redis server with additional database capabilities and the visualisation toll RedisInsight.
   description: |
@@ -28,11 +28,11 @@ redis-stack:
     RedisTimeSeries: Store and manage time series data in Redis, perform aggregated queries and downsampling
     RedisBloom: Extends Redis to include popular probabilistic data structures including Bloom and Cuckoo filters, Count-Min Sketch and Top-K
     RedisGraph: Adds graph database and Cypher query capabilities to Redis
-    
+
     Manage your Redis server and view your data with the RedisInsight graphical tool, which is also included in this package.
 
 redis-stack-server:
-  version: 1.0.0
+  version: 1.0.1
   product: redis-stack-server
   summary: redis-stack installs a Redis server with additional database capabilities.
   description: |
