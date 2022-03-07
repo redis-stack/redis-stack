@@ -156,29 +156,6 @@ jobs:
           redis/src/redis-benchmark
           redis/src/redis-cli
 
-    - name: build redis-stack-server package
-      run: |
-        cd redis-stack
-        source .venv/bin/activate
-        rm -f *.${{env.target}}
-        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t ${{env.target}} -p redis-stack-server
-        mkdir s3dist
-        cp *.${{env.target}} s3dist
-    - name: perist redis-stack-server package
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
-        path: |
-          redis-stack/redis-stack-server*.${{env.target}}
-
-    - name: build redis-stack package
-      run: |
-        cd redis-stack
-        source .venv/bin/activate
-        rm -f *.osxpkg
-        invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t ${{env.target}} -p redis-stack
-        cp *.${{env.target}} s3dist
-
     - name: build the redis-stack-server zipfile (for homebrew)
       run: |
         cd redis-stack
@@ -200,12 +177,10 @@ jobs:
     - name: upload snapshots
       if: startsWith(github.ref, 'refs/tags/') != true
       run: |
-        s3cmd put -P redis-stack/s3dist/*.${{env.target}} s3://redismodules/redis-stack/snapshots/
         s3cmd put -P redis-stack/s3dist/*.zip s3://redismodules/redis-stack/snapshots/
     - name: upload release
       if: startsWith(github.ref, 'refs/tags/')
       run: |
-        s3cmd put -P redis-stack/s3dist/*.${{env.target}} s3://redismodules/redis-stack/
         s3cmd put -P redis-stack/s3dist/*.zip s3://redismodules/redis-stack/
 
   dockers:
@@ -246,11 +221,11 @@ jobs:
 
       - uses: actions/download-artifact@v2
         with:
-          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.deb
+          name: redis-stack-server-${{env.platform}}-${{env.arch}}.deb
           path: redis-stack
       - uses: actions/download-artifact@v2
         with:
-          name: redisinsight-${{env.platform}}-${{env.arch}}.deb
+          name: redisinsight-web-${{env.platform}}-${{env.arch}}.deb
           path: redis-stack
       - name: display structure
         run: ls -R
