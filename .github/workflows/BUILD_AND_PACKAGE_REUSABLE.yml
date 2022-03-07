@@ -108,7 +108,9 @@ jobs:
     needs: [build-redis]
     strategy:
       matrix:
-        package: ['redis-stack', 'redis-stack-server', 'redisinsight']
+        # FUTURE with all the linux platforms
+        # package: ['redis-stack', 'redis-stack-server', 'redisinsight', 'redisinsight-web']
+        package: ['redis-stack-server', 'redisinsight-web']  # to enable the docker
 
     steps:
       - uses: actions/checkout@v2

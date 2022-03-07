@@ -7,6 +7,9 @@ from loguru import logger
 import shutil
 import os
 
+# FUTURE this is a placeholder for the package depending on packages, in Linux
+# This is not a real package
+
 
 class RedisStack(Recipe):
     """A recipe to build the redis-stack package"""

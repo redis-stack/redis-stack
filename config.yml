@@ -1,13 +1,14 @@
 ---
 
 # module versions
-rejson: 2.0.7
-redistimeseries: 1.6.7
-redisearch: 2.4.0
-redisgraph: 2.8.8
-redisbloom: 2.2.13
-redisinsight: 2.0.4-preview
-nodejs: v14.19.0
+versions:
+  rejson: 2.0.7
+  redistimeseries: 1.6.7
+  redisearch: 2.4.0
+  redisgraph: 2.8.8
+  redisbloom: 2.2.13
+  redisinsight: 22028
+  nodejs: v14.19.0
 
 # common package variables
 email: Redis OSS <oss@redislabs.com>
@@ -49,6 +50,12 @@ redisinsight-web:
   product: redisinsight-web
   summary: RI Web summary
   description: RI Web placeholder
+
+redisinsight:
+  version: 2.0.4preview
+  product: redisinsight
+  summary: RI summary
+  description: RI placeholder
 
 # uid/gid
 product_user: nobody

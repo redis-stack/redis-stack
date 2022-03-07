@@ -9,8 +9,13 @@ if [ -f /redis-stack.conf ]; then
     CONFFILE=/redis-stack.conf
 fi
 
+if [ -z ${REDIS_DATA_DIR} ]; then
+    REDIS_DATA_DIR=/data/redis
+fi
+
 ${CMD} \
 ${CONFFILE} -- \
+--dir ${REDIS_DATA_DIR} \
 --protected-mode no \
 --loadmodule /opt/redis-stack/lib/redisearch.so \
 ${REDISEARCH_ARGS} \

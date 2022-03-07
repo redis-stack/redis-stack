@@ -66,7 +66,7 @@ if __name__ == "__main__":
         help="Package recipe to build",
         default="redis-stack-server",
         type="choice",
-        choices=["redis-stack", "redis-stack-server", "redisinsight"]
+        choices=["redis-stack", "redis-stack-server", "redisinsight", "redisinsight-web"]
     )
 
     # run time argumetns
@@ -118,6 +118,8 @@ if __name__ == "__main__":
         from stack.recipes.redis_stack import RedisStack as pkgklass
     elif opts.PACKAGE == "redisinsight":
         from stack.recipes.redisinsight import RedisInsight as pkgklass
+    elif opts.PACKAGE == "redisinsight-web":
+        from stack.recipes.redisinsight import RedisInsightWeb as pkgklass
     else:
         sys.stderr.write(f"{opts.PACKAGE} is an unsupported package recipe.\n")
         sys.exit(3)
