@@ -140,7 +140,7 @@ class Recipe(object):
 
     def osxpkg(self, fpmargs, build_number, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.osxpkg"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.osxpkg"
         )
         fpmargs.append("-t osxpkg")
         return fpmargs
@@ -151,7 +151,7 @@ class Recipe(object):
         fpmargs.remove(f"-C {self.__PATHS__.WORKDIR}")
         fpmargs.append(f"-C {self.__PATHS__.BASEDIR}")
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.zip"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.zip"
         )
         fpmargs.append("-t zip")
         return fpmargs
