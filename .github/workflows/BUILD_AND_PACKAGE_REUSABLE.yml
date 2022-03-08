@@ -93,10 +93,6 @@ jobs:
            redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}
     - name: install s3cmd
       run: |
-        python --version || echo "nopy"
-        python2 --version || echo "nopy2"
-        python3 --version || echo "nopy3"
-        pip3 install -U pip
         pip3 install s3cmd
     # - uses: s3-actions/s3cmd@v1.1
     #   with:
