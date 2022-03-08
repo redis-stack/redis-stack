@@ -249,7 +249,7 @@ jobs:
         key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
     - name: install packaging tools
       run: |
-        sudo ${{inputs.packaging_deps}}
+        sudo apt-get install -y rpm unzip
         poetry install
     - run: gem install fpm -v ${{env.fpmversion}}
 
