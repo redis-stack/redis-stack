@@ -224,6 +224,8 @@ jobs:
       rubyversion: 2.7.2
     runs-on: ubuntu-latest
     steps:
+    - name: checkout sources
+      uses: actions/checkout@v2
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{env.rubyversion}}
