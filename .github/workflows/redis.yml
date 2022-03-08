@@ -147,16 +147,16 @@ jobs:
 
     - name: package redis for s3
       run: |
-        mkdir redis-${{env.redisversion}}-${{env.osname}}-${{env.platform}}-${{env.arch}}
+        mkdir redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
         cp redis/src/redis-server \
            redis/src/redis-sentinel \
            redis/src/redis-check-aof \
            redis/src/redis-check-rdb \
            redis/src/redis-benchmark \
            redis/src/redis-cli \
-           redis-${{env.redisversion}}-${{env.osname}}-${{env.platform}}-${{env.arch}}
-        tar -czvf redis-${{env.redisversion}}-${{env.osname}}-${{env.platform}}-${{env.arch}}.tgz \
-           redis-${{env.redisversion}}-${{env.osname}}-${{env.arch}}
+           redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
+        tar -czvf redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
+           redis-${{env.redisversion}}-${{env.osname}}-#{{env.osnick}}-${{env.arch}}
 
     - uses: s3-actions/s3cmd@v1.1
       with:
@@ -166,8 +166,8 @@ jobs:
         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     - name: persist redis to s3
       run: |
-        s3cmd put -P redis-${{env.redisversion}}-${{env.osname}}-${{env.platform}}-${{env.arch}}.tgz \
-        s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{env.osname}}-${{env.platform}}-${{env.arch}}.tgz
+        s3cmd put -P redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
+        s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
 
     - name: perist redis
       uses: actions/upload-artifact@v2
