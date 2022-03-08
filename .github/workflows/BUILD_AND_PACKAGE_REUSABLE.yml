@@ -79,6 +79,29 @@ jobs:
         key: cache-${{hashFiles('**/redis.yml')}}-${{inputs.platform}}-${{inputs.arch}}-build
     - name: make
       run: make -C redis/src all BUILD_TLS=yes
+    - name: package redis for s3
+      run: |
+        mkdir redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}
+        cp redis/src/redis-server \
+           redis/src/redis-sentinel \
+           redis/src/redis-check-aof \
+           redis/src/redis-check-rdb \
+           redis/src/redis-benchmark \
+           redis/src/redis-cli \
+           redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}
+        tar -czvf redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}.tgz \
+           redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}
+      - uses: s3-actions/s3cmd@v1.1
+        with:
+          provider: aws
+          region: us-east-1
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: persist redis to s3
+        run: |
+          s3cmd put -P redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}.tgz \
+          s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}.tgz
+
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:

@@ -144,6 +144,31 @@ jobs:
         cd redis-stack
         source .venv/bin/activate
         invoke build-redis -r ../redis
+
+    - name: package redis for s3
+      run: |
+        mkdir redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}
+        cp ../redis/src/redis-server \
+           ../redis/src/redis-sentinel \
+           ../redis/src/redis-check-aof \
+           ../redis/src/redis-check-rdb \
+           ../redis/src/redis-benchmark \
+           ../redis/src/redis-cli \
+           redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}
+        tar -czvf redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}.tgz \
+           redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}
+
+    - uses: s3-actions/s3cmd@v1.1
+      with:
+        provider: aws
+        region: us-east-1
+        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    - name: persist redis to s3
+      run: |
+        s3cmd put -P redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}.tgz \
+        s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}.tgz
+
     - name: perist redis
       uses: actions/upload-artifact@v2
       with:
@@ -251,48 +276,3 @@ jobs:
         run: |
           docker build -f dockers/Dockerfile.${{ matrix.package }} -t redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} .
           docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
-#   # package-snap:
-#   #   runs-on: ubuntu-latest
-#   #   needs: [build-ubuntu-focal]
-#   #   env:
-#   #     platform: focal
-#   #     osname: Linux
-#   #     osnick: ubuntu20.04
-#   #     arch: x86_64
-#   #     target: snap
-#   #   steps:
-#   #     - uses: actions/checkout@v2
-#   #     - uses: ruby/setup-ruby@v1
-#   #     - name: install python
-#   #       uses: actions/setup-python@v2
-#   #       with:
-#   #         python-version: ${{env.pythonversion}}
-#   #     - name: install poetry
-#   #       uses: snok/install-poetry@v1
-#   #       with:
-#   #         version: latest
-#   #         virtualenvs-in-project: true
-#   #         virtualenvs-create: true
-#   #         installer-parallel: true
-
-#   #     - name: install packaging tools
-#   #       run: |
-#   #         sudo apt-get install -y rpm unzip
-#   #         poetry install
-#   #     - run: gem install fpm -v ${{env.fpmversion}}
-#   #     - uses: actions/download-artifact@v2
-#   #       with:
-#   #         name: redis-${{env.redisversion}}-${{env.platform}}
-#   #         path: deps/redis-${{env.redisversion}}-${{env.platform}}
-#   #     - name: display structure
-#   #       run: ls -R
-#   #     - name: build the package
-#   #       run: |
-#   #         source .venv/bin/activate
-#   #         invoke package  -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}}
-#   #     - name: perist packages
-#   #       uses: actions/upload-artifact@v2
-#   #       with:
-#   #         name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
-#   #         path: |
-#   #           *.snap
