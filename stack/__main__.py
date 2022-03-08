@@ -29,7 +29,7 @@ if __name__ == "__main__":
         "-r",
         "--redis-binaries",
         dest="REDISBIN",
-        help="Path to redis binaries",
+        help="[Optional] Path to redis binaries",
         metavar="DIR",
     )
     p.add_option(
@@ -96,10 +96,6 @@ if __name__ == "__main__":
         help="Enable debug logs",
     )
     opts, args = p.parse_args()
-
-    if opts.REDISBIN is None or not os.path.isdir(opts.REDISBIN):
-        sys.stderr.write("Path to redis binaries does not exist. \n")
-        sys.exit(3)
 
     if not opts.VARIANT:
         opts.VARIANT = f"{opts.OSNICK}-{opts.ARCH}"

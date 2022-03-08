@@ -2,6 +2,7 @@ import abc
 from ..config import Config
 from loguru import logger
 import os
+import re
 import shutil
 from semver.version import Version
 import subprocess
@@ -37,7 +38,7 @@ class Recipe(object):
         branch = r.stdout.strip()
         if branch in ["master", "main"]:
             return "99.99.99"
-        
+
         # get the current tag
         tagcmd = ["git", "tag", "--points-at", "HEAD"]
         r = subprocess.run(tagcmd, stdout=subprocess.PIPE, text=True)
@@ -45,6 +46,10 @@ class Recipe(object):
         if version != "":
             return version
        
+       
+        if len(re.findall('[a-zA-Z]', branch)) != 0:
+            return "snapshot"
+
         # any branch - just takes the version
         config = Config()
         return config.get_key(self.PACKAGE_NAME)['version']

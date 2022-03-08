@@ -29,17 +29,25 @@ class Modules(object):
     def generate_url(self, module: str, version: str):
         """Assuming the module follows the standard, return the URL from
         which to grab it"""
-        try:
-            semantic_version.Version(version)
+        
+        if module == 'redisearch':
+            module = 'redisearch-oss'
+        
+        # FIXME mac M1 temporary hack until it moves
+        if self.ARCH == 'arm64':
+            if module == 'redisearch-oss':
+                version = '2.2.9'
+            if module == 'redisgraph':
+                version = '2.8.8'
             return urllib.parse.urljoin(
                 f"https://{self.AWS_S3_BUCKET}",
-                f"{module}/{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip",
+                f"lab/23-macos-m1/{module}.{self.OSNAME}-{self.OSNICK}-arm64v8.{version}.zip",
             )
-        except ValueError:
-            return urllib.parse.urljoin(
-                f"https://{self.AWS_S3_BUCKET}",
-                f"{module}/snapshots/{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip",
-            )
+       
+        return urllib.parse.urljoin(
+            f"https://{self.AWS_S3_BUCKET}",
+            f"{module}/{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip",
+        )
 
     def rejson(self, version: Union[str, None] = None):
         """rejson specific fetch"""
@@ -55,10 +63,10 @@ class Modules(object):
 
     def redisearch(self, version: Union[str, None] = None):
         """redisearch specific fetch"""
+        
         if version is None:
             version = self.C.get_key("versions")["redisearch"]
-        url = f"https://{self.AWS_S3_BUCKET}/redisearch-oss/redisearch-oss.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip"
-        self._run("redisearch", None, url)
+        self._run("redisearch", version) #None, url)
 
     def redistimeseries(self, version: Union[str, None] = None):
         """redistimeseries specific fetch"""

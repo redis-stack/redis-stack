@@ -9,6 +9,7 @@ versions:
   redisbloom: 2.2.13
   redisinsight: 22128
   nodejs: v14.19.0
+  redis: 6.2.6
 
 # common package variables
 email: Redis OSS <oss@redislabs.com>
@@ -17,7 +18,7 @@ vendor: Redis Inc
 url: "https://redis.io"
 
 redis-stack:
-  version: 1.0.0
+  version: 1.0.1
   product: redis-stack
   summary: redis-stack installs a Redis server with additional database capabilities and the visualisation toll RedisInsight.
   description: |
@@ -32,7 +33,7 @@ redis-stack:
     Manage your Redis server and view your data with the RedisInsight graphical tool, which is also included in this package.
 
 redis-stack-server:
-  version: 1.0.0
+  version: 1.0.1
   product: redis-stack-server
   summary: redis-stack installs a Redis server with additional database capabilities.
   description: |
