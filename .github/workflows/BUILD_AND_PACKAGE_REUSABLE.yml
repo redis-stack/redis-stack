@@ -81,7 +81,7 @@ jobs:
       run: make -C redis/src all BUILD_TLS=yes
     - name: package redis for s3
       run: |
-        mkdir redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}
+        mkdir redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}
         cp redis/src/redis-server \
            redis/src/redis-sentinel \
            redis/src/redis-check-aof \
