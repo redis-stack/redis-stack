@@ -156,7 +156,7 @@ jobs:
            redis/src/redis-cli \
            redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
         tar -czvf redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
-           redis-${{env.redisversion}}-${{env.osname}}-#{{env.osnick}}-${{env.arch}}
+           redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
 
     - uses: s3-actions/s3cmd@v1.1
       with:
@@ -267,11 +267,6 @@ jobs:
         run: |
           source .venv/bin/activate
           invoke dockergen -d ${{ matrix.package }}
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
-
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -282,16 +277,4 @@ jobs:
           docker build -f dockers/Dockerfile.${{ matrix.package }} -t redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} .
       - name: publish docker
         run: |
-          branch=${{steps.extract_branch.outputs.branch}}
-          pushdocker=0
-          if [ ${branch} == "master" ]; then
-            pushdocker=1
-          fi
-          echo ${branch} | egrep "([0-9]\.[0-9])"
-          if [ $? -eq 0 ]; then
-            pushdocker=1
-          fi
-
-          if [ ${pushdocker} == 1 ]; then 
-            docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
-          fi
+          docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
