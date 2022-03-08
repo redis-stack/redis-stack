@@ -65,6 +65,10 @@ jobs:
     steps:
     - name: install dependencies
       run: ${{inputs.build_deps}}
+    - name: install python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{env.pythonversion}}
     - uses: actions/checkout@v2
       with:
         repository: redis/redis
