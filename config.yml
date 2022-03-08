@@ -7,7 +7,7 @@ versions:
   redisearch: 2.4.0
   redisgraph: 2.8.8
   redisbloom: 2.2.13
-  redisinsight: 22103
+  redisinsight: 22128
   nodejs: v14.19.0
 
 # common package variables
