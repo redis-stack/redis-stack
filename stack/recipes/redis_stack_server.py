@@ -1,6 +1,7 @@
 from . import Recipe
 from ..paths import Paths
 from ..components.modules import Modules
+from ..components.redis import Redis
 from ..config import Config
 import requests
 import os
@@ -57,22 +58,26 @@ class RedisStackServer(Recipe):
         shutil.copyfile(os.path.join(self.__PATHS__.SCRIPTDIR, "redis-stack-server"), stackdest)
         os.chmod(stackdest, mode=0o755)
         
-        logger.debug(f"Copying redis binaries from {binary_dir}")
-        for i in [
-            "redis-benchmark",
-            "redis-check-aof",
-            "redis-check-rdb",
-            "redis-cli",
-            "redis-sentinel",
-            "redis-server",
-        ]:
-            dest = os.path.join(self.__PATHS__.BINDIR, i)
-            shutil.copy2(os.path.join(binary_dir, i), dest)
-            os.chmod(dest, mode=0o755)
+        if binary_dir is not None and not os.path.isdir(binary_dir):
+            r = Redis(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
+            r.prepare()
+        else:
+            logger.debug(f"Copying redis binaries from {binary_dir}")
+            for i in [
+                "redis-benchmark",
+                "redis-check-aof",
+                "redis-check-rdb",
+                "redis-cli",
+                "redis-sentinel",
+                "redis-server",
+            ]:
+                dest = os.path.join(self.__PATHS__.BINDIR, i)
+                shutil.copy2(os.path.join(binary_dir, i), dest)
+                os.chmod(dest, mode=0o755)
 
-            # copy configuration files
-            shutil.copytree(
-                os.path.join(self.__PATHS__.SCRIPTDIR, "conf"),
-                self.__PATHS__.ETCDIR,
-                dirs_exist_ok=True,
-            )
+        # copy configuration files
+        shutil.copytree(
+            os.path.join(self.__PATHS__.SCRIPTDIR, "conf"),
+            self.__PATHS__.ETCDIR,
+            dirs_exist_ok=True,
+        )

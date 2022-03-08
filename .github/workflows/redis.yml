@@ -209,6 +209,69 @@ jobs:
       run: |
         s3cmd put -P redis-stack/s3dist/*.zip s3://redismodules/redis-stack/
 
+  # the m1 requires a zip file so that homebrew can unpack it
+  build-package-osx-m1:
+    name: Mac (M1) Package
+    env:
+      arch: arm64
+      osnick: monterey
+      target: zip
+      platform: monterey
+      osname: macos
+      redisversion: 6.2.6
+      pythonversion: 3.9
+      fpmversion: 1.14.1
+      rubyversion: 2.7.2
+    runs-on: ubuntu-latest
+    steps:
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{env.rubyversion}}
+    - name: install python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "${{ env.pythonversion }}"
+    - name: install poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-in-project: true
+        virtualenvs-create: true
+        installer-parallel: true
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          /var/cache/apt
+          ~/.cache/pip
+          ~/.cache/pypoetry
+          ~/.local/share/gem
+        key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
+    - name: install packaging tools
+      run: |
+        sudo ${{inputs.packaging_deps}}
+        poetry install
+    - run: gem install fpm -v ${{env.fpmversion}}
+
+    - name: build redis-stack-server
+      run: |
+        source .venv/bin/activate
+        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redis-stack-server
+    - uses: s3-actions/s3cmd@v1.1
+      with:
+        provider: aws
+        region: us-east-1
+        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    - name: upload snapshots
+      if: startsWith(github.ref, 'refs/tags/') != true
+      run: |
+        s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+    - name: upload release
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
+
   dockers:
     name: ${{matrix.package}} docker
     strategy:
