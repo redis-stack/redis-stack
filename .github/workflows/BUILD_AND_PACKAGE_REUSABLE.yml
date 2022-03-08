@@ -94,12 +94,6 @@ jobs:
     - name: install s3cmd
       run: |
         pip3 install s3cmd
-    # - uses: s3-actions/s3cmd@v1.1
-    #   with:
-    #     provider: aws
-    #     region: us-east-1
-    #     access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #     secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     - name: persist redis to s3
       run: |
         s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}.tgz \
@@ -169,12 +163,12 @@ jobs:
           sudo ${{inputs.packaging_deps}}
           poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
-      # - uses: actions/download-artifact@v2
-      #   with:
-      #     name: redis-${{env.redisversion}}-${{env.platform}}
-      #     path: deps/redis-${{env.redisversion}}-${{env.platform}}
-      # - name: display structure
-      #   run: ls -R
+      - uses: actions/download-artifact@v2
+        with:
+          name: redis-${{env.redisversion}}-${{env.platform}}
+          path: deps/redis-${{env.redisversion}}-${{env.platform}}
+      - name: display structure
+        run: ls -R
       - name: build ${{matrix.package}}
         run: |
           source .venv/bin/activate
