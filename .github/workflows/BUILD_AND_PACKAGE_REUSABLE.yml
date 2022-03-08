@@ -88,9 +88,9 @@ jobs:
            redis/src/redis-check-rdb \
            redis/src/redis-benchmark \
            redis/src/redis-cli \
-           redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}
-        tar -czvf redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}.tgz \
-           redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}
+           redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}
+        tar -czvf redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}.tgz \
+           redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}
     - uses: s3-actions/s3cmd@v1.1
       with:
         provider: aws
@@ -99,8 +99,8 @@ jobs:
         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     - name: persist redis to s3
       run: |
-        s3cmd put -P redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}.tgz \
-        s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}.tgz
+        s3cmd put -P redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}.tgz \
+        s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}.tgz
 
     - name: perist redis
       uses: actions/upload-artifact@v2
