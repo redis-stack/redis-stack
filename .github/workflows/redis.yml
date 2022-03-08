@@ -148,12 +148,12 @@ jobs:
     - name: package redis for s3
       run: |
         mkdir redis-${{env.redisversion}}-${{env.osname}}-${{env.arch}}
-        cp ../redis/src/redis-server \
-           ../redis/src/redis-sentinel \
-           ../redis/src/redis-check-aof \
-           ../redis/src/redis-check-rdb \
-           ../redis/src/redis-benchmark \
-           ../redis/src/redis-cli \
+        cp redis/src/redis-server \
+           redis/src/redis-sentinel \
+           redis/src/redis-check-aof \
+           redis/src/redis-check-rdb \
+           redis/src/redis-benchmark \
+           redis/src/redis-cli \
            redis-${{env.redisversion}}-${{env.osname}}-${{env.arch}}
         tar -czvf redis-${{env.redisversion}}-${{env.osname}}-${{env.arch}}.tgz \
            redis-${{env.redisversion}}-${{env.osname}}-${{env.arch}}

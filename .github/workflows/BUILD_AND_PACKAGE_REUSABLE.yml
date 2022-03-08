@@ -65,10 +65,6 @@ jobs:
     steps:
     - name: install dependencies
       run: ${{inputs.build_deps}}
-    - name: install python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{env.pythonversion}}
     - uses: actions/checkout@v2
       with:
         repository: redis/redis
@@ -95,16 +91,25 @@ jobs:
            redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}
         tar -czvf redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}.tgz \
            redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}
-    - uses: s3-actions/s3cmd@v1.1
+
+    - name: install python
+      uses: actions/setup-python@v2
       with:
-        provider: aws
-        region: us-east-1
-        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        python-version: ${{env.pythonversion}}
+    - name: install s3cmd
+      run: |
+        pip install -U pip
+        pip install s3cmd
+    # - uses: s3-actions/s3cmd@v1.1
+    #   with:
+    #     provider: aws
+    #     region: us-east-1
+    #     access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     - name: persist redis to s3
       run: |
-        s3cmd put -P redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}.tgz \
-        s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}.tgz
+        s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}.tgz \
+          s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}.tgz
 
     - name: perist redis
       uses: actions/upload-artifact@v2
