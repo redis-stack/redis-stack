@@ -7,7 +7,7 @@ versions:
   redisearch: 2.4.0
   redisgraph: 2.8.8
   redisbloom: 2.2.13
-  redisinsight: 22103
+  redisinsight: 22128
   nodejs: v14.19.0
 
 # common package variables
@@ -28,7 +28,7 @@ redis-stack:
     RedisTimeSeries: Store and manage time series data in Redis, perform aggregated queries and downsampling
     RedisBloom: Extends Redis to include popular probabilistic data structures including Bloom and Cuckoo filters, Count-Min Sketch and Top-K
     RedisGraph: Adds graph database and Cypher query capabilities to Redis
-    
+
     Manage your Redis server and view your data with the RedisInsight graphical tool, which is also included in this package.
 
 redis-stack-server:
