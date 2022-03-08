@@ -91,15 +91,13 @@ jobs:
            redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}
         tar -czvf redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}.tgz \
            redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}
-
-    - name: install python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{env.pythonversion}}
     - name: install s3cmd
       run: |
-        pip install -U pip
-        pip install s3cmd
+        python --version || echo "nopy"
+        python2 --version || echo "nopy2"
+        python3 --version || echo "nopy3"
+        pip3 install -U pip
+        pip3 install s3cmd
     # - uses: s3-actions/s3cmd@v1.1
     #   with:
     #     provider: aws
