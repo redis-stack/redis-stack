@@ -166,8 +166,8 @@ jobs:
         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     - name: persist redis to s3
       run: |
-        s3cmd put -P redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}.tgz \
-        s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{input.osname}}-${{input.arch}}.tgz
+        s3cmd put -P redis-${{env.redisversion}}-${{env.osname}}-${{env.arch}}.tgz \
+        s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{env.osname}}-${{env.arch}}.tgz
 
     - name: perist redis
       uses: actions/upload-artifact@v2
@@ -235,7 +235,7 @@ jobs:
             ~/.cache/pip
             ~/.cache/pypoetry
             ~/.local/share/gem
-          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{inputs.platform}}-${{inputs.arch}}-package
+          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
 
       - name: install poetry
         uses: snok/install-poetry@v1
