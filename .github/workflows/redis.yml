@@ -154,7 +154,7 @@ jobs:
            redis/src/redis-check-rdb \
            redis/src/redis-benchmark \
            redis/src/redis-cli \
-           redis-${{env.redisversion}}-${{env.osname}}-${{env.arch}}
+           redis-${{env.redisversion}}-${{env.osname}}-${{env.platform}}-${{env.arch}}
         tar -czvf redis-${{env.redisversion}}-${{env.osname}}-${{env.platform}}-${{env.arch}}.tgz \
            redis-${{env.redisversion}}-${{env.osname}}-${{env.arch}}
 
@@ -209,70 +209,89 @@ jobs:
       run: |
         s3cmd put -P redis-stack/s3dist/*.zip s3://redismodules/redis-stack/
 
-  # dockers:
-  #   name: ${{matrix.package}} docker
-  #   strategy:
-  #     matrix:
-  #       package: ['redis-stack-server', 'redis-stack']
-  #   env:
-  #     platform: focal
-  #     arch: x86_64
+  dockers:
+    name: ${{matrix.package}} docker
+    strategy:
+      matrix:
+        package: ['redis-stack-server', 'redis-stack']
+    env:
+      platform: focal
+      arch: x86_64
 
-  #   runs-on: ubuntu-latest
-  #   needs: [focal]
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: install python
-  #       uses: actions/setup-python@v2
-  #       with:
-  #         python-version: 3.9
+    runs-on: ubuntu-latest
+    needs: [focal]
+    steps:
+      - uses: actions/checkout@v2
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
 
-  #     - uses: actions/cache@v2
-  #       with:
-  #         path: |
-  #           /var/cache/apt
-  #           /var/cache/yum
-  #           ~/.cache/pip
-  #           ~/.cache/pypoetry
-  #           ~/.local/share/gem
-  #         key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
+      - uses: actions/cache@v2
+        with:
+          path: |
+            /var/cache/apt
+            /var/cache/yum
+            ~/.cache/pip
+            ~/.cache/pypoetry
+            ~/.local/share/gem
+          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
 
-  #     - name: install poetry
-  #       uses: snok/install-poetry@v1
-  #       with:
-  #         version: latest
-  #         virtualenvs-in-project: true
-  #         virtualenvs-create: true
-  #         installer-parallel: true
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
 
-  #     - uses: actions/download-artifact@v2
-  #       with:
-  #         name: redis-stack-server-${{env.platform}}-${{env.arch}}.deb
-  #         path: redis-stack
-  #     - uses: actions/download-artifact@v2
-  #       with:
-  #         name: redisinsight-web-${{env.platform}}-${{env.arch}}.deb
-  #         path: redis-stack
-  #     - name: display structure
-  #       run: ls -R
+      - uses: actions/download-artifact@v2
+        with:
+          name: redis-stack-server-${{env.platform}}-${{env.arch}}.deb
+          path: redis-stack
+      - uses: actions/download-artifact@v2
+        with:
+          name: redisinsight-web-${{env.platform}}-${{env.arch}}.deb
+          path: redis-stack
+      - name: display structure
+        run: ls -R
 
-  #     - name: get package version
-  #       id: get_version
-  #       run: |
-  #         poetry install
-  #         source .venv/bin/activate
-  #         realversion=`invoke version -p ${{ matrix.package }} -d true`
-  #         echo "::set-output name=VERSION::$realversion"
-  #     - name: generate docker file
-  #       run: |
-  #         source .venv/bin/activate
-  #         invoke dockergen -d ${{ matrix.package }}
-  #     - name: Log in to GitHub Container Registry
-  #       uses: docker/login-action@v1
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
-  #     - name: build docker
-  #       run: |
-  #         docker build -f dockers/Dockerfile.${{ matrix.package }} -t redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} .
-  #         docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
+      - name: get package version
+        id: get_version
+        run: |
+          poetry install
+          source .venv/bin/activate
+          realversion=`invoke version -p ${{ matrix.package }} -d true`
+          echo "::set-output name=VERSION::$realversion"
+      - name: generate docker file
+        run: |
+          source .venv/bin/activate
+          invoke dockergen -d ${{ matrix.package }}
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: build docker
+        run: |
+          docker build -f dockers/Dockerfile.${{ matrix.package }} -t redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} .
+      - name: publish docker
+        run: |
+          branch=${{steps.extract_branch.outputs.branch}}
+          pushdocker=0
+          if [ ${branch} == "master" ]; then
+            pushdocker=1
+          fi
+          echo ${branch} | egrep "([0-9]\.[0-9])"
+          if [ $? -eq 0 ]; then
+            pushdocker=1
+          fi
+
+          if [ ${pushdocker} == 1 ]; then 
+            docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
+          fi
