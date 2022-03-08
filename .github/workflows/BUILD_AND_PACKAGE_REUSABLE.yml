@@ -96,7 +96,7 @@ jobs:
         pip3 install s3cmd
     - name: persist redis to s3
       run: |
-        s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.arch}}.tgz \
+        s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.platform}}-${{inputs.arch}}.tgz \
           s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.platform}}-${{inputs.arch}}.tgz
 
     - name: perist redis
