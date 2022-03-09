@@ -27,13 +27,13 @@ Ports that need plumbing
 
 To persist data outside of the docker you're going to *need* to include the following options prior to the image (redislabs/redis-stack:edge).
 
--v /path/to/redisinsight/data:/root/redisinsight
--v /path/to/your/redis-data:/data/redis
+-v /path/to/redisinsight/data:/redisinsight
+-v /path/to/your/redis-data:/data/
 
 Example, with the current directory containing something called data which hosts our data.
 
 ```
-docker run -v `pwd`/data/redisinsight:/root/redisinsight -v `pwd`/data/redis:/data/redis -p 6379:6379 -p 8001:8001 redislabs/redis-stack:edge
+docker run -v `pwd`/data/redisinsight:/redisinsight -v `pwd`/redis:/data -p 6379:6379 -p 8001:8001 redislabs/redis-stack:edge
 ```
 
 ```

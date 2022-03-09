@@ -10,7 +10,7 @@ if [ -f /redis-stack.conf ]; then
 fi
 
 if [ -z ${REDIS_DATA_DIR} ]; then
-    REDIS_DATA_DIR=/data/redis
+    REDIS_DATA_DIR=/data
 fi
 
 ${CMD} \
