@@ -43,15 +43,6 @@ class RedisInsightBase(Recipe):
         fpmargs.append(f"--deb-group {self.C.get_key('product_group')}")
         fpmargs.append(f"--deb-dist {distribution}")
         fpmargs.append("-t deb")
-        fpmargs.append(
-            f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}"
-        )
-        fpmargs.append(
-            f"--after-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postremove')}"
-        )
-        fpmargs.append(
-            f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}"
-        )
 
         if not os.path.isdir(self.__PATHS__.SVCDIR):
             os.makedirs(self.__PATHS__.SVCDIR)
@@ -75,15 +66,6 @@ class RedisInsightBase(Recipe):
         fpmargs.append(f"--rpm-group {self.C.get_key('product_group')}")
         fpmargs.append(f"--rpm-dist {distribution}")
         fpmargs.append("-t rpm")
-        fpmargs.append(
-            f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}"
-        )
-        fpmargs.append(
-            f"--after-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postremove')}"
-        )
-        fpmargs.append(
-            f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}"
-        )
 
         if not os.path.isdir(self.__PATHS__.SVCDIR):
             os.makedirs(self.__PATHS__.SVCDIR)
@@ -101,15 +83,6 @@ class RedisInsightBase(Recipe):
     def pacman(self, fpmargs, build_number, distribution):
         fpmargs.append(
             f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.pacman"
-        )
-        fpmargs.append(
-            f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}"
-        )
-        fpmargs.append(
-            f"--after-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postremove')}"
-        )
-        fpmargs.append(
-            f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}"
         )
         fpmargs.append(f"--pacman-user {self.C.get_key('product_user')}")
         fpmargs.append(f"--pacman-group {self.C.get_key('product_group')}")
