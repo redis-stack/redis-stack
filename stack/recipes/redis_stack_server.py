@@ -54,8 +54,9 @@ class RedisStackServer(Recipe):
                     raise
 
         logger.debug("Copying redis-stack-server script")
-        stackdest = os.path.join(self.__PATHS__.USRBINDIR, "redis-stack-server")
+        stackdest = os.path.join(self.__PATHS__.BINDIR, "redis-stack-server")
         shutil.copyfile(os.path.join(self.__PATHS__.SCRIPTDIR, "redis-stack-server"), stackdest)
+        logger.debug(stackdest)
         os.chmod(stackdest, mode=0o755)
         
         if binary_dir is not None and not os.path.isdir(binary_dir):

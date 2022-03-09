@@ -182,7 +182,7 @@ class RedisInsight(RedisInsightBase):
         ]:
             os.makedirs(i, exist_ok=True, mode=0o755)
             
-        from ..components.insight import RedisInsight as RI
+        from ..components.redisinsight import RedisInsight as RI
 
  
         for i in [NodeJS, RI]:
@@ -207,7 +207,7 @@ class RedisInsightWeb(RedisInsightBase):
         ]:
             os.makedirs(i, exist_ok=True, mode=0o755)
             
-        from ..components.insight import RedisInsightWeb as RI
+        from ..components.redisinsight import RedisInsightWeb as RI
 
  
         for i in [NodeJS, RI]:

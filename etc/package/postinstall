@@ -5,6 +5,7 @@ for i in redis-cli redis-benchmark redis-check-aof redis-check-rdb redis-cli red
         ln -s /opt/redis-stack/bin/$i /usr/bin/$i
     fi
 done
+ln -s /opt/redis-stack/bin/redis-stack-server /usr/bin/redis-stack-server
 
 # if [ -f /usr/bin/systemctl ]; then
 #     systemctl enable redis-stack

@@ -10,3 +10,5 @@ for i in redis-cli redis-benchmark redis-check-aof redis-check-rdb redis-cli red
         rm /usr/bin/$i
     fi
 done
+
+rm /usr/bin/redis-stack-server
