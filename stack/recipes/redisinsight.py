@@ -135,9 +135,9 @@ class RedisInsightBase(Recipe):
             fpmargs = self.osxpkg(fpmargs, build_number, distribution)
 
         elif package_type == "pacman":
-            fpmargs = self.pacman()(fpmargs, build_number, distribution)
+            fpmargs = self.pacman(fpmargs, build_number, distribution)
         elif package_type == "zip":  # ignored
-            fpmargs = self.zip()(fpmargs, build_number, distribution)
+            fpmargs = self.zip(fpmargs, build_number, distribution)
         else:
             raise AttributeError(f"{package_type} is an invalid package type")
 
