@@ -195,6 +195,7 @@ jobs:
             ${{ matrix.package }}*.zip
 
       - name: gather packages for s3 upload
+        continue-on-error: true
         run: |
           mkdir -p s3uploads
           cp *.${{env.target}} *.zip s3uploads
