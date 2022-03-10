@@ -130,6 +130,8 @@ class RedisInsightBase(Recipe):
 
         elif package_type == "pacman":
             fpmargs = self.pacman()(fpmargs, build_number, distribution)
+        elif package_type == "zip":  # ignored
+            return
         else:
             raise AttributeError(f"{package_type} is an invalid package type")
 
