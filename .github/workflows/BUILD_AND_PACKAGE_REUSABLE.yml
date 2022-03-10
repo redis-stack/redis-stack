@@ -173,12 +173,22 @@ jobs:
         run: |
           source .venv/bin/activate
           invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
-      - name: perist packages
+      - name: build zip package
+        run: |
+          source .venv/bin/activate
+          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t zip -p ${{ matrix.package }}
+      - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
           path: |
             ${{ matrix.package }}*.${{env.target}}
+      - name: perist zip package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.zip
+          path: |
+            ${{ matrix.package }}*.zip
       - uses: s3-actions/s3cmd@v1.1
         with:
           provider: aws
@@ -189,7 +199,9 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') != true
         run: |
           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+          s3cmd put -P *.zip s3://redismodules/redis-stack/snapshots/
       - name: upload release
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
+          s3cmd put -P *.zip s3://redismodules/redis-stack/

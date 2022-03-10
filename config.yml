@@ -4,7 +4,7 @@
 versions:
   rejson: 2.0.7
   redistimeseries: 1.6.9
-  redisearch: 2.4.1
+  redisearch: 2.4.2
   redisgraph: 2.8.9
   redisbloom: 2.2.13
   redisinsight: 22128
