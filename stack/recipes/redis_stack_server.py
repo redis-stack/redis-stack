@@ -31,6 +31,7 @@ class RedisStackServer(Recipe):
             self.__PATHS__.BINDIR,
             self.__PATHS__.SHAREDIR,
             self.__PATHS__.USRBINDIR,
+            self.__PATHS__.BASEETCDIR,
         ]:
             os.makedirs(i, exist_ok=True, mode=0o755)
 
@@ -53,10 +54,10 @@ class RedisStackServer(Recipe):
                 else:
                     raise
 
+        # per os
         logger.debug("Copying redis-stack-server script")
         stackdest = os.path.join(self.__PATHS__.BINDIR, "redis-stack-server")
-        shutil.copyfile(os.path.join(self.__PATHS__.SCRIPTDIR, "redis-stack-server"), stackdest)
-        logger.debug(stackdest)
+        shutil.copyfile(os.path.join(self.__PATHS__.SCRIPTDIR, "scripts", f"redis-stack-server.{self.OSNAME}"), stackdest)
         os.chmod(stackdest, mode=0o755)
         
         if binary_dir is not None and not os.path.isdir(binary_dir):
@@ -76,6 +77,15 @@ class RedisStackServer(Recipe):
                 shutil.copy2(os.path.join(binary_dir, i), dest)
                 os.chmod(dest, mode=0o755)
 
+        
+        # linux only - copy to /etc
+        if self.OSNAME == "Linux":
+            confdest = os.path.join(self.__PATHS__.BASEETCDIR, "redis-stack.conf")
+            shutil.copy(
+                os.path.join(self.__PATHS__.SCRIPTDIR, "conf", "redis-stack.conf"),
+                confdest)
+            os.chmod(confdest, mode=0o640)
+        
         # copy configuration files
         shutil.copytree(
             os.path.join(self.__PATHS__.SCRIPTDIR, "conf"),
@@ -83,7 +93,9 @@ class RedisStackServer(Recipe):
             dirs_exist_ok=True,
         )
 
-        shutil.copyfile(
-            os.path.join(self.__PATHS__.SCRIPTDIR, 'RSAL_LICENSE'),
-            os.path.join(self.__PATHS__.SHAREDIR, 'RSAL_LICENSE'),
+        # license files
+        shutil.copytree(
+            os.path.join(self.__PATHS__.SCRIPTDIR, 'licenses'),
+            os.path.join(self.__PATHS__.SHAREDIR),
+            dirs_exist_ok=True,
         )

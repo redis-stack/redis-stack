@@ -9,7 +9,7 @@ User=nobody
 Restart=always
 RestartSec=1
 User=nobody
-ExecStart=/opt/redis-stack/bin/redis-server /opt/redis-stack/etc/redis-stack.conf
+ExecStart=/opt/redis-stack/bin/redis-server /etc/redis-stack.conf --dir /var/lib/redis-stack
 ExecStop=/bin/kill -s TERM ${MAINPID}
 
 [Install]

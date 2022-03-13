@@ -1,0 +1,68 @@
+#!/bin/sh
+
+thiscript=`readlink $0`
+if [ $? -ne 0 ]; then
+    thiscript=$0
+fi
+
+HERE=`dirname ${thiscript}`
+BASEDIR=`dirname $HERE`
+
+# default database location
+REDIS_DATA_DIR=`pwd`
+
+_platform=`uname -p`
+if [ -d /usr/local/var ]; then
+    BREW_BASE=/usr/local
+    _datadir=/usr/local/var/db/redis-stack
+    mkdir -p ${_datadir}
+    touch ${_datadir}/.testfile 2>&1
+    if [ $? -eq 0 ]; then
+        REDIS_DATA_DIR=${_datadir}
+    fi
+elif [ -d /opt/homebrew/var ]; then
+    BREW_BASE=/usr/local
+    _datadir=/opt/homebrew/var/db/redis-stack
+    mkdir -p ${_datadir}
+    touch ${_datadir}/.testfile 2>&1
+    if [ $? -eq 0 ]; then
+        REDIS_DATA_DIR=${_datadir}
+    fi
+else
+    BREW_BASE=${BASEDIR}
+    _datadir=${BASEDIR}/var/db/redis-stack
+    mkdir -p ${_datadir}
+    touch ${_datadir}/.testfile 2>&1
+    if [ $? -eq 0 ]; then
+        REDIS_DATA_DIR=${_datadir}
+    fi
+fi
+
+CMD=${BASEDIR}/bin/redis-server
+if [ -f "${1}" ]; then
+    CONFFILE="${1}"
+    shift
+elif [ -f ${BREW_BASE}/etc/redis-stack.conf ]; then
+    CONFFILE=${BREW_BASE}/etc/redis-stack.conf
+fi
+MODULEDIR=${BASEDIR}/lib
+
+echo "Starting redis-stack-server, database path ${REDIS_DATA_DIR}"
+
+DYLD_LIBRARY_PATH=${BASEDIR}/lib \
+${CMD} \
+${CONFFILE} -- \
+--dir ${REDIS_DATA_DIR} \
+--protected-mode no \
+--daemonize no \
+--loadmodule ${MODULEDIR}/redisearch.so \
+${REDISEARCH_ARGS} \
+--loadmodule ${MODULEDIR}/redisgraph.so \
+${REDISGRAPH_ARGS} \
+--loadmodule ${MODULEDIR}/redistimeseries.so \
+${REDISTIMESERIES_ARGS} \
+--loadmodule ${MODULEDIR}/rejson.so \
+${REJSON_ARGS} \
+--loadmodule ${MODULEDIR}/redisbloom.so \
+${REDISBLOOM_ARGS} \
+$*

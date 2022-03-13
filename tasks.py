@@ -38,7 +38,7 @@ def dockergen(c, docker_type='redis-stack'):
     'target': 'target package type to build (eg: deb)',
     'arch': 'architecture (eg: x86_64)',
     'build_number': 'build number (defaults to 1)',
-    'package': 'package to build {redis_stack|redis_stack_server|redisinsight|redisinsight-web}',
+    'package': 'package to build {redis-stack|redis-stack-server|redisinsight|redisinsight-web}',
 })
 def package(
     c, osname='Linux', osnick='', dist='',
