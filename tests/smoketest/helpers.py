@@ -21,6 +21,10 @@ BINARIES = [
     "redis-sentinel",
 ]
 
+ROOT = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '..', '..')
+)
+
 
 def start_procs():
     if _in_docker() is False:
@@ -30,7 +34,7 @@ def start_procs():
         assert proc.returncode == 0
 
     else:
-        cmd = ["/bin/bash", "/build/etc/entrypoint.sh"]
+        cmd = ["/bin/bash", "/build/etc/scripts/entrypoint.sh"]
         proc = subprocess.Popen(cmd)
         # proc = subprocess.run(cmd, capture_output=False)
         # assert proc.returncode == 0
