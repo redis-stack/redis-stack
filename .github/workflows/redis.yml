@@ -193,7 +193,7 @@ jobs:
       with:
         name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
         path: |
-          redis-stack/redis-stack-*.${{env.target}}
+          redis-stack/redis-stack-*.zip
     - uses: s3-actions/s3cmd@v1.1
       with:
         provider: aws

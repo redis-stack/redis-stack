@@ -108,6 +108,12 @@ class RedisInsightBase(Recipe):
         )
         fpmargs.append("-t osxpkg")
         return fpmargs
+    
+    def zip(self, fpmargs, build_number, distribution):
+        fpmargs.append(
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.osxpkg"
+        )
+        return fpmargs
 
     def package(
         self,
@@ -129,7 +135,9 @@ class RedisInsightBase(Recipe):
             fpmargs = self.osxpkg(fpmargs, build_number, distribution)
 
         elif package_type == "pacman":
-            fpmargs = self.pacman()(fpmargs, build_number, distribution)
+            fpmargs = self.pacman(fpmargs, build_number, distribution)
+        elif package_type == "zip":  # ignored
+            fpmargs = self.zip(fpmargs, build_number, distribution)
         else:
             raise AttributeError(f"{package_type} is an invalid package type")
 

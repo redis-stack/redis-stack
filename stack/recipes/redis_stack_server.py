@@ -82,3 +82,8 @@ class RedisStackServer(Recipe):
             self.__PATHS__.ETCDIR,
             dirs_exist_ok=True,
         )
+
+        shutil.copyfile(
+            os.path.join(self.__PATHS__.SCRIPTDIR, 'RSAL_LICENSE'),
+            os.path.join(self.__PATHS__.SHAREDIR, 'RSAL_LICENSE'),
+        )
