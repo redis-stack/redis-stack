@@ -128,6 +128,6 @@ class TestCentos8(TARTestBase):
 
     def __precommands__(self):
         return [
-            "yum install -y epel-release",
+            "yum install -y epel-release tar",
             "yum install -y openssl-devel jemalloc-devel libgomp",
         ]
