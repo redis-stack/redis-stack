@@ -14,7 +14,7 @@ class RedisInsightBase(Recipe):
         self.OSNAME = osname
         self.__PATHS__ = Paths(self.PACKAGE_NAME, osnick, arch, osname)
         self.C = Config()
-        
+
     @property
     def __package_base_args__(self) -> list:
         """Return base arguments for the package."""
@@ -108,10 +108,16 @@ class RedisInsightBase(Recipe):
         )
         fpmargs.append("-t osxpkg")
         return fpmargs
-    
+
     def zip(self, fpmargs, build_number, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.osxpkg"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.zip"
+        )
+        return fpmargs
+
+    def tar(self, fpmargs, build_number, distribution):
+        fpmargs.append(
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.tar.gz"
         )
         return fpmargs
 
@@ -138,6 +144,8 @@ class RedisInsightBase(Recipe):
             fpmargs = self.pacman(fpmargs, build_number, distribution)
         elif package_type == "zip":  # ignored
             fpmargs = self.zip(fpmargs, build_number, distribution)
+        elif package_type == "tar":  # ignored
+            fpmargs = self.tar(fpmargs, build_number, distribution)
         else:
             raise AttributeError(f"{package_type} is an invalid package type")
 
@@ -149,11 +157,11 @@ class RedisInsight(RedisInsightBase):
     """A recipe to build a redisinsight package from the native app"""
 
     PACKAGE_NAME = "redisinsight"
-    
+
     def prepackage(
         self, binary_dir: str, ignore: bool = False, version_override: str = None
     ):
-        
+
         for i in [
             self.__PATHS__.EXTERNAL,
             self.__PATHS__.DESTDIR,
@@ -162,23 +170,23 @@ class RedisInsight(RedisInsightBase):
             self.__PATHS__.SHAREDIR,
         ]:
             os.makedirs(i, exist_ok=True, mode=0o755)
-            
+
         from ..components.redisinsight import RedisInsight as RI
 
- 
+
         for i in [NodeJS, RI]:
             n = i(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
             n.prepare()
-    
+
 class RedisInsightWeb(RedisInsightBase):
     """A recipe to build a redisinsight package for the web application"""
 
     PACKAGE_NAME = "redisinsight-web"
-    
+
     def prepackage(
         self, binary_dir: str, ignore: bool = False, version_override: str = None
     ):
-        
+
         for i in [
             self.__PATHS__.EXTERNAL,
             self.__PATHS__.DESTDIR,
@@ -187,10 +195,10 @@ class RedisInsightWeb(RedisInsightBase):
             self.__PATHS__.SHAREDIR,
         ]:
             os.makedirs(i, exist_ok=True, mode=0o755)
-            
+
         from ..components.redisinsight import RedisInsightWeb as RI
 
- 
+
         for i in [NodeJS, RI]:
             n = i(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
             n.prepare()
