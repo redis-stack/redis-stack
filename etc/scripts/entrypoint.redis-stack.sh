@@ -27,7 +27,7 @@ ${REDISGRAPH_ARGS} \
 --loadmodule /opt/redis-stack/lib/redistimeseries.so \
 ${REDISTIMESERIES_ARGS} \
 --loadmodule /opt/redis-stack/lib/rejson.so \
-${REJSON_ARGS} \
+${REDISJSON_ARGS} \
 --loadmodule /opt/redis-stack/lib/redisbloom.so \
 ${REDISBLOOM_ARGS} \
 ${REDIS_ARGS}

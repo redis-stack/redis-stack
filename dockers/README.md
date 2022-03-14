@@ -14,7 +14,7 @@ Environment variables that can be set on the docker image:
 
 * REDISBLOOM_ARGS - arguments to pass when loading the bloom module
 * REDISEARCH_ARGS - arguments to pass when loading the search module
-* REJSON_ARGS - arguments to pass when loading the json module
+* REDISJSON_ARGS - arguments to pass when loading the json module
 * REDISTIMESERIES_ARGS - arguments to pass when loading the timeseries module
 * REDISGRAPH_ARGS - arguments to pass when loading the graph module
 * REDIS_ARGS - extra arguments to pass to redis
