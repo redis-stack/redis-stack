@@ -111,7 +111,13 @@ class RedisInsightBase(Recipe):
 
     def zip(self, fpmargs, build_number, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.osxpkg"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.zip"
+        )
+        return fpmargs
+
+    def tar(self, fpmargs, build_number, distribution):
+        fpmargs.append(
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.tar.gz"
         )
         return fpmargs
 
@@ -138,6 +144,8 @@ class RedisInsightBase(Recipe):
             fpmargs = self.pacman(fpmargs, build_number, distribution)
         elif package_type == "zip":  # ignored
             fpmargs = self.zip(fpmargs, build_number, distribution)
+        elif package_type == "tar":  # ignored
+            fpmargs = self.tar(fpmargs, build_number, distribution)
         else:
             raise AttributeError(f"{package_type} is an invalid package type")
 
@@ -169,7 +177,6 @@ class RedisInsight(RedisInsightBase):
         for i in [NodeJS, RI]:
             n = i(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
             n.prepare()
-
 
 class RedisInsightWeb(RedisInsightBase):
     """A recipe to build a redisinsight package for the web application"""

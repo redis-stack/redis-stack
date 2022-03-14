@@ -44,7 +44,6 @@ class Recipe(object):
         version = r.stdout.strip().replace("v", "")
         if version != "":
             return version
-
         # any branch - just takes the version
         config = Config()
         return config.get_key(self.PACKAGE_NAME)["version"]
@@ -156,6 +155,28 @@ class Recipe(object):
         )
         fpmargs.append("-t zip")
         return fpmargs
+    
+    def tar(self, fpmargs, build_number, distribution):
+        
+        # tar, like zip begins at the root of the package
+        # fpm compresses the output only if it ends in .tar.gz
+        fpmargs.remove(f"-C {self.__PATHS__.WORKDIR}")
+        fpmargs.append(
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.tar.gz"
+        )
+        fpmargs.append("-t tar")
+        
+        # the tarball, unlike a package requires a workdir name 'redis-stack-<version>'
+        # since this is the expectation
+        # we prepare that extra step here
+        tartree = f"{self.__PATHS__.WORKDIR}-tar"
+        tarbase = os.path.join(tartree, f"{self.PACKAGE_NAME}-{self.version}")
+        shutil.rmtree(tartree, ignore_errors=True)
+        shutil.copytree(self.__PATHS__.BASEDIR, tarbase)
+        fpmargs.append(f"-C {tartree}")
+        
+        return fpmargs
+       
 
     def package(
         self,
@@ -180,6 +201,8 @@ class Recipe(object):
             fpmargs = self.pacman(fpmargs, build_number, distribution)
         elif package_type == "zip":
             fpmargs = self.zip(fpmargs, build_number, distribution)
+        elif package_type == "tar":
+            fpmargs = self.tar(fpmargs, build_number, distribution)
         else:
             raise AttributeError(f"{package_type} is an invalid package type")
 
