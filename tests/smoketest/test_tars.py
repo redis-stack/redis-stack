@@ -80,6 +80,7 @@ class TestBionic(TARTestBase):
             "apt-get install -yq libssl-dev libgomp1",
         ]
 
+
 @pytest.mark.xenial
 class TestXenial(TARTestBase):
 

@@ -35,4 +35,3 @@ class Paths:
         self.SHAREDIR = os.path.join(self.BASEDIR, "share")
         self.ETCDIR = os.path.join(self.BASEDIR, "etc")
         self.SVCDIR = os.path.join(self.WORKDIR, "etc", "systemd", "system")
-        self.USRBINDIR = os.path.join(self.WORKDIR, "usr", "bin")

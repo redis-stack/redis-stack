@@ -40,6 +40,7 @@ class RPMTestBase(InDockerTestEnv, object):
         if res != 0:
             raise IOError(out)
 
+
 @pytest.mark.rhel7
 class TestRHEL7(RPMTestBase):
 
