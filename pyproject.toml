@@ -20,6 +20,17 @@ docker = "^5.0.3"
 flake8 = "^4.0.1"
 black = "^22.1.0"
 
+[tool.pytest.ini_options]
+markers = [
+    "xenial: ubuntu xenial tests",
+    "bionic: ubuntu bionic tests",
+    "focal: ubuntu focal tests",
+    "rhel7: RedHat 7 (rhel7) tests",
+    "rhel8: RedHat 8 (rhel8) tests",
+    "docker: test the built dockers"
+]
+
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
