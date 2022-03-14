@@ -23,6 +23,9 @@ jobs:
       target: deb
       osname: Linux
       osnick: ubuntu20.04
+      pythonversion: 3.9
+      fpmversion: 1.14.1
+      rubyversion: 2.7.2
     steps:
       - uses: actions/checkout@v2
       - name: Cache dependencies
