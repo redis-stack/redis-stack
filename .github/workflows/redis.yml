@@ -81,21 +81,6 @@ jobs:
           source .venv/bin/activate
           pytest -m ${{env.platform}}
 
-      # now, fetch from s3 and install to the redis-stack directory
-      - name: get packages from s3
-        run: |
-          mkdir redis-stack
-          wget -q \
-            https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{version}}.${{env.platform}}.${{env.arch}}.deb \
-            -O redis-stack/redis-stack-server.deb
-          wget -q \
-            https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{version}}.${{env.platform}}.${{env.arch}}.tar.gz \
-            -O redis-stack/redis-stack-server.tar.gz
-
-      - name: validate debian archive
-        run: |
-          pytest -m ${{env.platform}}
-
   # bionic:
   #   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
   #   with:
@@ -154,7 +139,6 @@ jobs:
   #       dnf install -y oracle-epel-release-el8
   #       dnf install -y gcc make jemalloc-devel openssl-devel tar git python3 python3-pip
   #     packaging_deps: sudo apt-get install -y rpm unzip
-          pytest
 
   # bionic:
   #   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
