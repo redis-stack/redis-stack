@@ -26,7 +26,7 @@ class RPMTestBase(InDockerTestEnv, object):
         )
         cls.__CONTAINER__ = container
 
-        res, out = container.exec_run("yum install -y epel-release")
+        res, out = container.exec_run("yum install -y epel-release tar")
         assert res == 0
 
         # validate we properly get bad outputs as bad
