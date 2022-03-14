@@ -1,5 +1,6 @@
 from helpers import InDockerTestEnv, ROOT
 import docker
+import pytest
 
 
 class RPMTestBase(InDockerTestEnv, object):
@@ -39,13 +40,14 @@ class RPMTestBase(InDockerTestEnv, object):
         if res != 0:
             raise IOError(out)
 
-
+@pytest.mark.rhel7
 class TestRHEL7(RPMTestBase):
 
     DOCKER_NAME = "centos:7"
     CONTAINER_NAME = "redis-stack-centos7"
 
 
+@pytest.mark.rhel8
 class TestRHEL8(RPMTestBase):
 
     DOCKER_NAME = "oraclelinux:8"

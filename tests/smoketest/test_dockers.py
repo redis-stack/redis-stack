@@ -33,6 +33,7 @@ class TestRedisStack(RedisInsightTestMixin, DockerTestBase):
     PORTMAP = {"6379/tcp": 6379, "8001/tcp": 8001}
 
 
+@pytest.mark.docker
 class TestRedisStackServer(DockerTestBase):
 
     DOCKER_NAME = "redis/redis-stack-server"

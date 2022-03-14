@@ -1,4 +1,5 @@
 import docker
+import pytest
 
 from helpers import InDockerTestEnv, ROOT
 
@@ -67,6 +68,7 @@ class TARTestBase(InDockerTestEnv, object):
         assert res == 0
 
 
+@pytest.mark.bionic
 class TestBionic(TARTestBase):
 
     DOCKER_NAME = "ubuntu:bionic"
@@ -78,7 +80,7 @@ class TestBionic(TARTestBase):
             "apt-get install -yq libssl-dev libgomp1",
         ]
 
-
+@pytest.mark.xenial
 class TestXenial(TARTestBase):
 
     DOCKER_NAME = "ubuntu:xenial"
@@ -91,6 +93,7 @@ class TestXenial(TARTestBase):
         ]
 
 
+@pytest.mark.focal
 class TestFocal(TARTestBase):
 
     DOCKER_NAME = "ubuntu:focal"
@@ -103,6 +106,7 @@ class TestFocal(TARTestBase):
         ]
 
 
+@pytest.mark.rhel7
 class TestCentos7(TARTestBase):
 
     DOCKER_NAME = "centos:7"
@@ -115,6 +119,7 @@ class TestCentos7(TARTestBase):
         ]
 
 
+@pytest.mark.rhel8
 class TestCentos8(TARTestBase):
 
     DOCKER_NAME = "oraclelinux:8"

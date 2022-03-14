@@ -1,4 +1,5 @@
 import docker
+import pytest
 from helpers import InDockerTestEnv, ROOT
 
 
@@ -46,19 +47,21 @@ class DEBTestBase(InDockerTestEnv, object):
         if res != 0:
             raise IOError(out)
 
-
+@pytest.mark.xenial
 class TestXenial(DEBTestBase):
 
     DOCKER_NAME = "ubuntu:xenial"
     CONTAINER_NAME = "redis-stack-xenial"
 
 
+@pytest.mark.bionic
 class TestBionic(DEBTestBase):
 
     DOCKER_NAME = "ubuntu:bionic"
     CONTAINER_NAME = "redis-stack-bionic"
 
 
+@pytest.mark.focal
 class TestFocal(DEBTestBase):
 
     DOCKER_NAME = "ubuntu:focal"
