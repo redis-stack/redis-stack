@@ -82,15 +82,25 @@ class RedisStackServer(Recipe):
                 shutil.copy2(os.path.join(binary_dir, i), dest)
                 os.chmod(dest, mode=0o755)
 
+<<<<<<< HEAD
+=======
+        
+>>>>>>> origin/master
         # linux only - copy to /etc
         if self.OSNAME == "Linux":
             confdest = os.path.join(self.__PATHS__.BASEETCDIR, "redis-stack.conf")
             shutil.copy(
                 os.path.join(self.__PATHS__.SCRIPTDIR, "conf", "redis-stack.conf"),
+<<<<<<< HEAD
                 confdest,
             )
             os.chmod(confdest, mode=0o640)
 
+=======
+                confdest)
+            os.chmod(confdest, mode=0o640)
+        
+>>>>>>> origin/master
         # copy configuration files
         shutil.copytree(
             os.path.join(self.__PATHS__.SCRIPTDIR, "conf"),
@@ -100,7 +110,14 @@ class RedisStackServer(Recipe):
 
         # license files
         shutil.copytree(
+<<<<<<< HEAD
             os.path.join(self.__PATHS__.SCRIPTDIR, "licenses"),
             os.path.join(self.__PATHS__.SHAREDIR),
             dirs_exist_ok=True,
         )
+=======
+            os.path.join(self.__PATHS__.SCRIPTDIR, 'licenses'),
+            os.path.join(self.__PATHS__.SHAREDIR),
+            dirs_exist_ok=True,
+        )
+>>>>>>> origin/master

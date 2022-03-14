@@ -53,7 +53,11 @@ ${REDISGRAPH_ARGS} \
 --loadmodule ${MODULEDIR}/redistimeseries.so \
 ${REDISTIMESERIES_ARGS} \
 --loadmodule ${MODULEDIR}/rejson.so \
+<<<<<<< HEAD
 ${REJSON_ARGS} \
+=======
+${REDISJSON_ARGS} \
+>>>>>>> origin/master
 --loadmodule ${MODULEDIR}/redisbloom.so \
 ${REDISBLOOM_ARGS} \
 $*
