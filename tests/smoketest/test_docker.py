@@ -12,7 +12,7 @@ class TestDocker(ServiceTestMixin):
 
     @classmethod
     def setup_class(cls):
-        VERSION=os.getenv('REDIS_STACK_VERSION', 'edge')
+        VERSION = os.getenv("REDIS_STACK_VERSION", "edge")
         cls.env = docker.from_env()
         container = cls.env.containers.run(
             image=f"{cls.DOCKER_NAME}:{VERSION}",
@@ -22,7 +22,7 @@ class TestDocker(ServiceTestMixin):
             ports={"6379/tcp": 6379, "8001/tcp": 8001},
         )
         container.reload()
-        
+
         # time for the docker to settle
         time.sleep(3)
 

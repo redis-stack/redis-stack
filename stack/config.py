@@ -5,7 +5,7 @@ import yaml
 
 class Config(object):
     """Singleton of our configuration parameters"""
-    
+
     def __new__(cls):
         if not hasattr(cls, "instance"):
             cls.instance = super(Config, cls).__new__(cls)

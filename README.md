@@ -12,8 +12,33 @@ This repository builds redis, and downloads various components (modules, RedisIn
 
 1. Create a virtualenv and install dependencies *poetry install*
 1. Install the fpm gem: *gem install fpm*
+
+    *  Based on your Linux distribution you may need to install a debian tools package (i.e something providing dpkg), something to provide zip, tar, and rpm package tools.
+
 1. Clone [redis](https://github.com/redis/redis).
-1. Use invoke -l to execute the various tasks you need
+1. Use invoke -l to execute the various tasks you need (below, an example on packaging).
+
+*To build a focal package*
+```
+invoke package -o Linux -p redis-stack-server -s ubuntu20.04 -t deb -d focal
+```
+
+*To build a xenial package*
+```
+invoke package -o Linux -p redis-stack-server -s ubuntu16.04 -t deb -d xenial
+```
+
+*To build a macos (x86_64) zip, prior to homebrew*
+```
+invoke package -o macos -p redis-stack-server -s catalina -t zip -d catalina
+```
+
+*To build a macos (m1) zip, prior to homebrew*
+```
+invoke package -o macos -p redis-stack-server -s monterey -t zip -d monterey -a arm64
+```
+
+See github workflows for how CI reuses invoke.
 
 ### Packaging
 
@@ -21,6 +46,17 @@ Invoke wraps fpm, in order to provide a unified packaging interface on top of fp
 
 While it's possible to build all Linux packages on Arch or Ubuntu, OSX packages must be built on a Mac.
 
+### Testing
+
+Tests are run via pytest. Linux tests create and destroy dockers, validating their contents. In order to validate the individual packages (i.e foo.rpm), packages must be copied to a folder called *redis-stack* and renamed, so as not to include the version number.
+
+For example to test *redis-stack-server-99.99.99-1.x86_64.rpm*:
+
+``` bash
+mkdir redis-stack
+cp *redis-stack-server-99.99.99-1.x86_64.deb* redis-stack/redis-stack-server.deb
+pytest tests/smoketest/test_deb_packages.py::TestXenial
+```
 --------
 
 #### Modifying service initializations
