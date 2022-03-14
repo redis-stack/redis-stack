@@ -4,6 +4,7 @@ import subprocess
 from redis.commands.search.query import Query
 from redis.commands.search.field import TextField
 import docker
+from urllib.request import urlopen
 
 
 BASEPATH = "/opt/redis-stack"
@@ -90,11 +91,12 @@ class PackageTestMixin:
             assert proc.returncode == 1
 
 
-# class RedisInsightTestMixin()
-#     def test_basic_redisinsight(self):
-#         c = urlopen(f"http://{get_localhost_equiv()}:8001")
-#         content = c.read().decode()
-#         assert content.lower().find('redisinsight') != -1
+class RedisInsightTestMixin:
+    def test_basic_redisinsight(self):
+        stack_dockloader(self)
+        c = urlopen("http://localhost:8001")
+        content = c.read().decode()
+        assert content.lower().find("redisinsight") != -1
 
 
 class RedisTestMixin:
