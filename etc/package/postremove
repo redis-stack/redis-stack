@@ -5,4 +5,3 @@ if [ -f /usr/bin/systemctl ]; then
     rm -f /etc/systemd/system/redis-stack-redis.service
     rm -f /etc/systemd/system/redisinsight.service
 fi
-rm -rf /opt/redis-stack

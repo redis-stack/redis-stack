@@ -1,14 +1,15 @@
 #!/bin/sh
 
 if [ -f /usr/bin/systemctl ]; then
-    systemctl stop redis-stack redis-stack-redis redisinsight
+    for i in redis-stack redis-stack-redis redisinsight; do
+        systemctl disable $i 2>&/dev/null
+        systemctl stop $i 2>&/dev/null
+    done
 fi
 
-for i in redis-cli redis-benchmark redis-check-aof redis-check-rdb redis-cli redis-sentinel redis-server; do
-    RES=`readlink /usr/bin/$i`
-    if [ ${RES} == /opt/redis-stack/bin/$i ]; then
-        rm /usr/bin/$i
+for i in redis-cli redis-benchmark redis-check-aof redis-check-rdb redis-cli redis-sentinel redis-server redis-stack-server; do
+    RES=`readlink /usr/bin/${i}`
+    if [ "${RES}" = "/opt/redis-stack/bin/${i}" ]; then
+        rm /usr/bin/${i}
     fi
 done
-
-rm /usr/bin/redis-stack-server

@@ -19,9 +19,9 @@ RUN dpkg -i /var/cache/apt/redis-stack/redisinsight*.deb
 RUN rm -rf /var/cache/apt
 
 {% if docker_type == 'redis-stack-server' %}
-COPY ./etc/entrypoint.redis-stack-server.sh /entrypoint.sh
+COPY ./etc/scripts/entrypoint.redis-stack-server.sh /entrypoint.sh
 {% elif docker_type == 'redis-stack' %}
-COPY ./etc/entrypoint.redis-stack.sh /entrypoint.sh
+COPY ./etc/scripts/entrypoint.redis-stack.sh /entrypoint.sh
 {% endif %}
 RUN chmod a+x /entrypoint.sh
 

@@ -1,0 +1,3 @@
+This directory contains example configuration files. On Linux, the default configuration file is usually found in /etc, whereas on OSX a default file will be copied to the etc directory within Homebrew.
+
+The redis-stack-server shell script starts the application, and by default loads the configuration in the files mentioned above.
