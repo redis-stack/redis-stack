@@ -14,26 +14,26 @@ on:
       - '[0-9].[0-9]'
 
 jobs:
-  focal:
-    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-    with:
-      image_name: ubuntu:focal
-      platform: focal
-      osname: Linux
-      osnick: ubuntu20.04
-      arch: x86_64
-      target: deb
-      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-      packaging_deps: sudo apt-get install -y rpm unzip
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  # focal:
+  #   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+  #   with:
+  #     image_name: ubuntu:focal
+  #     platform: focal
+  #     osname: Linux
+  #     osnick: ubuntu20.04
+  #     arch: x86_64
+  #     target: deb
+  #     build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
+  #     packaging_deps: sudo apt-get install -y rpm unzip
+  #   secrets:
+  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   test_focal_packages:
     env:
       platform: focal
       arch: x86_64
-    needs: [focal]
+    # needs: [focal]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -70,10 +70,10 @@ jobs:
         run: |
           mkdir redis-stack
           wget -q \
-            https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{env.VERSION}}.${{env.platform}}.${{env.arch}}.deb \
+            https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}.${{env.platform}}.${{env.arch}}.deb \
             -O redis-stack/redis-stack-server.deb
           wget -q \
-            https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{env.VERSION}}.${{env.platform}}.${{env.arch}}.tar.gz \
+            https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}.${{env.platform}}.${{env.arch}}.tar.gz \
             -O redis-stack/redis-stack-server.tar.gz
 
       - name: validate debian archive
