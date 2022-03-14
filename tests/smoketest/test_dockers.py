@@ -25,7 +25,7 @@ class DockerTestBase(InDockerTestEnv, object):
         time.sleep(3)
 
 
-@pytest.mark.docker
+@pytest.mark.dockers
 class TestRedisStack(RedisInsightTestMixin, DockerTestBase):
 
     DOCKER_NAME = "redis/redis-stack"
@@ -33,7 +33,7 @@ class TestRedisStack(RedisInsightTestMixin, DockerTestBase):
     PORTMAP = {"6379/tcp": 6379, "8001/tcp": 8001}
 
 
-@pytest.mark.docker
+@pytest.mark.dockers
 class TestRedisStackServer(DockerTestBase):
 
     DOCKER_NAME = "redis/redis-stack-server"

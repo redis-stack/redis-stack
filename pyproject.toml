@@ -27,7 +27,7 @@ markers = [
     "focal: ubuntu focal tests",
     "rhel7: RedHat 7 (rhel7) tests",
     "rhel8: RedHat 8 (rhel8) tests",
-    "docker: test the built dockers"
+    "dockers: test the built dockers"
 ]
 
 
