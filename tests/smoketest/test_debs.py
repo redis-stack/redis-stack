@@ -1,8 +1,8 @@
-from helpers import InDockerTestEnv, ROOT
 import docker
+from helpers import InDockerTestEnv, ROOT
 
 
-class RPMTestBase(InDockerTestEnv, object):
+class DEBTestBase(InDockerTestEnv, object):
     @classmethod
     def setup_class(cls):
         cls.env = docker.from_env()
@@ -25,8 +25,15 @@ class RPMTestBase(InDockerTestEnv, object):
         )
         cls.__CONTAINER__ = container
 
-        res, out = container.exec_run("yum install -y epel-release")
+        res, out = container.exec_run("apt update -q")
         assert res == 0
+
+        res, out = container.exec_run("apt install -yq gdebi-core")
+        assert res == 0
+
+        # make sure gdebi is present
+        res, out = container.exec_run("ls /usr/bin/gdebi")
+        assert "/usr/bin/gdebi" in out.decode()
 
         # validate we properly get bad outputs as bad
         res, out = container.exec_run("iamnotarealcommand")
@@ -34,20 +41,25 @@ class RPMTestBase(InDockerTestEnv, object):
 
         # now, install our package
         res, out = container.exec_run(
-            "yum install -y /build/redis-stack/redis-stack-server.rpm"
+            "gdebi -n /build/redis-stack/redis-stack-server.deb"
         )
         if res != 0:
             raise IOError(out)
-        assert res == 0
 
 
-class TestRHEL7(RPMTestBase, object):
+class TestXenial(DEBTestBase):
 
-    DOCKER_NAME = "centos:7"
-    CONTAINER_NAME = "redis-stack-centos7"
+    DOCKER_NAME = "ubuntu:xenial"
+    CONTAINER_NAME = "redis-stack-xenial"
 
 
-class TestRHEL8(RPMTestBase, object):
+class TestBionic(DEBTestBase):
 
-    DOCKER_NAME = "oraclelinux:8"
-    CONTAINER_NAME = "redis-stack-centos8"
+    DOCKER_NAME = "ubuntu:bionic"
+    CONTAINER_NAME = "redis-stack-bionic"
+
+
+class TestFocal(DEBTestBase):
+
+    DOCKER_NAME = "ubuntu:focal"
+    CONTAINER_NAME = "redis-stack-focal"

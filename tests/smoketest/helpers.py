@@ -1,6 +1,5 @@
 import os
 import time
-import subprocess
 from redis.commands.search.query import Query
 from redis.commands.search.field import TextField
 import docker
@@ -27,20 +26,6 @@ BINARIES = [
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
-# def start_procs():
-#     if _in_docker() is False:
-#         subprocess.run(['systemctl', 'stop', 'redis-stack'], capture_output=False)  # in case started, and ignore the return code
-#         cmd = ['systemctl', 'start', 'redis-stack']
-#         proc = subprocess.run(cmd, capture_output=False)
-#         assert proc.returncode == 0
-
-#     else:
-#         cmd = ["/bin/bash", "/build/etc/scripts/entrypoint.sh"]
-#         proc = subprocess.Popen(cmd)
-#         # proc = subprocess.run(cmd, capture_output=False)
-#         # assert proc.returncode == 0
-
-
 def stack_dockloader(cls):
     if getattr(cls, "IN_DOCKER", None) is not None:
         cls.container.reload()
@@ -48,47 +33,6 @@ def stack_dockloader(cls):
             "/opt/redis-stack/bin/redis-stack-server", detach=True
         )
         time.sleep(2)
-
-
-class PackageTestMixin:
-    def test_paths_exist(self):
-        for i in [BINDIR, LIBDIR, ETCDIR, SHAREDIR]:
-            assert os.path.isdir(i)
-
-    def test_files_exist(self):
-        assert os.path.isfile(os.path.join(ETCDIR, "redis-stack.conf"))
-        for binary in BINARIES:
-
-            fpath = os.path.join(BINDIR, binary)
-            assert os.path.isfile(fpath)
-            assert os.path.getsize(fpath) > 0
-
-            stats = os.stat(fpath)
-            assert stats.st_uid == REDIS_UID
-            assert stats.st_gid == REDIS_GID
-
-        # otherwise we can't load the modules
-        for mod in [
-            "rejson.so",
-            "redistimeseries.so",
-            "redisearch.so",
-            "redisgraph.so",
-            "redisbloom.so",
-        ]:
-
-            fpath = os.path.join(LIBDIR, mod)
-            assert os.path.isfile(fpath)
-
-            stats = os.stat(fpath)
-            assert stats.st_uid == REDIS_UID
-            assert stats.st_gid == REDIS_GID
-
-    def test_binaries_execute(self):
-        for binary in BINARIES:
-            proc = subprocess.run(
-                [os.path.join(BINDIR, binary), "-h"], capture_output=False
-            )
-            assert proc.returncode == 1
 
 
 class RedisInsightTestMixin:
@@ -223,6 +167,7 @@ class InDockerTestEnv(RedisTestMixin, object):
             "redis-sentinel",
             "redis-check-aof",
         ]
+
         for b in binaries:
             res, out = self.container.exec_run(f"/opt/redis-stack/bin/{b} -h")
             assert res == 1  # no segfault

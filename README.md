@@ -55,7 +55,7 @@ For example to test *redis-stack-server-99.99.99-1.x86_64.rpm*:
 ``` bash
 mkdir redis-stack
 cp *redis-stack-server-99.99.99-1.x86_64.deb* redis-stack/redis-stack-server.deb
-pytest tests/smoketest/test_deb_packages.py::TestXenial
+pytest tests/smoketest/test_debs.py::TestXenial
 ```
 --------
 

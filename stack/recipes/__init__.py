@@ -87,6 +87,7 @@ class Recipe(object):
     def rpm(self, fpmargs, build_number, distribution):
         fpmargs.append("--depends openssl-devel")
         fpmargs.append("--depends jemalloc-devel")
+        fpmargs.append("--depends libgomp")
         fpmargs.append(
             f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.rpm"
         )

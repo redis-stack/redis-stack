@@ -6,7 +6,16 @@ if [ $? -ne 0 ]; then
 fi
 
 HERE=`dirname ${thiscript}`
+if [ ${HERE} = "/" ]; then
+    echo "Please do not install redis-stack to /"
+    exit 3
+fi
+
+if [ ${HERE} = "." ]; then
+BASEDIR=..
+else
 BASEDIR=`dirname $HERE`
+fi
 
 # default database location
 REDIS_DATA_DIR=`pwd`
