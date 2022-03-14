@@ -259,7 +259,7 @@ jobs:
               https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}-1.${{env.platform}}.${{env.arch}}.tar.gz \
               -O redis-stack/redis-stack-server.tar.gz
 
-        - name: validate debian archive
+        - name: validate packages
           run: |
             source .venv/bin/activate
             pytest -m ${{env.platform}}

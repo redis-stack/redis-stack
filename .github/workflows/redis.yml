@@ -521,5 +521,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: test dockers
+        run: |
           source .venv/bin/activate
           pytest -m dockers
