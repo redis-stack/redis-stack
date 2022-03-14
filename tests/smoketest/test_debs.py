@@ -47,6 +47,7 @@ class DEBTestBase(InDockerTestEnv, object):
         if res != 0:
             raise IOError(out)
 
+
 @pytest.mark.xenial
 class TestXenial(DEBTestBase):
 

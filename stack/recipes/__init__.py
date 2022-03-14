@@ -155,9 +155,9 @@ class Recipe(object):
         )
         fpmargs.append("-t zip")
         return fpmargs
-    
+
     def tar(self, fpmargs, build_number, distribution):
-        
+
         # tar, like zip begins at the root of the package
         # fpm compresses the output only if it ends in .tar.gz
         fpmargs.remove(f"-C {self.__PATHS__.WORKDIR}")
@@ -165,7 +165,7 @@ class Recipe(object):
             f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.tar.gz"
         )
         fpmargs.append("-t tar")
-        
+
         # the tarball, unlike a package requires a workdir name 'redis-stack-<version>'
         # since this is the expectation
         # we prepare that extra step here
@@ -174,9 +174,8 @@ class Recipe(object):
         shutil.rmtree(tartree, ignore_errors=True)
         shutil.copytree(self.__PATHS__.BASEDIR, tarbase)
         fpmargs.append(f"-C {tartree}")
-        
+
         return fpmargs
-       
 
     def package(
         self,

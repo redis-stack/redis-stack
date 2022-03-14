@@ -80,6 +80,7 @@ class TestBionic(TARTestBase):
             "apt-get install -yq libssl-dev libgomp1",
         ]
 
+
 @pytest.mark.xenial
 class TestXenial(TARTestBase):
 
@@ -127,6 +128,6 @@ class TestCentos8(TARTestBase):
 
     def __precommands__(self):
         return [
-            "yum install -y epel-release",
+            "yum install -y epel-release tar",
             "yum install -y openssl-devel jemalloc-devel libgomp",
         ]
