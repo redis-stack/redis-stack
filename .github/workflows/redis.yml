@@ -70,10 +70,10 @@ jobs:
         run: |
           mkdir redis-stack
           wget -q \
-            https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{version}}.${{env.platform}}.${{env.arch}}.deb \
+            https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{env.VERSION}}.${{env.platform}}.${{env.arch}}.deb \
             -O redis-stack/redis-stack-server.deb
           wget -q \
-            https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{version}}.${{env.platform}}.${{env.arch}}.tar.gz \
+            https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{env.VERSION}}.${{env.platform}}.${{env.arch}}.tar.gz \
             -O redis-stack/redis-stack-server.tar.gz
 
       - name: validate debian archive
