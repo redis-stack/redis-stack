@@ -16,6 +16,8 @@ dockers/Docker*
 *.pacman
 *.snap
 *.zip
+*.tar.gz
+*.tgz
 
 *.rdb
 *.lock

@@ -77,3 +77,9 @@ def version(c, package='redis-stack-server', docker=None):
     """Return the version, according to our rules"""
     from stack import get_version
     print(get_version(package, docker))
+
+@task
+def linters(c):
+    """Run linters against the codebase"""
+    run("flake8 --ignore E501 stack tests")
+    run("black --target-version py39 --check --diff stack tests")

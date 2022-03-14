@@ -1,5 +1,6 @@
 import os
 import shutil
+
 # import zipfile
 import tarfile
 from typing import Union
@@ -10,8 +11,8 @@ from loguru import logger
 from ..config import Config
 from ..paths import Paths
 
+
 class RedisInsightBase(object):
-    
     def __init__(
         self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux"
     ):
@@ -21,14 +22,14 @@ class RedisInsightBase(object):
         self.OSNAME = osname
         self.__PATHS__ = Paths(package, osnick, arch, osname)
         self.C = Config()
-        
+
     def generate_url(self, version):
         if self.OSNAME == "macos":
             osname = "darwin"
         else:
             osname = self.OSNAME.lower()
-        if self.ARCH == 'x86_64':
-            arch = 'x64'
+        if self.ARCH == "x86_64":
+            arch = "x64"
         else:
             arch = self.ARCH
         return f"https://s3.amazonaws.com/redisinsight.test/public/rs-ri-builds/{version}/redisstack/RedisInsight-preview-{self.APPTYPE}-{osname}.{arch}.tar.gz"
@@ -48,8 +49,8 @@ class RedisInsightBase(object):
         #     zp.extractall(path=os.path.join(self.__PATHS__.DESTDIR, "redisinsight"))
         logger.debug(f"Untarring {destfile} and storing in {self.__PATHS__.DESTDIR}")
         with tarfile.open(destfile) as f:
-             f.extractall(path=os.path.join(self.__PATHS__.DESTDIR, "redisinsight"))
- 
+            f.extractall(path=os.path.join(self.__PATHS__.DESTDIR, "redisinsight"))
+
     def prepare(self, version: Union[str, None] = None):
         if version is None:
             version = self.C.get_key("versions")["redisinsight"]
@@ -62,16 +63,17 @@ class RedisInsightBase(object):
         if os.path.isfile(destfile):
             return
         pkg_unzip_dest = os.path.join(self.__PATHS__.DESTDIR, "redisinsight")
-        self._fetch_and_unzip(url, destfile) #, pkg_unzip_dest)
+        self._fetch_and_unzip(url, destfile)  # , pkg_unzip_dest)
         shutil.copytree(
             pkg_unzip_dest, os.path.join(self.__PATHS__.SHAREDIR, "redisinsight")
         )
-        
+
+
 class RedisInsight(RedisInsightBase):
 
     APPTYPE = "app"
-    
+
 
 class RedisInsightWeb(RedisInsightBase):
-    
+
     APPTYPE = "web"

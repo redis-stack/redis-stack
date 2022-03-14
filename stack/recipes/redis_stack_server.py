@@ -57,9 +57,14 @@ class RedisStackServer(Recipe):
         # per os
         logger.debug("Copying redis-stack-server script")
         stackdest = os.path.join(self.__PATHS__.BINDIR, "redis-stack-server")
-        shutil.copyfile(os.path.join(self.__PATHS__.SCRIPTDIR, "scripts", f"redis-stack-server.{self.OSNAME}"), stackdest)
+        shutil.copyfile(
+            os.path.join(
+                self.__PATHS__.SCRIPTDIR, "scripts", f"redis-stack-server.{self.OSNAME}"
+            ),
+            stackdest,
+        )
         os.chmod(stackdest, mode=0o755)
-        
+
         if binary_dir is not None and not os.path.isdir(binary_dir):
             r = Redis(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
             r.prepare()
@@ -77,15 +82,15 @@ class RedisStackServer(Recipe):
                 shutil.copy2(os.path.join(binary_dir, i), dest)
                 os.chmod(dest, mode=0o755)
 
-        
         # linux only - copy to /etc
         if self.OSNAME == "Linux":
             confdest = os.path.join(self.__PATHS__.BASEETCDIR, "redis-stack.conf")
             shutil.copy(
                 os.path.join(self.__PATHS__.SCRIPTDIR, "conf", "redis-stack.conf"),
-                confdest)
+                confdest,
+            )
             os.chmod(confdest, mode=0o640)
-        
+
         # copy configuration files
         shutil.copytree(
             os.path.join(self.__PATHS__.SCRIPTDIR, "conf"),

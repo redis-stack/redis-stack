@@ -1,10 +1,7 @@
-import abc
 from ..config import Config
 from loguru import logger
 import os
-import re
 import shutil
-from semver.version import Version
 import subprocess
 
 
@@ -26,15 +23,17 @@ class Recipe(object):
             f"--version {self.version}",
             f"--url '{c.get_key('url')}'",
             f"--license {c.get_key('license')}",
-            f"--category server",
+            "--category server",
             f"--maintainer '{c.get_key('email')}'",
             f"--description '{c.get_key(self.PACKAGE_NAME)['description']}'",
-            f"--directories '/opt/redis-stack'",
+            "--directories '/opt/redis-stack'",
         ]
 
     @property
     def version(self):
-        r = subprocess.run(["git", "branch", "--show-current"], stdout=subprocess.PIPE, text=True)
+        r = subprocess.run(
+            ["git", "branch", "--show-current"], stdout=subprocess.PIPE, text=True
+        )
         branch = r.stdout.strip()
         if branch in ["master", "main"]:
             return "99.99.99"
@@ -42,13 +41,12 @@ class Recipe(object):
         # get the current tag
         tagcmd = ["git", "tag", "--points-at", "HEAD"]
         r = subprocess.run(tagcmd, stdout=subprocess.PIPE, text=True)
-        version = r.stdout.strip().replace('v', '')
+        version = r.stdout.strip().replace("v", "")
         if version != "":
             return version
-       
         # any branch - just takes the version
         config = Config()
-        return config.get_key(self.PACKAGE_NAME)['version']
+        return config.get_key(self.PACKAGE_NAME)["version"]
 
     def deb(self, fpmargs, build_number, distribution):
         fpmargs.append("--depends libssl-dev")
@@ -88,6 +86,7 @@ class Recipe(object):
     def rpm(self, fpmargs, build_number, distribution):
         fpmargs.append("--depends openssl-devel")
         fpmargs.append("--depends jemalloc-devel")
+        fpmargs.append("--depends libgomp")
         fpmargs.append(
             f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.rpm"
         )
@@ -145,9 +144,9 @@ class Recipe(object):
         )
         fpmargs.append("-t osxpkg")
         return fpmargs
-    
+
     def zip(self, fpmargs, build_number, distribution):
-        
+
         # zipfiles really just include the root of the package
         fpmargs.remove(f"-C {self.__PATHS__.WORKDIR}")
         fpmargs.append(f"-C {self.__PATHS__.BASEDIR}")

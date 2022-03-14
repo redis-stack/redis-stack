@@ -13,20 +13,20 @@ import os
 
 class RedisStack(Recipe):
     """A recipe to build the redis-stack package"""
-    
+
     PACKAGE_NAME = "redis-stack"
-    
+
     def __init__(self, osnick, arch="x86_64", osname="Linux"):
         self.ARCH = arch
         self.OSNAME = osname
         self.OSNICK = osnick
         self.__PATHS__ = Paths(self.PACKAGE_NAME, osnick, arch, osname)
         self.C = Config()
-        
+
     def prepackage(
         self, binary_dir: str, ignore: bool = False, version_override: str = None
     ):
-        
+
         for i in [
             self.__PATHS__.EXTERNAL,
             self.__PATHS__.DESTDIR,
@@ -59,9 +59,11 @@ class RedisStack(Recipe):
 
         logger.debug("Copying redis-stack-server script")
         stackdest = os.path.join(self.__PATHS__.USRBINDIR, "redis-stack-server")
-        shutil.copyfile(os.path.join(self.__PATHS__.SCRIPTDIR, "redis-stack-server"), stackdest)
+        shutil.copyfile(
+            os.path.join(self.__PATHS__.SCRIPTDIR, "redis-stack-server"), stackdest
+        )
         os.chmod(stackdest, mode=0o755)
-        
+
         logger.debug(f"Copying redis binaries from {binary_dir}")
         for i in [
             "redis-benchmark",

@@ -6,8 +6,8 @@ import os
 import shutil
 from loguru import logger
 
-class RedisInsightBase(Recipe):
 
+class RedisInsightBase(Recipe):
     def __init__(self, osnick, arch="x86_64", osname="Linux"):
         self.OSNICK = osnick
         self.ARCH = arch
@@ -29,10 +29,10 @@ class RedisInsightBase(Recipe):
             f"--version {self.version}",
             f"--url '{c.get_key('url')}'",
             f"--license {c.get_key('license')}",
-            f"--category server",
+            "--category server",
             f"--maintainer '{c.get_key('email')}'",
             f"--description '{c.get_key(self.PACKAGE_NAME)['description']}'",
-            f"--directories /opt/redis-stack",
+            "--directories /opt/redis-stack",
         ]
 
     def deb(self, fpmargs, build_number, distribution):
@@ -153,6 +153,7 @@ class RedisInsightBase(Recipe):
         logger.debug(f"Packaging: {cmd}")
         return os.system(cmd)
 
+
 class RedisInsight(RedisInsightBase):
     """A recipe to build a redisinsight package from the native app"""
 
@@ -172,7 +173,6 @@ class RedisInsight(RedisInsightBase):
             os.makedirs(i, exist_ok=True, mode=0o755)
 
         from ..components.redisinsight import RedisInsight as RI
-
 
         for i in [NodeJS, RI]:
             n = i(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
@@ -197,7 +197,6 @@ class RedisInsightWeb(RedisInsightBase):
             os.makedirs(i, exist_ok=True, mode=0o755)
 
         from ..components.redisinsight import RedisInsightWeb as RI
-
 
         for i in [NodeJS, RI]:
             n = i(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)

@@ -1,7 +1,6 @@
 from optparse import OptionParser
 import sys
 from loguru import logger
-import os
 
 
 if __name__ == "__main__":
@@ -66,7 +65,12 @@ if __name__ == "__main__":
         help="Package recipe to build",
         default="redis-stack-server",
         type="choice",
-        choices=["redis-stack", "redis-stack-server", "redisinsight", "redisinsight-web"]
+        choices=[
+            "redis-stack",
+            "redis-stack-server",
+            "redisinsight",
+            "redisinsight-web",
+        ],
     )
 
     # run time argumetns
@@ -119,7 +123,7 @@ if __name__ == "__main__":
     else:
         sys.stderr.write(f"{opts.PACKAGE} is an unsupported package recipe.\n")
         sys.exit(3)
-    
+
     a = pkgklass(opts.OSNICK, opts.ARCH, opts.OSNAME)
 
     if opts.SKIP is None or opts.SKIP != "fetch":
