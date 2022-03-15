@@ -22,7 +22,7 @@ class Recipe(object):
             f"--vendor '{c.get_key('vendor')}'",
             f"--version {self.version}",
             f"--url '{c.get_key('url')}'",
-            f"--license {c.get_key('license')}",
+            f"--license '{c.get_key('license')}'",
             "--category server",
             f"--maintainer '{c.get_key('email')}'",
             f"--description '{c.get_key(self.PACKAGE_NAME)['description']}'",

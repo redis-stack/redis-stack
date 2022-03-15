@@ -32,8 +32,6 @@ CMD=${BASEDIR}/bin/redis-server
 if [ -f "${1}" ]; then
     CONFFILE="${1}"
     shift
-elif [ -f /etc/redis-stack.conf ]; then
-    CONFFILE=/etc/redis-stack.conf
 elif [ -f ${BASEDIR}/etc/redis-stack.conf ]; then
     CONFFILE=${BASEDIR}/etc/redis-stack.conf
 fi

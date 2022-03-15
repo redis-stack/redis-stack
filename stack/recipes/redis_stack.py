@@ -27,6 +27,8 @@ class RedisStack(Recipe):
         self, binary_dir: str, ignore: bool = False, version_override: str = None
     ):
 
+        raise NotImplementedError("DISABLED FOR NOW, INTENTIONALLY")
+
         for i in [
             self.__PATHS__.EXTERNAL,
             self.__PATHS__.DESTDIR,

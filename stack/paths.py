@@ -30,6 +30,7 @@ class Paths:
         # package paths
         self.BASEDIR = os.path.join(self.WORKDIR, "opt", "redis-stack")
         self.BASEETCDIR = os.path.join(self.WORKDIR, "etc")
+        self.BASEVARDBDIR = os.path.join(self.WORKDIR, "var", "lib", "redis-stack")
         self.LIBDIR = os.path.join(self.BASEDIR, "lib")
         self.BINDIR = os.path.join(self.BASEDIR, "bin")
         self.SHAREDIR = os.path.join(self.BASEDIR, "share")

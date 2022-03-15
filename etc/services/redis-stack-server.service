@@ -1,16 +1,14 @@
 [Unit]
-Description=redis-stack-server
+Description=Redis stack server
+Documentation=https://redis.io/
 After=network.target
-#PartOf=redis-stack.service
 
 [Service]
 Type=simple
 User=nobody
-Restart=always
-RestartSec=1
-User=nobody
-ExecStart=/opt/redis-stack/bin/redis-server /etc/redis-stack.conf --dir /var/lib/redis-stack
-ExecStop=/bin/kill -s TERM ${MAINPID}
+ExecStart=/opt/redis-stack/bin/redis-server /etc/redis-stack.conf
+WorkingDirectory=/var/lib/redis-stack
+UMask=0077
 
 [Install]
 WantedBy=multi-user.target
