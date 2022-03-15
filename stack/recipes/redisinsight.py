@@ -177,6 +177,8 @@ class RedisInsight(RedisInsightBase):
         for i in [NodeJS, RI]:
             n = i(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
             n.prepare()
+            
+        raise NotImplementedError("DISABLED FOR NOW, INTENTIONALY.")
 
 
 class RedisInsightWeb(RedisInsightBase):

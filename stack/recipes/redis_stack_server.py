@@ -31,6 +31,7 @@ class RedisStackServer(Recipe):
             self.__PATHS__.BINDIR,
             self.__PATHS__.SHAREDIR,
             self.__PATHS__.BASEETCDIR,
+            self.__PATHS__.BASEVARDBDIR,
         ]:
             os.makedirs(i, exist_ok=True, mode=0o755)
 
@@ -85,7 +86,7 @@ class RedisStackServer(Recipe):
         if self.OSNAME == "Linux":
             confdest = os.path.join(self.__PATHS__.BASEETCDIR, "redis-stack.conf")
             shutil.copy(
-                os.path.join(self.__PATHS__.SCRIPTDIR, "conf", "redis-stack.conf"),
+                os.path.join(self.__PATHS__.SCRIPTDIR, "conf", "redis-stack-service.conf"),
                 confdest,
             )
             os.chmod(confdest, mode=0o640)

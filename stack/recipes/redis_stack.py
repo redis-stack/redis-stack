@@ -22,6 +22,8 @@ class RedisStack(Recipe):
         self.OSNICK = osnick
         self.__PATHS__ = Paths(self.PACKAGE_NAME, osnick, arch, osname)
         self.C = Config()
+        
+        raise NotImplementedError("DISABLED FOR NOW, INTENTIONALLY")
 
     def prepackage(
         self, binary_dir: str, ignore: bool = False, version_override: str = None
