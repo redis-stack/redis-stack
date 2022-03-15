@@ -127,6 +127,9 @@ class RedisInsightBase(Recipe):
         build_number: int = 1,
         distribution: str = "bionic",
     ):
+
+        raise NotImplementedError("DISABLED FOR NOW, INTENTIONALY.")
+
         logger.info(f"Building {package_type} package")
         fpmargs = self.__package_base_args__
         fpmargs.append(f"--iteration {build_number}")
@@ -177,8 +180,6 @@ class RedisInsight(RedisInsightBase):
         for i in [NodeJS, RI]:
             n = i(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
             n.prepare()
-            
-        raise NotImplementedError("DISABLED FOR NOW, INTENTIONALY.")
 
 
 class RedisInsightWeb(RedisInsightBase):

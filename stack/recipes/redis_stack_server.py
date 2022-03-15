@@ -86,7 +86,9 @@ class RedisStackServer(Recipe):
         if self.OSNAME == "Linux":
             confdest = os.path.join(self.__PATHS__.BASEETCDIR, "redis-stack.conf")
             shutil.copy(
-                os.path.join(self.__PATHS__.SCRIPTDIR, "conf", "redis-stack-service.conf"),
+                os.path.join(
+                    self.__PATHS__.SCRIPTDIR, "conf", "redis-stack-service.conf"
+                ),
                 confdest,
             )
             os.chmod(confdest, mode=0o640)
