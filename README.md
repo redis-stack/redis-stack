@@ -4,9 +4,10 @@ This repository builds redis, and downloads various components (modules, RedisIn
 
 ## Development Requirements
 
-* Python > 3.6 (for this toolkit) and poetry
+* Python > 3.9 (for this toolkit) and [poetry](https://python-poetry.org)
 * Ruby > 2.7 (for [fpm](https://github.com/jordansissel/fpm))
 * Docker (to build a docker)
+* zip/apt/deb/tar depending on your target outputs.  
 
 ## How to Build
 
