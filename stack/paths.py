@@ -19,6 +19,11 @@ class Paths:
         self.BUILDROOT = os.path.join(self.HERE, "build")
         self.SCRIPTDIR = os.path.join(self.HERE, "etc")
 
+        # binary cache dir
+        self.BINCACHEDIR = os.path.join(
+            self.HERE, "binaries", f"{self.OSNAME}-{self.ARCH}"
+        )
+
         # used throughout
         self.DESTDIR = os.path.join(
             self.EXTERNAL, f"{self.OSNAME}-{self.OSNICK}-{self.ARCH}"

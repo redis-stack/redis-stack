@@ -180,6 +180,7 @@ class RedisInsight(RedisInsightBase):
             n = i(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
             n.prepare()
 
+
 class RedisInsightWeb(RedisInsightBase):
     """A recipe to build a redisinsight package for the web application"""
 

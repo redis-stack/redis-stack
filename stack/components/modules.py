@@ -25,7 +25,7 @@ class Modules(object):
         self.__PATHS__ = Paths(package, osnick, arch, osname)
         self.C = Config()
 
-    def generate_url(self, module: str, version: str):
+    def generate_url(self, module: str, version: str, override: bool = False):
         """Assuming the module follows the standard, return the URL from
         which to grab it"""
 
@@ -34,54 +34,70 @@ class Modules(object):
 
         # FIXME mac M1 temporary hack until it moves
         if self.ARCH == "arm64":
-            if module == "redisearch-oss":
-                version = "2.2.9"
-            if module == "redisgraph":
-                version = "2.8.8"
             return urllib.parse.urljoin(
                 f"https://{self.AWS_S3_BUCKET}",
                 f"lab/23-macos-m1/{module}.{self.OSNAME}-{self.OSNICK}-arm64v8.{version}.zip",
             )
-
-        return urllib.parse.urljoin(
-            f"https://{self.AWS_S3_BUCKET}",
-            f"{module}/{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip",
-        )
+        if override:
+            return urllib.parse.urljoin(
+                f"https://{self.AWS_S3_BUCKET}",
+                f"{module}/snapshots/{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip",
+            )
+        else:
+            return urllib.parse.urljoin(
+                f"https://{self.AWS_S3_BUCKET}",
+                f"{module}/{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip",
+            )
 
     def rejson(self, version: Union[str, None] = None):
         """rejson specific fetch"""
         if version is None:
             version = self.C.get_key("versions")["rejson"]
-        self._run("rejson", version)
+            override = False
+        else:
+            override = True
+        self._run("rejson", version, override)
 
     def redisgraph(self, version: Union[str, None] = None):
         """redisgraph specific fetch"""
         if version is None:
             version = self.C.get_key("versions")["redisgraph"]
-        self._run("redisgraph", version)
+            override = False
+        else:
+            override = True
+        self._run("redisgraph", version, override)
 
     def redisearch(self, version: Union[str, None] = None):
         """redisearch specific fetch"""
 
         if version is None:
             version = self.C.get_key("versions")["redisearch"]
-        self._run("redisearch", version)  # None, url)
+            override = False
+        else:
+            override = True
+        self._run("redisearch", version, override)
 
     def redistimeseries(self, version: Union[str, None] = None):
         """redistimeseries specific fetch"""
         if version is None:
             version = self.C.get_key("versions")["redistimeseries"]
-        self._run("redistimeseries", version)
+            override = False
+        else:
+            override = True
+        self._run("redistimeseries", version, override)
 
     def redisbloom(self, version: Union[str, None] = None):
         """bloom specific fetch"""
+        override = False
         if version is None:
             version = self.C.get_key("versions")["redisbloom"]
-        self._run("redisbloom", version)
+            override = False
+        else:
+            override = True
+        self._run("redisbloom", version, override)
 
-    def _run(self, modulename: str, version: str, url: Union[str, None] = None):
-        if url is None:
-            url = self.generate_url(modulename, version)
+    def _run(self, modulename: str, version: str, override=False):
+        url = self.generate_url(modulename, version, override)
         logger.info(f"Fetching {modulename}")
         destfile = os.path.join(
             self.__PATHS__.EXTERNAL,
