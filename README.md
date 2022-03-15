@@ -67,3 +67,10 @@ Today, to modify the way a service starts, the following files all need editing:
 * entrypoint.sh (for dockers)
 * snapcraft.j2 (for ubuntu snaps)
 * etc/services/ (for systemd services on Linux)
+
+-------
+##### Caveats
+
+Files in the binaries directory are added using git-lfs. Given that currently we can't build on an M1, we store these binaries, here, and repackage accordingly, including the appropriate APACHE license.
+
+If we're building on the native platform, files will be copied from $HOMEBREW/lib - assuming they're available. But, in the case where they are not - this tree exists.
