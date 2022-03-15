@@ -39,6 +39,7 @@ def dockergen(c, docker_type='redis-stack'):
     'arch': 'architecture (eg: x86_64)',
     'build_number': 'build number (defaults to 1)',
     'package': 'package to build {redis-stack|redis-stack-server|redisinsight|redisinsight-web}',
+    'skip': '[Optional] set to fetch or package to determine which step to skip',
 })
 def package(
     c, osname='Linux', osnick='', dist='',
@@ -67,6 +68,9 @@ def package(
         f"-x",
         f"-I",
     ]
+    if skip:
+        cmd.append(f'-S {skip}')
+    print(cmd)
     run(' '.join(cmd))
 
 @task(help={
