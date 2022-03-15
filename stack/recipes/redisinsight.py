@@ -128,8 +128,6 @@ class RedisInsightBase(Recipe):
         distribution: str = "bionic",
     ):
 
-        raise NotImplementedError("DISABLED FOR NOW, INTENTIONALY.")
-
         logger.info(f"Building {package_type} package")
         fpmargs = self.__package_base_args__
         fpmargs.append(f"--iteration {build_number}")
@@ -166,6 +164,7 @@ class RedisInsight(RedisInsightBase):
         self, binary_dir: str, ignore: bool = False, version_override: str = None
     ):
 
+        raise NotImplementedError("DISABLED FOR NOW, INTENTIONALY.")
         for i in [
             self.__PATHS__.EXTERNAL,
             self.__PATHS__.DESTDIR,
@@ -180,7 +179,6 @@ class RedisInsight(RedisInsightBase):
         for i in [NodeJS, RI]:
             n = i(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
             n.prepare()
-
 
 class RedisInsightWeb(RedisInsightBase):
     """A recipe to build a redisinsight package for the web application"""
