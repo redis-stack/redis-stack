@@ -76,7 +76,7 @@ jobs:
         path: |
           /var/cache/apt
           /var/cache/yum
-        key: cache-${{hashFiles('**/redis.yml')}}-${{inputs.platform}}-${{inputs.arch}}-build
+        key: cache-${{hashFiles('.github/workflows/redis.yml')}}-${{inputs.platform}}-${{inputs.arch}}-build
     - name: make
       run: make -C redis/src all BUILD_TLS=yes
     - name: package redis for s3
@@ -141,7 +141,7 @@ jobs:
             ~/.cache/pip
             ~/.cache/pypoetry
             ~/.local/share/gem
-          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{inputs.platform}}-${{inputs.arch}}-package
+          key: pypoetry-${{hashFiles('pyproject.toml')}}-${{inputs.platform}}-${{inputs.arch}}-package
 
       - uses: ruby/setup-ruby@v1
       - name: install python
@@ -232,7 +232,7 @@ jobs:
               ~/.cache/pip
               ~/.cache/pypoetry
               ~/.local/share/gem
-            key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
+            key: pypoetry-${{hashFiles('pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
         - name: install poetry
           uses: snok/install-poetry@v1
           with:
