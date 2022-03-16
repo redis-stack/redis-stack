@@ -431,6 +431,10 @@ jobs:
           virtualenvs-in-project: true
           virtualenvs-create: true
           installer-parallel: true
+      - name: install packaging tools
+        run: |
+          gem install fpm -v ${{env.fpmversion}}
+          poetry install
       - name: build snap
         run: |
           invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redis-stack-server
@@ -449,6 +453,56 @@ jobs:
         run: |
           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
 
+  test-snap:
+      env:
+        platform: focal
+        arch: x86_64
+        target: snap
+        pythonversion: 3.9
+      needs: [snap]
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - name: install python
+          uses: actions/setup-python@v2
+          with:
+            python-version: ${{env.pythonversion}}
+        - uses: actions/cache@v2
+          with:
+            path: |
+              /var/cache/apt
+              /var/cache/yum
+              ~/.cache/pip
+              ~/.cache/pypoetry
+              ~/.local/share/gem
+            key: pypoetry-${{hashFiles('pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
+        - name: install poetry
+          uses: snok/install-poetry@v1
+          with:
+            version: latest
+            virtualenvs-in-project: true
+            virtualenvs-create: true
+            installer-parallel: true
+        - name: get package version
+          id: get_version
+          run: |
+            poetry install
+            source .venv/bin/activate
+            realversion=`invoke version -p redis-stack-server`
+            echo "::set-output name=VERSION::$realversion"
+
+        # now, fetch from s3 and install to the redis-stack directory
+        - name: get packages from s3
+          run: |
+            mkdir redis-stack
+            wget -q \
+              https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}-1.${{env.platform}}.${{env.arch}}.${{env.target}} \
+              -O redis-stack/redis-stack-server.${{env.target}}
+
+        - name: validate packages
+          run: |
+            source .venv/bin/activate
+            pytest -m snaps
 
   dockers:
     name: ${{matrix.package}} docker
