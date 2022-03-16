@@ -58,8 +58,7 @@ MODULEDIR=${BASEDIR}/lib
 
 echo "Starting redis-stack-server, database path ${REDIS_DATA_DIR}"
 
-DYLD_LIBRARY_PATH=${BASEDIR}/lib \
-${CMD} \
+${CMD}
 ${CONFFILE} -- \
 --dir ${REDIS_DATA_DIR} \
 --protected-mode no \
