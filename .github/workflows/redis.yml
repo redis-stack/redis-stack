@@ -216,9 +216,8 @@ jobs:
         poetry install
     - name: build redis from source
       run: |
-        cd redis-stack
-        source .venv/bin/activate
-        invoke build-redis -r ../redis
+        cd redis
+        make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a" 
 
     - name: package redis for s3
       run: |
