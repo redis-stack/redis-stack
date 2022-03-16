@@ -459,6 +459,7 @@ jobs:
         arch: x86_64
         target: snap
         pythonversion: 3.9
+        rubyversion: 3.9
       needs: [snap]
       runs-on: ubuntu-latest
       steps:
