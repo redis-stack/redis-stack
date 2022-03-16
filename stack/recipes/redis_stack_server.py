@@ -55,7 +55,7 @@ class RedisStackServer(Recipe):
                     raise
 
         # optionally copy our select mac binaries
-        for i in ['libomp.dylib', 'libssl.dylib', 'libcrypto.dylib']: do
+        for i in ["libomp.dylib", "libssl.dylib", "libcrypto.dylib", "libcrypto.dylib"]:
             if self.OSNAME == "macos":
                 if os.path.exists(f"/usr/local/lib/{i}"):
                     shutil.copy(f"/usr/local/lib/{i}", self.__PATHS__.LIBDIR)
