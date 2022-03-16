@@ -54,20 +54,6 @@ class RedisStackServer(Recipe):
                 else:
                     raise
 
-        # # optionally copy our select mac binaries
-        # for i in ["libomp.dylib", "libssl.dylib", "libcrypto.dylib", "libcrypto.dylib"]:
-        #     if self.OSNAME == "macos":
-        #         if os.path.exists(f"/usr/local/lib/{i}"):
-        #             shutil.copy(f"/usr/local/lib/{i}", self.__PATHS__.LIBDIR)
-        #         elif os.path.exists(f"/opt/homebrew/lib/{i}"):
-        #             shutil.copy(f"/opt/homebrew/lib/{i}", self.__PATHS__.LIBDIR)
-        #         else:
-        #             logger.info("No local dylib found, copying from repo cache")
-        #             shutil.copy(
-        #                 os.path.join(self.__PATHS__.BINCACHEDIR, i),
-        #                 i,
-        #             )
-
         # per os
         logger.debug("Copying redis-stack-server script")
         stackdest = os.path.join(self.__PATHS__.BINDIR, "redis-stack-server")
