@@ -7,7 +7,7 @@ from stack.paths import Paths
 
 
 @task
-def build_redis(c, redis_repo_path="redis", build_args="all BUILD_TLS=yes"):
+def build_redis(c, redis_repo_path="redis", build_args="all build_tls=yes"):
     """compile redis"""
     redispath = os.path.join(os.getcwd(), redis_repo_path, "src")
     run(f"make -C {redispath} -j `nproc` {build_args}")

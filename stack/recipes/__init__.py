@@ -3,6 +3,8 @@ from loguru import logger
 import os
 import shutil
 import subprocess
+import jinja2
+import tempfile
 
 
 class Recipe(object):
@@ -177,6 +179,40 @@ class Recipe(object):
 
         return fpmargs
 
+    def snap(self, fpmargs, build_number, distribution):
+        snap_grade = "stable"
+        snap_confinement = "classic"
+
+        vars = {
+            "PRODUCT": self.C.get_key(self.PACKAGE_NAME)["product"],
+            "VERSION": self.version,
+            "SUMMARY": self.C.get_key(self.PACKAGE_NAME)["summary"],
+            "DESCRIPTION": self.C.get_key(self.PACKAGE_NAME)["description"],
+            "SNAP_GRADE": snap_grade,
+            "SNAP_CONFINEMENT": snap_confinement,
+            "basedir": self.__PATHS__.BASEDIR,
+        }
+
+        # generate the snapcraft.yaml from the template
+        dest = tempfile.mktemp(suffix=".yaml", prefix="snapcraft")
+        src = "snapcraft.j2"
+
+        loader = jinja2.FileSystemLoader(self.__PATHS__.SCRIPTDIR)
+        env = jinja2.Environment(loader=loader)
+        tmpl = loader.load(name=src, environment=env)
+        generated = tmpl.render(vars)
+        with open(dest, "w+") as fp:
+            fp.write(generated)
+
+        fpmargs.append(
+            f"-p {self.PACKAGE_NAME}-{self.version}-{build_number}.{self.ARCH}.snap"
+        )
+        fpmargs.append(f"--snap-confinement {snap_confinement}")
+        fpmargs.append(f"--snap-grade {snap_grade}")
+        fpmargs.append(f"--snap-yaml {dest}")
+        fpmargs.append("-t snap")
+        return fpmargs
+
     def package(
         self,
         package_type: str = "deb",
@@ -202,6 +238,8 @@ class Recipe(object):
             fpmargs = self.zip(fpmargs, build_number, distribution)
         elif package_type == "tar":
             fpmargs = self.tar(fpmargs, build_number, distribution)
+        elif package_type == "snap":
+            fpmargs = self.snap(fpmargs, build_number, distribution)
         else:
             raise AttributeError(f"{package_type} is an invalid package type")
 

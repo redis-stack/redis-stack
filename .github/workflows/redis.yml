@@ -393,6 +393,63 @@ jobs:
       run: |
         s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
 
+  snap:
+    name: ${{matrix.package}} snap
+    runs-on: ubuntu-latest
+    needs: [focal]
+    strategy:
+      matrix:
+        package: ['redis-stack-server']
+    env:
+      platform: focal
+      arch: x86_64
+      osnick: ubuntu20.04
+      target: snap
+      osname: Linux
+      pythonversion: 3.9
+    steps:
+      - uses: actions/checkout@v2
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{env.pythonversion}}
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            /var/cache/apt
+            /var/cache/yum
+            ~/.cache/pip
+            ~/.cache/pypoetry
+            ~/.local/share/gem
+          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
+
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+      - name: build snap
+        run: |
+          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redis-stack-server
+      - uses: s3-actions/s3cmd@v1.1
+        with:
+          provider: aws
+          region: us-east-1
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: upload snapshots
+        if: startsWith(github.ref, 'refs/tags/') != true
+        run: |
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+      - name: upload release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
+
+
   dockers:
     name: ${{matrix.package}} docker
     strategy:

@@ -7,13 +7,32 @@ description: |
 grade: {{SNAP_GRADE}}
 confinement: {{SNAP_CONFINEMENT}}
 base: core20
+source: redis-stack
 
 apps:
     {{PRODUCT}}:
-        command: /opt/redis-stack/bin/redis-server -p /opt/redis-stack/etc/redis-stack.conf
+        command: /opt/redis-stack/bin/redis-stack-server
         plugs:
           - network
+    {% if product == 'redis-stack' %}
     REDISINSIGHT:
         command: /opt/redis-stack/nodejs/bin/node -r /opt/redis-stack/share/redisinsight/api/node_modules/dotenv/config share/redisinsight/api/dist/src/main.js dotenv_config_path=/opt/redis-stack/share/redisinsight/.env
         plugs:
           - network
+    {% endif %}
+
+parts:
+    {{PRODUCT}}:
+        plugin: dump
+        organize:
+            {{basedir}}:/opt/redis-stack
+        stage-packages:
+            - libssl-dev
+            - libomp1
+
+plugs:
+    {{PRODUCT}}-home:
+        interface: home
+        stage-packages: [libssl-dev, libomp1]
+    {{PRODUCT}}-network:
+        interface: network
