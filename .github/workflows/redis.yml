@@ -67,7 +67,9 @@ jobs:
           cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
       - name: sign package
         run: |
-          dpkg-sig -g "--no-tty --passphrase ${{secrets.GPG_PASSWORD}}" -k ${{ secrets.GPG_ID }} -s redis  *.deb
+          echo '${{secrets.GPG_PASSWORD}}' > .passfile
+          dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{secrets.GPG_ID}} *.deb
+          rm -f .passfile
 
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
