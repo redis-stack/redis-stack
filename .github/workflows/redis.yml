@@ -53,7 +53,7 @@ jobs:
           installer-parallel: true
       - name: install packaging tools
         run: |
-          sudo apt-get install unzip debsigs libterm-readkey-perl dpkg-sign
+          sudo apt-get install unzip debsigs libterm-readkey-perl dpkg-sig
           poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
 
