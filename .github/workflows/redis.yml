@@ -53,7 +53,7 @@ jobs:
           installer-parallel: true
       - name: install packaging tools
         run: |
-          sudo apt-get install unzip debsigs libterm-readkey-perl dpkg-sig
+          sudo apt-get install unzip libterm-readkey-perl dpkg-sig
           poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
 
@@ -65,7 +65,7 @@ jobs:
       - name: install gpg key
         run: |
           cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
-      - name: sign package
+      - name: gpg sign package
         run: |
           echo '${{secrets.GPG_PASSWORD}}' > .passfile
           dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{secrets.GPG_ID}} *.deb
@@ -97,20 +97,22 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           s3cmd put -P s3uploads/* s3://redismodules/redis-stack/
-  # focal:
-  #   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-  #   with:
-  #     image_name: ubuntu:focal
-  #     platform: focal
-  #     osname: Linux
-  #     osnick: ubuntu20.04
-  #     arch: x86_64
-  #     target: deb
-  #     build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-  #     packaging_deps: sudo apt-get install -y unzip debsigs
-  #   secrets:
-  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  focal:
+    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+    with:
+      image_name: ubuntu:focal
+      platform: focal
+      osname: Linux
+      osnick: ubuntu20.04
+      arch: x86_64
+      target: deb
+      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
+      packaging_deps: sudo apt-get install -y unzip debsigs
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
 
 
   # bionic:
@@ -143,20 +145,25 @@ jobs:
   #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-  # rhel7:
-  #   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-  #   with:
-  #     image_name: centos:7
-  #     platform: rhel7
-  #     osname: Linux
-  #     osnick: rhel7
-  #     arch: x86_64
-  #     target: rpm
-  #     build_deps: yum install -y epel-release gcc make jemalloc-devel openssl-devel python3 python3-pip
-  #     packaging_deps: sudo apt-get install -y rpm unzip
-  #   secrets:
-  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  rhel7:
+    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+    with:
+      image_name: centos:7
+      platform: rhel7
+      osname: Linux
+      osnick: rhel7
+      arch: x86_64
+      target: rpm
+      build_deps: yum install -y epel-release gcc make jemalloc-devel openssl-devel python3 python3-pip
+      packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2) 
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
+      GPG_ID: ${{ secrets.GPG_ID }}
 
   # rhel8:
   #   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
