@@ -65,14 +65,9 @@ jobs:
       - name: install gpg key
         run: |
           cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
-      - name: get gpg key id
-        id: gpg_key_id
-        run: |
-          gpgkey_id="gpg --list-keys ${{secrets.GPG_EMAIL}}|awk 'NR==2'"
-          echo "::set-output name=GPG_ID::$gpgkey_id"
       - name: sign package
         run: |
-          dpkg-sig -g "--no-tty --passphrase ${{secrets.GPG_PASSWORD}}" -k ${{ steps.gpg_key_id.outputs.GPG_ID }}" -s redis  *.deb
+          dpkg-sig -g "--no-tty --passphrase ${{secrets.GPG_PASSWORD}}" -k ${{ secrets.GPG_ID }} -s redis  *.deb
 
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
