@@ -113,6 +113,9 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
       GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_ID: ${{ secrets.GPG_ID }}
+      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
 
   # bionic:
@@ -161,9 +164,9 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
       GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
       GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
       GPG_ID: ${{ secrets.GPG_ID }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   # rhel8:
   #   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
