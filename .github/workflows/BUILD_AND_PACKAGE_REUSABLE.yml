@@ -191,22 +191,22 @@ jobs:
         run: |
           cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
 
-      - name: gpg sign ${{env.target}}
-        if: ${{ env.target }} == 'deb'
+      - name: gpg sign package
+        if: ${{ env.target }} = 'deb'
         run: |
-          echo '${{secrets.GPG_PASSWORD}}' > .passfile
-          dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{secrets.GPG_ID}} *.deb
-          rm -f .passfile
-
-      - name: gpg sign ${{env.target}}
-        if: ${{ env.target }} == 'rpm'
-        run: |
-          gpg --export -a '${{ secrets.GPG_EMAIL }}' > /key
-          rpm --import /key
-          echo allow-present-passphrase > ~/.gnupg/gpg-agent.conf
-          gpg-connect-agent reloadagent /bye
-          /usr/lib/gnupg/gpg-preset-passphrase '${{ secrets.GPG_PASSWORD }}' --present ${{ secrets.GPG_KEYGRIP }}
-          rpmsign --addisgn --key-id ${{ secrets.GPG_ID }} *.rpm
+          if [ -f /usr/bin/dpkg-sig ]; then
+            echo '${{secrets.GPG_PASSWORD}}' > .passfile
+            dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{secrets.GPG_ID}} *.deb
+            rm -f .passfile
+          elif [ -f /usr/bin/rpm ]; then
+            gpg --export -a '${{ secrets.GPG_EMAIL }}' > key
+            rpm --import key
+            echo allow-present-passphrase > ~/.gnupg/gpg-agent.conf
+            gpg-connect-agent reloadagent /bye
+            /usr/lib/gnupg/gpg-preset-passphrase '${{ secrets.GPG_PASSWORD }}' --present ${{ secrets.GPG_KEYGRIP }}
+            rpmsign --addisgn --key-id ${{ secrets.GPG_ID }} *.rpm
+            rm key
+          fi
 
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
