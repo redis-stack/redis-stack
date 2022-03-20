@@ -407,12 +407,15 @@ jobs:
       target: snap
       osname: Linux
       pythonversion: 3.9
+      fpmversion: 1.14.1
+      rubyversion: 2.7.2
     steps:
       - uses: actions/checkout@v2
       - name: install python
         uses: actions/setup-python@v2
         with:
           python-version: ${{env.pythonversion}}
+      - uses: ruby/setup-ruby@v1
 
       - uses: actions/cache@v2
         with:
@@ -459,7 +462,6 @@ jobs:
         arch: x86_64
         target: snap
         pythonversion: 3.9
-        rubyversion: 3.9
       needs: [snap]
       runs-on: ubuntu-latest
       steps:
