@@ -201,7 +201,7 @@ jobs:
           elif [ -f /usr/bin/rpm ]; then
             gpg --export -a '${{ secrets.GPG_EMAIL }}' > key
             rpm --import key
-            echo allow-present-passphrase > ~/.gnupg/gpg-agent.conf
+            echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
             gpg-connect-agent reloadagent /bye
             /usr/lib/gnupg/gpg-preset-passphrase '${{ secrets.GPG_PASSWORD }}' --present ${{ secrets.GPG_KEYGRIP }}
             rpmsign --addisgn --key-id ${{ secrets.GPG_ID }} *.rpm
