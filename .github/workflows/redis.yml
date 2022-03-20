@@ -436,6 +436,7 @@ jobs:
           installer-parallel: true
       - name: install packaging tools
         run: |
+          source .venv/bin/activate
           gem install fpm -v ${{env.fpmversion}}
           poetry install
       - name: build snap
