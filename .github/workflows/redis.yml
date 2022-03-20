@@ -175,7 +175,7 @@ jobs:
       target: osxpkg
       platform: catalina
       osname: macos
-      redisversion: 6.2.6
+      redisversion: 7.0-rc2
       pythonversion: 3.9
       fpmversion: 1.14.1
       rubyversion: 2.7.2
@@ -316,7 +316,7 @@ jobs:
       target: zip
       platform: monterey
       osname: macos
-      redisversion: 6.2.6
+      redisversion: 7.0-rc2
       pythonversion: 3.9
       fpmversion: 1.14.1
       rubyversion: 2.7.2
