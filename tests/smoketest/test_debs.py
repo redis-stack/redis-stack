@@ -32,6 +32,12 @@ class DEBTestBase(InDockerTestEnv, object):
         res, out = container.exec_run("apt install -yq gdebi-core")
         assert res == 0
 
+        res, out = container.exec_run("apt install -y git")
+        assert res == 0
+
+        res, out = container.exec_run("apt install -y python3-pip")
+        assert res == 0
+
         # make sure gdebi is present
         res, out = container.exec_run("ls /usr/bin/gdebi")
         assert "/usr/bin/gdebi" in out.decode()
