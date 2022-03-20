@@ -436,11 +436,11 @@ jobs:
           installer-parallel: true
       - name: install packaging tools
         run: |
-          source .venv/bin/activate
           gem install fpm -v ${{env.fpmversion}}
           poetry install
       - name: build snap
         run: |
+          source .venv/bin/activate
           invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redis-stack-server
       - uses: s3-actions/s3cmd@v1.1
         with:
