@@ -203,8 +203,8 @@ jobs:
             rpm --import key
             echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
             gpg-connect-agent reloadagent /bye
-            /usr/lib/gnupg/gpg-preset-passphrase '${{ secrets.GPG_PASSWORD }}' --preset ${{ secrets.GPG_KEYGRIP }}
-            rpmsign --addisgn --key-id ${{ secrets.GPG_ID }} *.rpm
+            /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ secrets.GPG_KEYGRIP }}
+            rpmsign --addsign --key-id ${{ secrets.GPG_ID }} *.rpm
             rm key
           fi
 
