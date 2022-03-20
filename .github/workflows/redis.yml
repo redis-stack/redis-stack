@@ -500,7 +500,7 @@ jobs:
           run: |
             mkdir redis-stack
             wget -q \
-              https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}-1.${{env.platform}}.${{env.arch}}.${{env.target}} \
+              https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}-1.${{env.arch}}.${{env.target}} \
               -O redis-stack/redis-stack-server.${{env.target}}
 
         - name: validate packages
