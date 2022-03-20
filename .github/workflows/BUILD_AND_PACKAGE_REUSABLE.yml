@@ -49,6 +49,16 @@ on:
         required: true
       AWS_SECRET_ACCESS_KEY:
         required: true
+      GPG_ID:
+        required: true
+      GPG_KEY:
+        required: true
+      GPG_PASSWORD:
+        required: true
+      GPG_KEYGRIP:
+        required: false
+      GPG_EMAIL:
+        required: false
 
 jobs:
 
@@ -176,6 +186,27 @@ jobs:
         run: |
           source .venv/bin/activate
           invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t tar -p ${{ matrix.package }}
+
+      - name: install gpg key
+        run: |
+          cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
+
+      - name: gpg sign package
+        if: ${{ env.target }} = 'deb'
+        run: |
+          if [ -f /usr/bin/dpkg-sig ]; then
+            echo '${{secrets.GPG_PASSWORD}}' > .passfile
+            dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{secrets.GPG_ID}} *.deb
+            rm -f .passfile
+          elif [ -f /usr/bin/rpm ]; then
+            gpg --export -a '${{ secrets.GPG_EMAIL }}' > key
+            rpm --import key
+            echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
+            gpg-connect-agent reloadagent /bye
+            /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ secrets.GPG_KEYGRIP }}
+            rpmsign --addsign --key-id ${{ secrets.GPG_ID }} *.rpm
+            rm key
+          fi
 
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
