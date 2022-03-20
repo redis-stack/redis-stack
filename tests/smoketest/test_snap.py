@@ -3,6 +3,7 @@ import os
 import getpass
 import subprocess
 from helpers import RedisTestMixin
+import time
 
 @pytest.mark.snaps
 class TestRedisStackServerSnap(RedisTestMixin, object):
@@ -19,6 +20,7 @@ class TestRedisStackServerSnap(RedisTestMixin, object):
         # start redis
         p = subprocess.Popen("redis-stack-server")
         cls.PID = p.pid
+        time.sleep(3)
     
     @classmethod
     def teardown(cls):
