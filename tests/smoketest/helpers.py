@@ -174,3 +174,20 @@ class InDockerTestEnv(RedisTestMixin, object):
 
         res, out = self.container.exec_run("/opt/redis-stack/bin/redis-stack-server -h")
         assert out.decode().lower().find("redis-stack-server") != -1
+
+    def test_run_redispy_tests(self):
+
+        res, out = self.container.exec_run(
+            "git clone https://github.com/redis/redis-py.git"
+        )
+        assert res == 0
+
+        res, out = self.container.exec_run(
+            "pip3 install -r redis-py/requirements.txt -r redis-py/dev_requirements.txt"
+        )
+        assert res == 0
+
+        res, out = self.container.exec_run(
+            "pytest redis-py/tests -m 'not onlycluster and not ssl and not replica and not experimental' --redismod-url='redis://localhost:6379/0'"
+        )
+        assert res == 0

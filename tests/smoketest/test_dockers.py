@@ -23,7 +23,11 @@ class DockerTestBase(InDockerTestEnv, object):
 
         # time for the docker to settle
         time.sleep(3)
+        res, out = container.exec_run("apt install -y git")
+        assert res == 0
 
+        res, out = container.exec_run("apt install -y python3-pip")
+        assert res == 0
 
 @pytest.mark.dockers
 class TestRedisStack(RedisInsightTestMixin, DockerTestBase):
