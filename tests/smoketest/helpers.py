@@ -186,9 +186,11 @@ class InDockerTestEnv(RedisTestMixin, object):
         res, out = self.container.exec_run(
             "pip3 install -r redis-py/requirements.txt -r redis-py/dev_requirements.txt"
         )
+        print(out)
         assert res == 0
 
         res, out = self.container.exec_run(
             "pytest redis-py/tests -m 'not onlycluster and not ssl and not replica and not experimental' --redismod-url='redis://localhost:6379/0'"
         )
+        print(out)
         assert res == 0
