@@ -48,7 +48,7 @@ class Recipe(object):
             return version
         # any branch - just takes the version
         config = Config()
-        return config.get_key(self.PACKAGE_NAME)["version"]
+        return config.get_key("versions")[self.PACKAGE_NAME]
 
     def deb(self, fpmargs, build_number, distribution):
         fpmargs.append("--depends libssl-dev")
