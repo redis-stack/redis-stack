@@ -180,6 +180,7 @@ class InDockerTestEnv(RedisTestMixin, object):
         res, out = self.container.exec_run(
             "git clone https://github.com/redis/redis-py.git"
         )
+        print(out)
         assert res == 0
 
         res, out = self.container.exec_run(
