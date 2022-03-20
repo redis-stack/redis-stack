@@ -506,7 +506,7 @@ jobs:
         - name: validate packages
           run: |
             source .venv/bin/activate
-            pytest -m snaps
+            sudo pytest -m snaps
 
   dockers:
     name: ${{matrix.package}} docker
