@@ -53,7 +53,7 @@ jobs:
           installer-parallel: true
       - name: install packaging tools
         run: |
-          sudo apt-get install unzip
+          sudo apt-get install unzip libterm-readkey-perl dpkg-sig
           poetry install
       - run: gem install fpm -v ${{env.fpmversion}}
 
@@ -61,6 +61,15 @@ jobs:
         run: |
           source .venv/bin/activate
           invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redisinsight-web
+
+      - name: install gpg key
+        run: |
+          cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
+      - name: gpg sign package
+        run: |
+          echo '${{secrets.GPG_PASSWORD}}' > .passfile
+          dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{secrets.GPG_ID}} *.deb
+          rm -f .passfile
 
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
@@ -98,10 +107,15 @@ jobs:
       arch: x86_64
       target: deb
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-      packaging_deps: sudo apt-get install -y rpm unzip
+      packaging_deps: sudo apt-get install -y unzip dpkg-sig
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_ID: ${{ secrets.GPG_ID }}
+      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
 
   bionic:
@@ -114,10 +128,15 @@ jobs:
       arch: x86_64
       target: deb
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-      packaging_deps: sudo apt-get install -y rpm unzip
+      packaging_deps: sudo apt-get install -y unzip dpkg-sig
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_ID: ${{ secrets.GPG_ID }}
+      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   xenial:
     uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
@@ -129,10 +148,15 @@ jobs:
       arch: x86_64
       target: deb
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-      packaging_deps: sudo apt-get install -y rpm unzip
+      packaging_deps: sudo apt-get install -y unzip dpkg-sig
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_ID: ${{ secrets.GPG_ID }}
+      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   rhel7:
     uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
@@ -144,10 +168,15 @@ jobs:
       arch: x86_64
       target: rpm
       build_deps: yum install -y epel-release gcc make jemalloc-devel openssl-devel python3 python3-pip
-      packaging_deps: sudo apt-get install -y rpm unzip
+      packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
+      GPG_ID: ${{ secrets.GPG_ID }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   rhel8:
     uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
@@ -165,6 +194,11 @@ jobs:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
+      GPG_ID: ${{ secrets.GPG_ID }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   # osx is the only one of these that is really
   build-package-osx:
@@ -175,7 +209,7 @@ jobs:
       target: osxpkg
       platform: catalina
       osname: macos
-      redisversion: 6.2.6
+      redisversion: 7.0-rc2
       pythonversion: 3.9
       fpmversion: 1.14.1
       rubyversion: 2.7.2
@@ -216,9 +250,8 @@ jobs:
         poetry install
     - name: build redis from source
       run: |
-        cd redis-stack
-        source .venv/bin/activate
-        invoke build-redis -r ../redis
+        cd redis
+        make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a" 
 
     - name: package redis for s3
       run: |
@@ -317,7 +350,7 @@ jobs:
       target: zip
       platform: monterey
       osname: macos
-      redisversion: 6.2.6
+      redisversion: 7.0-rc2
       pythonversion: 3.9
       fpmversion: 1.14.1
       rubyversion: 2.7.2
@@ -393,6 +426,120 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       run: |
         s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
+
+  snap:
+    name: ${{matrix.package}} snap
+    runs-on: ubuntu-latest
+    needs: [focal]
+    strategy:
+      matrix:
+        package: ['redis-stack-server']
+    env:
+      platform: focal
+      arch: x86_64
+      osnick: ubuntu20.04
+      target: snap
+      osname: Linux
+      pythonversion: 3.9
+      fpmversion: 1.14.1
+      rubyversion: 2.7.2
+    steps:
+      - uses: actions/checkout@v2
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{env.pythonversion}}
+      - uses: ruby/setup-ruby@v1
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            /var/cache/apt
+            /var/cache/yum
+            ~/.cache/pip
+            ~/.cache/pypoetry
+            ~/.local/share/gem
+          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
+
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+      - name: install packaging tools
+        run: |
+          gem install fpm -v ${{env.fpmversion}}
+          poetry install
+      - name: build snap
+        run: |
+          source .venv/bin/activate
+          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redis-stack-server
+      - uses: s3-actions/s3cmd@v1.1
+        with:
+          provider: aws
+          region: us-east-1
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: upload snapshots
+        if: startsWith(github.ref, 'refs/tags/') != true
+        run: |
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+      - name: upload release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
+
+  test-snap:
+      env:
+        platform: focal
+        arch: x86_64
+        target: snap
+        pythonversion: 3.9
+      needs: [snap]
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - name: install python
+          uses: actions/setup-python@v2
+          with:
+            python-version: ${{env.pythonversion}}
+        - uses: actions/cache@v2
+          with:
+            path: |
+              /var/cache/apt
+              /var/cache/yum
+              ~/.cache/pip
+              ~/.cache/pypoetry
+              ~/.local/share/gem
+            key: pypoetry-${{hashFiles('pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
+        - name: install poetry
+          uses: snok/install-poetry@v1
+          with:
+            version: latest
+            virtualenvs-in-project: true
+            virtualenvs-create: true
+            installer-parallel: true
+        - name: get package version
+          id: get_version
+          run: |
+            poetry install
+            source .venv/bin/activate
+            realversion=`invoke version -p redis-stack-server`
+            echo "::set-output name=VERSION::$realversion"
+
+        # now, fetch from s3 and install to the redis-stack directory
+        - name: get packages from s3
+          run: |
+            mkdir redis-stack
+            wget -q \
+              https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}-1.${{env.arch}}.${{env.target}} \
+              -O redis-stack/redis-stack-server.${{env.target}}
+
+        - name: validate packages
+          run: |
+            sudo .venv/bin/pytest -m snaps
 
   dockers:
     name: ${{matrix.package}} docker

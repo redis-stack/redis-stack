@@ -25,7 +25,7 @@ Ports that need plumbing
 
 ---------------
 
-To persist data outside of the docker you're going to *need* to include the following options prior to the image (redislabs/redis-stack:edge).
+To persist data outside of the docker you're going to *need* to include the following options prior to the image (redis/redis-stack:edge).
 
 -v /path/to/redisinsight/data:/redisinsight
 -v /path/to/your/redis-data:/data/
@@ -33,40 +33,40 @@ To persist data outside of the docker you're going to *need* to include the foll
 Example, with the current directory containing something called data which hosts our data.
 
 ```
-docker run -v `pwd`/data/redisinsight:/redisinsight -v `pwd`/redis:/data -p 6379:6379 -p 8001:8001 redislabs/redis-stack:edge
+docker run -v `pwd`/data/redisinsight:/redisinsight -v `pwd`/redis:/data -p 6379:6379 -p 8001:8001 redis/redis-stack:edge
 ```
 
 ```
 
 ### Run redis stack with ports 6379 (redis) and 8001 (redisinsight) tunneled back to your machine
 ```
-docker run -p 6379:6379 -p 8001:8001 redislabs/redis-stack:edge
+docker run -p 6379:6379 -p 8001:8001 redis/redis-stack:edge
 ```
 
 ### Same as the prior item, but running in the background (i.e disconnected)
 ```
-docker run -d -p 6379:6379 -p 8001:8001 redislabs/redis-stack:edge
+docker run -d -p 6379:6379 -p 8001:8001 redis/redis-stack:edge
 ```
 ### Run redis stack on another port: 5555 (redis) and 9999 (redisinsight) tunneled back to your machine
 ```
-docker run -p 5555:6379 -p 9999:8001 redislabs/redis-stack:edge
+docker run -p 5555:6379 -p 9999:8001 redis/redis-stack:edge
 ```
 
 
 ### Start, while loading extra options for the redis-server in a configuration file named *redis-stack.conf* stored outside the docker
 
 ```
-docker run -v `pwd`/redis-stack.conf:/redis-stack.conf -p 6379:6379 -p 8001:8001 redislabs/redis-stack:edge
+docker run -v `pwd`/redis-stack.conf:/redis-stack.conf -p 6379:6379 -p 8001:8001 redis/redis-stack:edge
 ```
 
 ### Start redis stack, passing in additional arguments to the REDISTIMESERIES module (such as retention time)
 
 ```
-docker run -e REDISTIMESERIES_ARGS="RETENTION_POLICY=20" -p 6379:6379 -p 8001:8001 redislabs/redis-stack:edge
+docker run -e REDISTIMESERIES_ARGS="RETENTION_POLICY=20" -p 6379:6379 -p 8001:8001 redis/redis-stack:edge
 ```
 
 ### Start redis stack, setting the password *redis-stack*
 
 ```
-docker run -e REDIS_ARGS="--requirepass redis-stack" -p 6379:6379 -p 8001:8001 redislabs/redis-stack:edge
+docker run -e REDIS_ARGS="--requirepass redis-stack" -p 6379:6379 -p 8001:8001 redis/redis-stack:edge
 ```

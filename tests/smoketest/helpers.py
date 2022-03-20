@@ -170,7 +170,7 @@ class InDockerTestEnv(RedisTestMixin, object):
 
         for b in binaries:
             res, out = self.container.exec_run(f"/opt/redis-stack/bin/{b} -h")
-            assert res == 1  # no segfault
+            assert res in [0, 1]  # no segfault
 
         res, out = self.container.exec_run("/opt/redis-stack/bin/redis-stack-server -h")
         assert out.decode().lower().find("redis-stack-server") != -1
