@@ -99,9 +99,9 @@ class RedisTestMixin:
         q = Query("foo ~bar").with_scores()
         res = r.ft().search(q)
         assert 2 == res.total
-        assert "doc2" == res.docs[0].id
-        assert 3.0 == res.docs[0].score
-        assert "doc1" == res.docs[1].id
+        docs = [i.id for i in res.docs]
+        assert "doc2" in docs
+        assert "doc1" in docs
 
 
 class InDockerTestEnv(RedisTestMixin, object):

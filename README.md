@@ -9,15 +9,15 @@ This repository builds redis, and downloads various components (modules, RedisIn
 * Docker (to build a docker)
 * zip/apt/deb/tar depending on your target outputs.  
 
-## How to Build
+## Building
 
 1. Create a virtualenv and install dependencies *poetry install*
 1. Install the fpm gem: *gem install fpm*
 
     *  Based on your Linux distribution you may need to install a debian tools package (i.e something providing dpkg), something to provide zip, tar, and rpm package tools.
 
-1. Clone [redis](https://github.com/redis/redis).
-1. Use invoke -l to execute the various tasks you need (below, an example on packaging).
+1. Clone [redis](https://github.com/redis/redis) if you're developing changes to the redis builds.
+1. Use invoke -l to list, and then execute the various tasks you need (below, an example on packaging).
 
 *To build a focal package*
 ```
@@ -39,7 +39,7 @@ invoke package -o macos -p redis-stack-server -s catalina -t zip -d catalina
 invoke package -o macos -p redis-stack-server -s monterey -t zip -d monterey -a arm64
 ```
 
-See github workflows for how CI reuses invoke.
+For more examples, see github workflows for how CI reuses invoke.
 
 ### Packaging
 
@@ -49,7 +49,7 @@ While it's possible to build all Linux packages on Arch or Ubuntu, OSX packages 
 
 ### Testing
 
-Tests are run via pytest. Linux tests create and destroy dockers, validating their contents. In order to validate the individual packages (i.e foo.rpm), packages must be copied to a folder called *redis-stack* and renamed, so as not to include the version number.
+Tests are run via pytest. Linux tests create and destroy dockers, validating their contents. In order to validate the individual packages (i.e foo.rpm), packages be built, via *invoke*, then copied to a folder called *redis-stack* and renamed, so as not to include the version number.
 
 For example to test *redis-stack-server-99.99.99-1.x86_64.rpm*:
 
@@ -58,13 +58,18 @@ mkdir redis-stack
 cp *redis-stack-server-99.99.99-1.x86_64.deb* redis-stack/redis-stack-server.deb
 pytest tests/smoketest/test_debs.py::TestXenial
 ```
+
+For the various pytest markers, see the *pyproject.toml*
+
 --------
 
-#### Changing package versions and sources
+### Releasing
 
-Versions for all packages are defined in the config.yaml file, and within a function named *generate_url* for each source type. In the case where you need to test a package that has been built to a custom location, set a variable named <module>-url-override in the config file at the top level.  For example, to override the rejson package location create a variable named *rejson-url-override*.  In the case of RedisInsight, all packages would derive from *redisinsight-url-override*.
+To make a release, use the GitHub release drafter. By creating a tag, in the release drafter, a release is made. Versions are taken from the *config.yaml*.
 
-Do not commit this change to a mainline branch.
+The process of releasing copies existing built artifacts (dockers, rpms, snaps, etc) from the snapshot directories, and re-uploading them to the root s3 folder (s3://redismodules/redis-stack/). No compilation or testing of releases occur, as that has already happened as prat of the continuous integration process.
+
+------------------------
 
 #### Modifying service initializations
 
@@ -73,3 +78,10 @@ Today, to modify the way a service starts, the following files all need editing:
 * entrypoint.sh (for dockers)
 * snapcraft.j2 (for ubuntu snaps)
 * etc/services/ (for systemd services on Linux)
+
+#### Changing package versions and sources
+
+Versions for all packages are defined in the config.yaml file, and within a function named *generate_url* for each source type. In the case where you need to test a package that has been built to a custom location, set a variable named <module>-url-override in the config file at the top level.  For example, to override the rejson package location create a variable named *rejson-url-override*.  In the case of RedisInsight, all packages would derive from *redisinsight-url-override*.
+
+Do not commit this change to a mainline branch.
+ 
