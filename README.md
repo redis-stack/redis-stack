@@ -60,6 +60,12 @@ pytest tests/smoketest/test_debs.py::TestXenial
 ```
 --------
 
+#### Changing package versions and sources
+
+Versions for all packages are defined in the config.yaml file, and within a function named *generate_url* for each source type. In the case where you need to test a package that has been built to a custom location, set a variable named <module>-url-override in the config file at the top level.  For example, to override the rejson package location create a variable named *rejson-url-override*.  In the case of RedisInsight, all packages would derive from *redisinsight-url-override*.
+
+Do not commit this change to a mainline branch.
+
 #### Modifying service initializations
 
 Today, to modify the way a service starts, the following files all need editing:
