@@ -34,7 +34,7 @@ class Modules(object):
 
         # eg: if rejson-url-override is set, fetch from that location
         # this solves someone's testing need
-        url_base_override = self.C.get_key(f"{module}-url-override", None)
+        url_base_override = self.C.get_key(f"{module}-url-override")
         if url_base_override is not None:
             return urllib.parse.urljoin(
                 f"{url_base_override}",
