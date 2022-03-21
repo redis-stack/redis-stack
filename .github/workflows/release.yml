@@ -5,12 +5,12 @@ on:
     types: [published]
 
 jobs:
-  env:
-    pythonversion: 3.9
-    s3root: s3://redismodules/redis-stack/
-
   promote_releases:
     runs-on: ubuntu-latest
+    env:
+      pythonversion: 3.9
+      s3root: s3://redismodules/redis-stack/
+
     steps:
       - uses: actions/checkout@v2
       - name: install python
