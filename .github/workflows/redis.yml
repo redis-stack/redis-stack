@@ -90,13 +90,9 @@ jobs:
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: upload snapshots
-        if: startsWith(github.ref, 'refs/tags/') != true
         run: |
           s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/
-      - name: upload release
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          s3cmd put -P s3uploads/* s3://redismodules/redis-stack/
+
   focal:
     uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
     with:
@@ -338,13 +334,8 @@ jobs:
         access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     - name: upload snapshots
-      if: startsWith(github.ref, 'refs/tags/') != true
       run: |
         s3cmd put -P redis-stack/s3dist/*.zip s3://redismodules/redis-stack/snapshots/
-    - name: upload release
-      if: startsWith(github.ref, 'refs/tags/')
-      run: |
-        s3cmd put -P redis-stack/s3dist/*.zip s3://redismodules/redis-stack/
 
   # the m1 requires a zip file so that homebrew can unpack it
   build-package-osx-m1:
@@ -424,13 +415,8 @@ jobs:
         access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     - name: upload snapshots
-      if: startsWith(github.ref, 'refs/tags/') != true
       run: |
         s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
-    - name: upload release
-      if: startsWith(github.ref, 'refs/tags/')
-      run: |
-        s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
 
   snap:
     name: ${{matrix.package}} snap
@@ -480,7 +466,14 @@ jobs:
       - name: build snap
         run: |
           source .venv/bin/activate
-          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redis-stack-server
+          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p ${{ matrix.package }}
+
+      - name: validate packages
+        run: |
+          mkdir redis-stack
+          cp *.snap redis-stack/${{ matrix.package }}.${{ env.target }}
+          sudo .venv/bin/pytest -m snaps
+
       - uses: s3-actions/s3cmd@v1.1
         with:
           provider: aws
@@ -488,63 +481,58 @@ jobs:
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: upload snapshots
-        if: startsWith(github.ref, 'refs/tags/') != true
         run: |
           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
-      - name: upload release
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/
 
-  test-snap:
-      env:
-        platform: focal
-        arch: x86_64
-        target: snap
-        pythonversion: 3.9
-      needs: [snap]
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v2
-        - name: install python
-          uses: actions/setup-python@v2
-          with:
-            python-version: ${{env.pythonversion}}
-        - uses: actions/cache@v2
-          with:
-            path: |
-              /var/cache/apt
-              /var/cache/yum
-              ~/.cache/pip
-              ~/.cache/pypoetry
-              ~/.local/share/gem
-            key: pypoetry-${{hashFiles('pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
-        - name: install poetry
-          uses: snok/install-poetry@v1
-          with:
-            version: latest
-            virtualenvs-in-project: true
-            virtualenvs-create: true
-            installer-parallel: true
-        - name: get package version
-          id: get_version
-          run: |
-            poetry install
-            source .venv/bin/activate
-            realversion=`invoke version -p redis-stack-server`
-            echo "::set-output name=VERSION::$realversion"
+  # test-snap:
+  #     env:
+  #       platform: focal
+  #       arch: x86_64
+  #       target: snap
+  #       pythonversion: 3.9
+  #     needs: [snap]
+  #     runs-on: ubuntu-latest
+  #     steps:
+  #       - uses: actions/checkout@v2
+  #       - name: install python
+  #         uses: actions/setup-python@v2
+  #         with:
+  #           python-version: ${{env.pythonversion}}
+  #       - uses: actions/cache@v2
+  #         with:
+  #           path: |
+  #             /var/cache/apt
+  #             /var/cache/yum
+  #             ~/.cache/pip
+  #             ~/.cache/pypoetry
+  #             ~/.local/share/gem
+  #           key: pypoetry-${{hashFiles('pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
+  #       - name: install poetry
+  #         uses: snok/install-poetry@v1
+  #         with:
+  #           version: latest
+  #           virtualenvs-in-project: true
+  #           virtualenvs-create: true
+  #           installer-parallel: true
+  #       - name: get package version
+  #         id: get_version
+  #         run: |
+  #           poetry install
+  #           source .venv/bin/activate
+  #           realversion=`invoke version -p redis-stack-server`
+  #           echo "::set-output name=VERSION::$realversion"
 
-        # now, fetch from s3 and install to the redis-stack directory
-        - name: get packages from s3
-          run: |
-            mkdir redis-stack
-            wget -q \
-              https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}-1.${{env.arch}}.${{env.target}} \
-              -O redis-stack/redis-stack-server.${{env.target}}
+  #       # now, fetch from s3 and install to the redis-stack directory
+  #       - name: get packages from s3
+  #         run: |
+  #           mkdir redis-stack
+  #           wget -q \
+  #             https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}-1.${{env.arch}}.${{env.target}} \
+  #             -O redis-stack/redis-stack-server.${{env.target}}
 
-        - name: validate packages
-          run: |
-            sudo .venv/bin/pytest -m snaps
+  #       - name: validate packages
+  #         run: |
+  #           sudo .venv/bin/pytest -m snaps
 
   dockers:
     name: ${{matrix.package}} docker
@@ -604,7 +592,7 @@ jobs:
         run: |
           source .venv/bin/activate
           invoke dockergen -d ${{ matrix.package }}
-      - name: Log in to GitHub Container Registry
+      - name: Log in to DockreHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -612,53 +600,59 @@ jobs:
       - name: build docker
         run: |
           docker build -f dockers/Dockerfile.${{ matrix.package }} -t redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} .
-      - name: publish docker
-        run: |
-          docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
 
-  test-dockers:
-    env:
-      platform: focal
-      arch: x86_64
-      target: deb
-    needs: [dockers]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: install python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - uses: actions/cache@v2
-        with:
-          path: |
-            /var/cache/apt
-            /var/cache/yum
-            ~/.cache/pip
-            ~/.cache/pypoetry
-            ~/.local/share/gem
-          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
-      - name: install poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: latest
-          virtualenvs-in-project: true
-          virtualenvs-create: true
-          installer-parallel: true
-      - name: get package version
-        id: get_version
-        run: |
-          poetry install
-          source .venv/bin/activate
-          realversion=`invoke version -p redis-stack-server -d true`
-          echo "::set-output name=VERSION::$realversion"
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: test dockers
+      - name: test docker build
         run: |
           source .venv/bin/activate
           pytest -m dockers
+
+      - name: publish docker
+        run: |
+          docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-edge
+
+  # test-dockers:
+  #   env:
+  #     platform: focal
+  #     arch: x86_64
+  #     target: deb
+  #   needs: [dockers]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: install python
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: 3.9
+  #     - uses: actions/cache@v2
+  #       with:
+  #         path: |
+  #           /var/cache/apt
+  #           /var/cache/yum
+  #           ~/.cache/pip
+  #           ~/.cache/pypoetry
+  #           ~/.local/share/gem
+  #         key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
+  #     - name: install poetry
+  #       uses: snok/install-poetry@v1
+  #       with:
+  #         version: latest
+  #         virtualenvs-in-project: true
+  #         virtualenvs-create: true
+  #         installer-parallel: true
+  #     - name: get package version
+  #       id: get_version
+  #       run: |
+  #         poetry install
+  #         source .venv/bin/activate
+  #         realversion=`invoke version -p redis-stack-server -d true`
+  #         echo "::set-output name=VERSION::$realversion"
+
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v1
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+  #     - name: test dockers
+  #       run: |
+  #         source .venv/bin/activate
+  #         pytest -m dockers
