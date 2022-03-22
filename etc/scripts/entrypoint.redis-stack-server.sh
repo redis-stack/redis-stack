@@ -18,8 +18,10 @@ ${CONFFILE} -- \
 --dir ${REDIS_DATA_DIR} \
 --protected-mode no \
 --loadmodule /opt/redis-stack/lib/redisearch.so \
+MAXSEARCHRESULTS 10000 MAXAGGREGATERESULTS 10000 \
 ${REDISEARCH_ARGS} \
 --loadmodule /opt/redis-stack/lib/redisgraph.so \
+MAX_QUEUED_QUERIES 25 TIMEOUT 1000 RESULTSET_SIZE 10000 \
 ${REDISGRAPH_ARGS} \
 --loadmodule /opt/redis-stack/lib/redistimeseries.so \
 ${REDISTIMESERIES_ARGS} \
