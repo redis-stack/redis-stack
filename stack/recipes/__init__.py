@@ -41,12 +41,6 @@ class Recipe(object):
             return "99.99.99"
 
         # get the current tag
-        tagcmd = ["git", "tag", "--points-at", "HEAD"]
-        r = subprocess.run(tagcmd, stdout=subprocess.PIPE, text=True)
-        version = r.stdout.strip().replace("v", "")
-        if version != "":
-            return version
-        # any branch - just takes the version
         config = Config()
         return config.get_key("versions")[self.PACKAGE_NAME]
 
