@@ -4,13 +4,25 @@ on:
   release:
     types: [published]
 
-jobs:
-  promote_releases:
-    runs-on: ubuntu-latest
-    env:
-      pythonversion: 3.9
-      s3root: s3://redismodules/redis-stack
+env:
+  pythonversion: 3.9
+  rubyversion: 2.7.2
+  s3root: s3://redismodules/redis-stack
 
+  # change, for public publication location when ready (for deb-s3)
+  s3publicreponame: redismodules
+
+  # root directory that contains the debian archive tree 
+  s3publicrepoprefix: redis-stack/playground
+
+  # change, for public publication location when ready (for rpms only)
+  s3packagereporoot: s3://redismodules/redis-stack/playground
+
+jobs:
+
+  promote_releases:
+    name: Promote Releases
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: install python
@@ -44,7 +56,7 @@ jobs:
       - name: publish all files to s3
         run: |
           s3cmd put -P s3uploads/* ${{ env.s3root }}/
-      - name: Log in to DockreHub
+      - name: Log in to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -56,3 +68,102 @@ jobs:
             docker tag redis/${i}:${{ steps.get_version.outputs.VERSION}}-edge redis/${i}:${{steps.get_version.outputs.VERSION}}
             docker push redis/${i}:${{ steps.get_version.outputs.VERSION}}
           done
+
+  publish_debs:
+    name: Publish Debian [${{ matrix.osnick }}] Feed
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        osnick: [xenial, bionic, focal]
+        arch: [x86_64]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{env.pythonversion}}
+      - uses: ruby/setup-ruby@v1
+      - name: install package tools
+        run: |
+          gem install deb-s3
+
+      - name: install gpg key
+        run: |
+          cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
+
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+      - name: get package version
+        id: get_version
+        run: |
+          poetry install
+          source .venv/bin/activate
+          realversion=`invoke version -p redis-stack-server -d true`
+          echo "::set-output name=VERSION::$realversion"
+      - uses: s3-actions/s3cmd@v1.1
+        with:
+          provider: aws
+          region: us-east-1
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: publish debs
+        run: |
+          mkdir s3uploads/
+          s3cmd get ${{env.s3root}}/snapshots/*${{ steps.get_version.outputs.VERSION }}*${{ matrix.osnick }}*${{ matrix.arch }}.deb s3uploads/
+          echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
+          gpg-connect-agent reloadagent /bye
+          /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ secrets.GPG_KEYGRIP }}
+          cd s3uploads
+          deb-s3 upload --s3-region us-east-1 \
+            --bucket ${{env.s3publicreponame}} \
+            --codename $i \
+            --preserve-versions \
+            --fail-if-exists \
+            --sign \
+            --prefix \
+            ${{env.s3publicrepoprefix}}/deb \
+            *${{ matrix.osnick }}*.deb
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY : ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+
+  publish_rpms:
+    name: Publish RPM [${{ matrix.osnick }}] Feed
+    runs-on: ubuntu-latest
+    container: oraclelinux:8
+    strategy:
+      max-parallel: 1
+      matrix:
+        osnick: [rhel7, rhel8]
+        arch: [x86_64]
+    steps:
+      - name: install dependencies
+        run: |
+          dnf install -y epel-release python39 python39-pip createrepo git tar
+      - uses: actions/checkout@v2
+      - name: get package version
+        id: get_version
+        run: |
+          pip3 install poetry s3cmd 
+          ln -s /usr/bin/python3 /usr/bin/python
+          poetry config virtualenvs.create false
+          poetry install
+          realversion=`invoke version -p redis-stack-server -d true`
+          echo "::set-output name=VERSION::$realversion"
+      - name: get files from s3
+        run: |
+          mkdir s3uploads
+          s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
+            sync s3://${{ env.s3publicrepoprefix}}/rpm/${{matrix.osnick}} s3uploads || mkdir -p s3uploads/x86_64
+          s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
+            get ${{env.s3root}}/snapshots/*${{ steps.get_version.outputs.VERSION }}*${{ matrix.osnick }}*${{ matrix.arch }}.rpm s3uploads/${{ matrix.arch }}
+          createrepo --update s3uploads/
+          s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
+            sync s3uploads/ ${{env.s3packagereporoot}}/rpm/${{ matrix.osnick }}/
