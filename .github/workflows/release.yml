@@ -7,16 +7,28 @@ on:
 env:
   pythonversion: 3.9
   rubyversion: 2.7.2
+
+  # Path to the S3 bucket containing our pre-build packages
   s3root: s3://redismodules/redis-stack
 
-  # change, for public publication location when ready (for deb-s3)
-  s3publicreponame: redismodules
+  ## NOTE ##
+  # The following, while duplicate, are required given the formats
+  # needed by the various tools.
+  ##########
 
-  # root directory that contains the debian archive tree 
-  s3publicrepoprefix: redis-stack/playground
+  # Name of the s3 bucket within the account, used to publish our feeds
+  # eg: redismodules
+  s3publicreponame: ${{ secrets.S3_PUBLIC_REPO_NAME}}
 
-  # change, for public publication location when ready (for rpms only)
-  s3packagereporoot: s3://redismodules/redis-stack/playground
+  # ths directory within the s3publicreponame taht contains our rpm
+  # and debian feeds. It cannot end in /.
+  # eg: redis-stack/playground
+  s3publicrepoprefix: ${{ secrets.S3_PUBLIC_REPO_PREFIX}}
+
+  # base s3 url for a published rpm feed 
+  # directory will include a directory named rpm, and cannot end in a /
+  # eg: s3://redismodules/redis-stack/playground
+  s3packagereporoot: s3://{{secrets.S3_PUBLIC_REPO_NAME}}/${{ secrets.S3_PUBLIC_REPO_PREFIX }}
 
 jobs:
 
@@ -161,9 +173,9 @@ jobs:
         run: |
           mkdir s3uploads
           s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
-            sync s3://${{ env.s3publicrepoprefix}}/rpm/${{matrix.osnick}} s3uploads || mkdir -p s3uploads/x86_64
+            sync s3://${{ env.s3publicreponame }}/${{ env.s3publicrepoprefix }}/rpm/${{matrix.osnick}} s3uploads || mkdir -p s3uploads/x86_64
           s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
             get ${{env.s3root}}/snapshots/*${{ steps.get_version.outputs.VERSION }}*${{ matrix.osnick }}*${{ matrix.arch }}.rpm s3uploads/${{ matrix.arch }}
           createrepo --update s3uploads/
           s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
-            sync  --acl-public s3uploads/ ${{env.s3packagereporoot}}/rpm/${{ matrix.osnick }}/
+            sync s3uploads/ ${{env.s3packagereporoot}}/rpm/${{ matrix.osnick }}/
