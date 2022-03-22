@@ -43,7 +43,6 @@ jobs:
           s3cmd get ${{env.s3root}}/sanpshots/*${{ steps.get_version.outputs.VERSION }}/* s3uploads/
       - name: publish all files to s3
         run: |
-          mkdir s3uploads
           s3cmd put -P s3uploads/* ${{ env.s3root }}
       - name: Log in to DockreHub
         uses: docker/login-action@v1
