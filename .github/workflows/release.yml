@@ -40,7 +40,7 @@ jobs:
       - name: get files from s3
         run: |
           mkdir s3uploads/
-          s3cmd get ${{env.s3root}}/sanpshots/*${{ steps.get_version.outputs.VERSION }}/* s3uploads/
+          s3cmd get ${{env.s3root}}/snapshots/*${{ steps.get_version.outputs.VERSION }}* s3uploads/
       - name: publish all files to s3
         run: |
           s3cmd put -P s3uploads/* ${{ env.s3root }}
