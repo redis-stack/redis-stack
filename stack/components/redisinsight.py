@@ -34,7 +34,7 @@ class RedisInsightBase(object):
         else:
             arch = self.ARCH
             
-        url_base_override = self.C.get_key(f"redisinsight-url-override", None)
+        url_base_override = self.C.get_key(f"redisinsight-url-override")
         if url_base_override is not None:
             return urllib.parse.urljoin(
                 f"{url_base_override}",
