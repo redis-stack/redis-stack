@@ -166,4 +166,4 @@ jobs:
             get ${{env.s3root}}/snapshots/*${{ steps.get_version.outputs.VERSION }}*${{ matrix.osnick }}*${{ matrix.arch }}.rpm s3uploads/${{ matrix.arch }}
           createrepo --update s3uploads/
           s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
-            sync s3uploads/ ${{env.s3packagereporoot}}/rpm/${{ matrix.osnick }}/
+            sync  --acl-public s3uploads/ ${{env.s3packagereporoot}}/rpm/${{ matrix.osnick }}/
