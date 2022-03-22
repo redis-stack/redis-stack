@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>Label</key>
+        <string>com.redis.redis_stack_server</string>
+
+        <key>Program</key>
+        <string>/opt/redis-stack/bin/redis-server</string>
+
+        <key>ProgramArguments</key>
+        <array>
+            <string>daemonize</string>
+            <string>no</string>
+            <string>port</string>
+            <string>6379</string>
+            <string>loadmodule</string>
+            <string>/opt/redis-stack/lib/redisearch.so</string>
+            <string>loadmodule</string>
+            <string>/opt/redis-stack/lib/redisgraph.so</string>
+            <string>loadmodule</string>
+            <string>/opt/redis-stack/lib/redistimeseries.so</string>
+            <string>loadmodule</string>
+            <string>/opt/redis-stack/lib/rejson.so</string>
+            <string>loadmodule</string>
+            <string>/opt/redis-stack/lib/redisbloom.so</string>
+        </array>
+
+        <key>WorkingDirectory</key>
+        <string>/</string>
+
+        <key>RunAtLoad</key>
+        <true/>
+
+        <key>KeepAlive</key>
+        <true/>
+
+        <key>ProcessType</key>
+        <string>Interactive</string>
+
+        <key>ThrottleInterval</key>
+        <integer>3</integer>
+
+        <key>ExitTimeOut</key>
+        <integer>30</integer>
+
+        <key>StandardOutPath</key>
+        <string>/var/log/redis-stack-server.log</string>
+        <key>StandardErrorPath</key>
+        <string>/var/log/redis-stack-server.log</string>
+    </dict>
+</plist>
