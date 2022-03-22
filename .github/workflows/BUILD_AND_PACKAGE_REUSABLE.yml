@@ -31,7 +31,6 @@ on:
       redisversion: 
         required: false
         type: string
-        default: 6.2.6
       pythonversion: 
         required: false
         type: string
