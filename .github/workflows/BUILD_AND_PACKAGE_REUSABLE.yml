@@ -233,6 +233,10 @@ jobs:
         run: |
           mkdir -p s3uploads
           cp *.${{env.target}} *.tar.gz s3uploads
+          cd s3uploads
+          for i in `ls`; do
+            sha256sum $i |awk '{print $1}' > $i.sha256
+          done
       - uses: s3-actions/s3cmd@v1.1
         with:
           provider: aws
@@ -243,7 +247,3 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') != true
         run: |
           s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/
-      - name: upload release
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          s3cmd put -P s3uploads/* s3://redismodules/redis-stack/
