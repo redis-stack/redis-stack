@@ -5,6 +5,8 @@ def get_version(product, docker=None):
         from .recipes.redis_stack_server import RedisStackServer as recipe
     elif product == "redisinsight":
         from .recipes.redisinsight import RedisInsight as recipe
+    else:
+        raise AttributeError("Unsupported product")
 
     r = recipe("Linux")
     if r.version == "99.99.99" and docker is not None:
