@@ -220,10 +220,10 @@ jobs:
 
     runs-on: macos-latest
     steps:
-    - name: "Select Xcode"
-      uses: devbotsxyz/xcode-select@v1
-      with:
-        version: "13.2.1"
+    # - name: "Select Xcode"
+    #   uses: devbotsxyz/xcode-select@v1
+    #   with:
+    #     version: "13.2.1"
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{env.rubyversion}}
@@ -315,7 +315,7 @@ jobs:
         CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
           /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
-          xcode altool --notarize-app -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i \
+          xcrun altool --notarize-app -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i \
             --primary-budle-id org.redis.$i -u ${{secrets.MAC_NOTARIZE_USERNAME}} -p ${{secrets.MAC_NOTARIZE_PASSWORD}}
         done
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
@@ -364,10 +364,10 @@ jobs:
       rubyversion: 2.7.2
     runs-on: macos-latest
     steps:
-    - name: "Select Xcode"
-      uses: devbotsxyz/xcode-select@v1
-      with:
-        version: "13.2.1"
+    # - name: "Select Xcode"
+    #   uses: devbotsxyz/xcode-select@v1
+    #   with:
+    #     version: "13.2.1"
     - name: checkout sources
       uses: actions/checkout@v2
     - uses: ruby/setup-ruby@v1
@@ -414,7 +414,7 @@ jobs:
         CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
           /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
-          xcode altool --notarize-app -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i \
+          xcrun altool --notarize-app -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i \
             --primary-budle-id org.redis.$i -u ${{secrets.MAC_NOTARIZE_USERNAME}} -p ${{secrets.MAC_NOTARIZE_PASSWORD}}
         done
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
