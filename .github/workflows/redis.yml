@@ -316,7 +316,7 @@ jobs:
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
           /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
           xcrun altool --notarize-app -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i \
-            --primary-budle-id org.redis.$i -u ${{secrets.MAC_NOTARIZE_USERNAME}} -p ${{secrets.MAC_NOTARIZE_PASSWORD}}
+            --primary-bundle-id org.redis.$i -u ${{secrets.MAC_NOTARIZE_USERNAME}} -p ${{secrets.MAC_NOTARIZE_PASSWORD}}
         done
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
           /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
@@ -415,7 +415,7 @@ jobs:
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
           /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
           xcrun altool --notarize-app -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i \
-            --primary-budle-id org.redis.$i -u ${{secrets.MAC_NOTARIZE_USERNAME}} -p ${{secrets.MAC_NOTARIZE_PASSWORD}}
+            --primary-bundle-id org.redis.$i -u ${{secrets.MAC_NOTARIZE_USERNAME}} -p ${{secrets.MAC_NOTARIZE_PASSWORD}}
         done
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
           /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
