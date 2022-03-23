@@ -327,6 +327,7 @@ jobs:
         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server -k fetch
         xcrun altool --notarize-app -f *.zip \
             --primary-bundle-id org.redis.redis-stack-server -u ${{secrets.MAC_NOTARIZE_USERNAME}} -p ${{secrets.MAC_NOTARIZE_PASSWORD}}
+        ls -R
         for i in `ls *.zip`; do
           sha256sum $i |awk '{print $1}' > $i.sha256
         done
