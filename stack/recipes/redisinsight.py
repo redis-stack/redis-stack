@@ -35,9 +35,9 @@ class RedisInsightBase(Recipe):
             "--directories /opt/redis-stack",
         ]
 
-    def deb(self, fpmargs, build_number, distribution):
+    def deb(self, fpmargs, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.deb"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.{self.ARCH}.deb"
         )
         fpmargs.append(f"--deb-user {self.C.get_key('product_user')}")
         fpmargs.append(f"--deb-group {self.C.get_key('product_group')}")
@@ -58,9 +58,9 @@ class RedisInsightBase(Recipe):
 
         return fpmargs
 
-    def rpm(self, fpmargs, build_number, distribution):
+    def rpm(self, fpmargs, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.rpm"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.{self.ARCH}.rpm"
         )
         fpmargs.append(f"--rpm-user {self.C.get_key('product_user')}")
         fpmargs.append(f"--rpm-group {self.C.get_key('product_group')}")
@@ -80,9 +80,9 @@ class RedisInsightBase(Recipe):
             fpmargs.append(f"--config-files {(os.path.join(self.__PATHS__.SVCDIR, i))}")
         return fpmargs
 
-    def pacman(self, fpmargs, build_number, distribution):
+    def pacman(self, fpmargs, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.pacman"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.{self.ARCH}.pacman"
         )
         fpmargs.append(f"--pacman-user {self.C.get_key('product_user')}")
         fpmargs.append(f"--pacman-group {self.C.get_key('product_group')}")
@@ -102,51 +102,49 @@ class RedisInsightBase(Recipe):
 
         return fpmargs
 
-    def osxpkg(self, fpmargs, build_number, distribution):
+    def osxpkg(self, fpmargs, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.osxpkg"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.osxpkg"
         )
         fpmargs.append("-t osxpkg")
         return fpmargs
 
-    def zip(self, fpmargs, build_number, distribution):
+    def zip(self, fpmargs, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.zip"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.zip"
         )
         return fpmargs
 
-    def tar(self, fpmargs, build_number, distribution):
+    def tar(self, fpmargs, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.tar.gz"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.tar.gz"
         )
         return fpmargs
 
     def package(
         self,
         package_type: str = "deb",
-        build_number: int = 1,
         distribution: str = "bionic",
     ):
 
         logger.info(f"Building {package_type} package")
         fpmargs = self.__package_base_args__
-        fpmargs.append(f"--iteration {build_number}")
 
         if package_type == "deb":
-            fpmargs = self.deb(fpmargs, build_number, distribution)
+            fpmargs = self.deb(fpmargs, distribution)
 
         elif package_type == "rpm":
-            fpmargs = self.rpm(fpmargs, build_number, distribution)
+            fpmargs = self.rpm(fpmargs, distribution)
 
         elif package_type == "osxpkg":
-            fpmargs = self.osxpkg(fpmargs, build_number, distribution)
+            fpmargs = self.osxpkg(fpmargs, distribution)
 
         elif package_type == "pacman":
-            fpmargs = self.pacman(fpmargs, build_number, distribution)
+            fpmargs = self.pacman(fpmargs, distribution)
         elif package_type == "zip":  # ignored
-            fpmargs = self.zip(fpmargs, build_number, distribution)
+            fpmargs = self.zip(fpmargs, distribution)
         elif package_type == "tar":  # ignored
-            fpmargs = self.tar(fpmargs, build_number, distribution)
+            fpmargs = self.tar(fpmargs, distribution)
         else:
             raise AttributeError(f"{package_type} is an invalid package type")
 
