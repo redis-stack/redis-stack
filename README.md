@@ -1,13 +1,13 @@
 # redis-stack
 
-This repository builds redis, and downloads various components (modules, RedisInsight) in order to build redis-stack packages for it's CI process.
+This repository builds redis, and downloads various components (modules, RedisInsight) in order to build redis-stack packages for its CI process.
 
 ## Development Requirements
 
 * Python > 3.9 (for this toolkit) and [poetry](https://python-poetry.org)
 * Ruby > 2.7 (for [fpm](https://github.com/jordansissel/fpm))
 * Docker (to build a docker)
-* zip/apt/deb/tar depending on your target outputs.  
+* zip/apt/deb/tar depending on your target outputs.
 
 ## Building
 
@@ -84,4 +84,4 @@ Today, to modify the way a service starts, the following files all need editing:
 Versions for all packages are defined in the config.yaml file, and within a function named *generate_url* for each source type. In the case where you need to test a package that has been built to a custom location, set a variable named <module>-url-override in the config file at the top level.  For example, to override the rejson package location create a variable named *rejson-url-override*.  In the case of RedisInsight, all packages would derive from *redisinsight-url-override*.
 
 Do not commit this change to a mainline branch.
- 
+
