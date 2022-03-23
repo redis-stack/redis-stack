@@ -115,7 +115,7 @@ jobs:
       - name: publish debs
         run: |
           mkdir s3uploads/
-          s3cmd get ${{env.s3root}}/snapshots/*${{ steps.get_version.outputs.VERSION }}*${{ matrix.osnick }}*${{ matrix.arch }}.deb s3uploads/
+          s3cmd get ${{env.s3root}}/snapshots/*${{ steps.get_version.outputs.VERSION }}*${{ matrix.osnick }}*${{ matrix.arch }}.deb .
           echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
           gpg-connect-agent reloadagent /bye
           /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ secrets.GPG_KEYGRIP }}
@@ -149,7 +149,7 @@ jobs:
       - name: get package version
         id: get_version
         run: |
-          pip3 install poetry s3cmd 
+          pip3 install poetry s3cmd
           ln -s /usr/bin/python3 /usr/bin/python
           poetry config virtualenvs.create false
           poetry install
@@ -167,4 +167,4 @@ jobs:
         run: |
           createrepo --update s3uploads/
           s3cmd --access_key=${{secrets.PACKAGES_AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.PACKAGES_AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
-            sync s3uploads/ ${{ env.s3publicreponame }}/rpm/${{ matrix.osnick }}/
+          sync s3uploads/ s3://${{ env.s3publicreponame }}/rpm/${{ matrix.osnick }}/
