@@ -220,6 +220,10 @@ jobs:
 
     runs-on: macos-latest
     steps:
+    - name: "Select Xcode 12.0.0"
+      uses: devbotsxyz/xcode-select@master
+      with:
+        version: "12.0.0"
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{env.rubyversion}}
