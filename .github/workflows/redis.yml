@@ -311,6 +311,8 @@ jobs:
         CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
           /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
+          xcode altool --notarize-app -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i \
+            --primary-budle-id org.redis.$i -u ${{secrets.MAC_NOTARIZE_USERNAME}} -p ${{secrets.MAC_NOTARIZE_PASSWORD}}
         done
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
           /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
@@ -404,6 +406,8 @@ jobs:
         CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
           /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
+          xcode altool --notarize-app -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i \
+            --primary-budle-id org.redis.$i -u ${{secrets.MAC_NOTARIZE_USERNAME}} -p ${{secrets.MAC_NOTARIZE_PASSWORD}}
         done
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
           /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
