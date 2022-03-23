@@ -127,19 +127,11 @@ jobs:
             --fail-if-exists \
             --sign \
             --prefix \
-<<<<<<< HEAD
-            ${{env.s3publicrepoprefix}}/deb \
-            *${{ matrix.osnick }}*.deb
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY : ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-=======
             deb \
             *${{ matrix.osnick }}*.deb
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PACKAGES_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY : ${{ secrets.PACKAGES_AWS_SECRET_ACCESS_KEY}}
->>>>>>> origin/master
 
   publish_rpms:
     name: Publish RPM [${{ matrix.osnick }}] Feed
