@@ -166,23 +166,13 @@ jobs:
       - name: get files from s3
         run: |
           mkdir s3uploads
-<<<<<<< HEAD
-          s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
-            sync s3://${{ env.s3publicreponame }}/${{ env.s3publicrepoprefix }}/rpm/${{matrix.osnick}} s3uploads || mkdir -p s3uploads/x86_64
-=======
           s3cmd --access_key=${{secrets.PACKAGES_AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.PACKAGES_AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
             sync s3://${{ env.s3publicreponame }}/rpm/${{matrix.osnick}} s3uploads || mkdir -p s3uploads/x86_64
->>>>>>> origin/master
           s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
             get ${{env.s3root}}/snapshots/*${{ steps.get_version.outputs.VERSION }}*${{ matrix.osnick }}*${{ matrix.arch }}.rpm s3uploads/${{ matrix.arch }}
 
       - name: update packages and publish upstream
         run: |
           createrepo --update s3uploads/
-<<<<<<< HEAD
-          s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
-            sync s3uploads/ ${{env.s3packagereporoot}}/rpm/${{ matrix.osnick }}/
-=======
           s3cmd --access_key=${{secrets.PACKAGES_AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.PACKAGES_AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
             sync s3uploads/ ${{ env.s3publicreponame }}/rpm/${{ matrix.osnick }}/
->>>>>>> origin/master
