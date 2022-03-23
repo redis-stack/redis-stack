@@ -220,10 +220,10 @@ jobs:
 
     runs-on: macos-latest
     steps:
-    - name: "Select Xcode 12.0.0"
+    - name: "Select Xcode"
       uses: devbotsxyz/xcode-select@v1
       with:
-        version: "12.0.0"
+        version: "13.2.1"
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{env.rubyversion}}
@@ -364,10 +364,10 @@ jobs:
       rubyversion: 2.7.2
     runs-on: macos-latest
     steps:
-    - name: "Select Xcode 12.0.0"
+    - name: "Select Xcode"
       uses: devbotsxyz/xcode-select@v1
       with:
-        version: "12.0.0"
+        version: "13.2.1"
     - name: checkout sources
       uses: actions/checkout@v2
     - uses: ruby/setup-ruby@v1
