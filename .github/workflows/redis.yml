@@ -315,8 +315,6 @@ jobs:
         CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
           /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
-          xcrun altool --notarize-app -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i \
-            --primary-bundle-id org.redis.$i -u ${{secrets.MAC_NOTARIZE_USERNAME}} -p ${{secrets.MAC_NOTARIZE_PASSWORD}}
         done
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
           /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
@@ -327,6 +325,8 @@ jobs:
         cd redis-stack
         source .venv/bin/activate
         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server -k fetch
+        xcrun altool --notarize-app -f *.zip \
+            --primary-bundle-id org.redis.redis-stack-server -u ${{secrets.MAC_NOTARIZE_USERNAME}} -p ${{secrets.MAC_NOTARIZE_PASSWORD}}
         for i in `ls *.zip`; do
           sha256sum $i |awk '{print $1}' > $i.sha256
         done
@@ -414,8 +414,6 @@ jobs:
         CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
           /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
-          xcrun altool --notarize-app -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i \
-            --primary-bundle-id org.redis.$i -u ${{secrets.MAC_NOTARIZE_USERNAME}} -p ${{secrets.MAC_NOTARIZE_PASSWORD}}
         done
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
           /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
@@ -425,6 +423,8 @@ jobs:
       run: |
         source .venv/bin/activate
         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redis-stack-server -k fetch
+        xcrun altool --notarize-app -f *.zip \
+          --primary-bundle-id org.redis.redis-stack-server -u ${{secrets.MAC_NOTARIZE_USERNAME}} -p ${{secrets.MAC_NOTARIZE_PASSWORD}}
         for i in `ls *.zip`; do
           sha256sum $i |awk '{print $1}' > $i.sha256
         done
