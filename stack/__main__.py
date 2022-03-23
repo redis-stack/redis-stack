@@ -42,14 +42,6 @@ if __name__ == "__main__":
         help="[Optional] Version with which to override all package versions",
     )
     p.add_option(
-        "-b",
-        "--build-number",
-        dest="BUILD_NUMBER",
-        help="[optional] build number",
-        metavar="INT",
-        default=1,
-    )
-    p.add_option(
         "-t",
         "--target",
         dest="TARGET",
@@ -130,4 +122,4 @@ if __name__ == "__main__":
         a.prepackage(opts.REDISBIN, opts.IGNORE, opts.VERSION_OVERRIDE)
 
     if opts.SKIP is None or opts.SKIP != "package":
-        sys.exit(a.package(opts.TARGET, opts.BUILD_NUMBER, opts.DIST))
+        sys.exit(a.package(opts.TARGET, opts.DIST))
