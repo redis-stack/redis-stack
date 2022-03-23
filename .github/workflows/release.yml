@@ -28,7 +28,7 @@ env:
   # base s3 url for a published rpm feed 
   # directory will include a directory named rpm, and cannot end in a /
   # eg: s3://redismodules/redis-stack/playground
-  s3packagereporoot: s3://{{secrets.S3_PUBLIC_REPO_NAME}}/${{ secrets.S3_PUBLIC_REPO_PREFIX }}
+  s3packagereporoot: s3://${{secrets.S3_PUBLIC_REPO_NAME}}/${{ secrets.S3_PUBLIC_REPO_PREFIX }}
 
 jobs:
 
@@ -84,6 +84,8 @@ jobs:
   publish_debs:
     name: Publish Debian [${{ matrix.osnick }}] Feed
     runs-on: ubuntu-latest
+
+    # limitation in deb s3
     strategy:
       max-parallel: 1
       matrix:
@@ -135,7 +137,7 @@ jobs:
           cd s3uploads
           deb-s3 upload --s3-region us-east-1 \
             --bucket ${{env.s3publicreponame}} \
-            --codename $i \
+            --codename ${{ matrix.osnick }} \
             --preserve-versions \
             --fail-if-exists \
             --sign \
@@ -151,7 +153,6 @@ jobs:
     runs-on: ubuntu-latest
     container: oraclelinux:8
     strategy:
-      max-parallel: 1
       matrix:
         osnick: [rhel7, rhel8]
         arch: [x86_64]
@@ -176,6 +177,9 @@ jobs:
             sync s3://${{ env.s3publicreponame }}/${{ env.s3publicrepoprefix }}/rpm/${{matrix.osnick}} s3uploads || mkdir -p s3uploads/x86_64
           s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
             get ${{env.s3root}}/snapshots/*${{ steps.get_version.outputs.VERSION }}*${{ matrix.osnick }}*${{ matrix.arch }}.rpm s3uploads/${{ matrix.arch }}
+
+      - name: update packages and publish upstream
+        run: |
           createrepo --update s3uploads/
           s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
             sync s3uploads/ ${{env.s3packagereporoot}}/rpm/${{ matrix.osnick }}/
