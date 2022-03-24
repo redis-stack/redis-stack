@@ -9,8 +9,8 @@ versions:
   redisbloom: 2.2.14
   nodejs: v14.19.0
   redis: 7.0-rc2
-  redis-stack: 7.0.0-RC1
-  redis-stack-server: 7.0.0-RC1
+  redis-stack: 7.0.0-RC2
+  redis-stack-server: 7.0.0-RC2
   redisinsight: 2.0.5
   redisinsight-web: 2.0.5
 
