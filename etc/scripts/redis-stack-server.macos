@@ -66,7 +66,7 @@ fi
 
 echo "Starting redis-stack-server, database path ${REDIS_DATA_DIR}"
 
-${CMD}
+${CMD} \
 ${CONFFILE} -- \
 --dir ${REDIS_DATA_DIR} \
 --protected-mode no \
