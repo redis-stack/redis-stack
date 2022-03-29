@@ -2,6 +2,7 @@ import os
 from helpers import RedisTestMixin
 import platform
 import subprocess
+import time
 
 
 class TestOSX(RedisTestMixin, object):
@@ -27,12 +28,13 @@ class TestOSX(RedisTestMixin, object):
             raise IOError("Failed to install redis-stack")
 
         # start redis-stack
-        r = subprocess.run(
+        r = subprocess.Popen(
             [f"{cls.BASEPATH}/bin/redis-stack-server"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
         cls.PROC = r.pid
+        time.sleep(2)
 
     @classmethod
     def teardown_class(cls):
@@ -100,28 +102,15 @@ class TestOSX(RedisTestMixin, object):
 
         for b in binaries:
             r = subprocess.run(
-                [f"{self.basepath}/bin/{b}", "-h"],
+                [f"{self.BASEPATH}/bin/{b}", "-h"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
             )
             assert r.returncode in [0, 1]  # no segfault
 
         out = subprocess.run(
-            [f"{self.basepath}/bin/redis-stack-server", "-h"],
+            [f"{self.BASEPATH}/bin/redis-stack-server", "-h"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
         assert out.stdout.decode().lower().find("redis-stack-server") != -1
-
-    def test_modules_present(self):
-        res, out = self.container.exec_run(f"ls {self.basepath}/lib")
-        content = out.decode().strip()
-        libs = [
-            "rejson.so",
-            "redisearch.so",
-            "redisgraph.so",
-            "redisbloom.so",
-            "redistimeseries.so",
-        ]
-        for i in libs:
-            assert i in content
