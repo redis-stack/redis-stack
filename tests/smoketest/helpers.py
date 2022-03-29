@@ -103,8 +103,8 @@ class RedisTestMixin:
         assert "doc2" in docs
         assert "doc1" in docs
 
+
 class RedisPackagingMixin:
-   
     @property
     def basepath(self):
         basepath = getattr(self, "BASEPATH", None)
@@ -164,7 +164,8 @@ class RedisPackagingMixin:
 
         res, out = self.container.exec_run(f"{self.basepath}/bin/redis-stack-server -h")
         assert out.decode().lower().find("redis-stack-server") != -1
-        
+
+
 class InDockerTestEnv(RedisTestMixin, RedisPackagingMixin, object):
 
     IN_DOCKER = True
@@ -182,4 +183,3 @@ class InDockerTestEnv(RedisTestMixin, RedisPackagingMixin, object):
     @property
     def container(self):
         return self.__CONTAINER__
- 
