@@ -114,12 +114,10 @@ jobs:
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: publish debs
         run: |
-          mkdir s3uploads/
-          s3cmd get ${{env.s3root}}/snapshots/*${{ steps.get_version.outputs.VERSION }}*${{ matrix.osnick }}*${{ matrix.arch }}.deb s3uploads/
+          s3cmd get ${{env.s3root}}/*${{ steps.get_version.outputs.VERSION }}*${{ matrix.osnick }}*${{ matrix.arch }}.deb .
           echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
           gpg-connect-agent reloadagent /bye
           /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ secrets.GPG_KEYGRIP }}
-          cd s3uploads
           deb-s3 upload --s3-region us-east-1 \
             --bucket ${{env.s3publicreponame}} \
             --codename ${{ matrix.osnick }} \
@@ -149,7 +147,7 @@ jobs:
       - name: get package version
         id: get_version
         run: |
-          pip3 install poetry s3cmd 
+          pip3 install poetry s3cmd
           ln -s /usr/bin/python3 /usr/bin/python
           poetry config virtualenvs.create false
           poetry install
@@ -157,14 +155,15 @@ jobs:
           echo "::set-output name=VERSION::$realversion"
       - name: get files from s3
         run: |
-          mkdir s3uploads
-          s3cmd --access_key=${{secrets.PACKAGES_AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.PACKAGES_AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
-            sync s3://${{ env.s3publicreponame }}/rpm/${{matrix.osnick}} s3uploads || mkdir -p s3uploads/x86_64
-          s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
-            get ${{env.s3root}}/snapshots/*${{ steps.get_version.outputs.VERSION }}*${{ matrix.osnick }}*${{ matrix.arch }}.rpm s3uploads/${{ matrix.arch }}
+          s3cmd --access_key=${{secrets.PACKAGES_AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.PACKAGES_AWS_SECRET_ACCESS_KEY}} \
+            sync s3://${{ env.s3publicreponame }}/rpm/${{matrix.osnick}}/ s3uploads/
+          mkdir -p s3uploads/${{ matrix.arch }}
+          cd s3uploads/${{matrix.arch}}
+          s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} \
+            get --force ${{env.s3root}}/*${{ steps.get_version.outputs.VERSION }}*${{ matrix.osnick }}*${{ matrix.arch }}.rpm .
 
       - name: update packages and publish upstream
         run: |
           createrepo --update s3uploads/
-          s3cmd --access_key=${{secrets.PACKAGES_AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.PACKAGES_AWS_SECRET_ACCESS_KEY}} --region=us-east-1 \
-            sync s3uploads/ ${{ env.s3publicreponame }}/rpm/${{ matrix.osnick }}/
+          s3cmd --access_key=${{secrets.PACKAGES_AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.PACKAGES_AWS_SECRET_ACCESS_KEY}} \
+            sync s3uploads/* s3://${{ env.s3publicreponame }}/rpm/${{ matrix.osnick }}/
