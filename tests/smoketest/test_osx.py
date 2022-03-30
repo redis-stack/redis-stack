@@ -1,4 +1,5 @@
 import os
+import time
 from helpers import RedisTestMixin
 import platform
 import subprocess
@@ -18,6 +19,10 @@ class TestOSX(RedisTestMixin, object):
             cls.teardown_class()
         except Exception:
             pass
+        
+        rdbfile = f"{cls.BASEPATH}/var/db/redis-stack/dump.rdb"
+        if os.path.isfile(rdbfile):
+            os.unlink(rdbfile)
 
         x = os.system("brew tap redis-stack/redis-stack")
         if x != 0:
@@ -35,6 +40,7 @@ class TestOSX(RedisTestMixin, object):
         )
         cls.PROC = r.pid
         time.sleep(2)
+        assert cls.PROC > 0
 
     @classmethod
     def teardown_class(cls):
@@ -42,7 +48,7 @@ class TestOSX(RedisTestMixin, object):
         # try to kill redis-stack if it is running
         try:
             os.kill(cls.PROC, 9)
-        except ProcessLookupError:
+        except (ProcessLookupError, TypeError, NameError):
             pass
 
         x = os.system("brew uninstall redis-stack-server")
@@ -107,10 +113,3 @@ class TestOSX(RedisTestMixin, object):
                 stderr=subprocess.PIPE,
             )
             assert r.returncode in [0, 1]  # no segfault
-
-        out = subprocess.run(
-            [f"{self.BASEPATH}/bin/redis-stack-server", "-h"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        assert out.stdout.decode().lower().find("redis-stack-server") != -1
