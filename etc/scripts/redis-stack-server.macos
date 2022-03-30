@@ -30,7 +30,7 @@ if [ -d /usr/local/var ]; then
         REDIS_DATA_DIR=${_datadir}
     fi
 elif [ -d /opt/homebrew/var ]; then
-    BREW_BASE=/usr/local
+    BREW_BASE=/opt/homebrew
     _datadir=/opt/homebrew/var/db/redis-stack
     mkdir -p ${_datadir}
     touch ${_datadir}/.testfile 2>&1
