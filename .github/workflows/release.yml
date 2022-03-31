@@ -118,7 +118,7 @@ jobs:
           echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
           gpg-connect-agent reloadagent /bye
           /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ secrets.GPG_KEYGRIP }}
-          deb-s3 upload --s3-region us-east-1 \
+          deb-s3 upload --s3-region us-east-2 \
             --bucket ${{env.s3publicreponame}} \
             --codename ${{ matrix.osnick }} \
             --preserve-versions \
