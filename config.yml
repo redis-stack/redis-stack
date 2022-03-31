@@ -2,10 +2,10 @@
 
 # module versions
 versions:
-  rejson: 2.0.7
+  rejson: 2.0.8
   redistimeseries: 1.6.9
-  redisearch: 2.2.10
-  redisgraph: 2.8.9
+  redisearch: 2.4.3
+  redisgraph: 2.8.11
   redisbloom: 2.2.14
   nodejs: v14.19.0
   redis: 7.0-rc2
