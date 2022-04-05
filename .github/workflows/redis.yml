@@ -63,10 +63,17 @@ jobs:
       - name: install gpg key
         run: |
           cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
+
+      - name: get gpg id from key
+        id: get_gpg_id  
+        run: |
+          gpg_id=`gpg --list-keys|sed -n 4p|awk '{print $1}'`
+          echo "::set-output name=GPG_ID::$gpg_id"
+
       - name: gpg sign package
         run: |
           echo '${{secrets.GPG_PASSWORD}}' > .passfile
-          dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{secrets.GPG_ID}} *.deb
+          dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{steps.get_gpg_id.outputs.GPG_ID}} *.deb
           for i in `ls *.deb`; do
             sha256sum $i |awk '{print $1}' > $i.sha256
           done
@@ -109,10 +116,7 @@ jobs:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
       GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_ID: ${{ secrets.GPG_ID }}
-      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
 
@@ -131,10 +135,7 @@ jobs:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
       GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_ID: ${{ secrets.GPG_ID }}
-      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   xenial:
@@ -152,10 +153,7 @@ jobs:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
       GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_ID: ${{ secrets.GPG_ID }}
-      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   rhel7:
@@ -173,10 +171,7 @@ jobs:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
       GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
-      GPG_ID: ${{ secrets.GPG_ID }}
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   rhel8:
@@ -196,10 +191,7 @@ jobs:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
       GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
-      GPG_ID: ${{ secrets.GPG_ID }}
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   # osx is the only one of these that is really
