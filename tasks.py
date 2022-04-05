@@ -11,7 +11,7 @@ def build_redis(c, redis_repo_path="redis", build_args="all build_tls=yes"):
     """compile redis"""
     redispath = os.path.join(os.getcwd(), redis_repo_path, "src")
     run(f"make -C {redispath} -j `nproc` {build_args}")
-    
+
 @task(
     help={
         "osname": "operating system name (eg: Linux)",
@@ -30,15 +30,15 @@ def package_redis(c, version="", osname='macos', dist='monterey', publish=False,
         shutil.rmtree(dest)
     os.mkdir(dest)
     binaries = ['redis-cli', 'redis-server', 'redis-sentinel', 'redis-benchmark', 'redis-check-rdb', 'redis-check-aof']
-    
+
     for b in binaries:
         shutil.copyfile(os.path.join(redispath, b), os.path.join(dest, b))
-        
+
     tarball = f"{dest}.tgz"
     tarcmd = f"tar -czvf {tarball} {dest}"
     run(tarcmd)
-        
-    if publish is not None:
+
+    if publish:
         cmd = ["aws",
                "s3",
                "cp",
