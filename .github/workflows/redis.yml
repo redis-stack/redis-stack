@@ -386,6 +386,7 @@ jobs:
 
     - name: check binaries exist [debug]
       run: |
+        set -x
         which wget
         which base64
         which security
