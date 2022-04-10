@@ -384,15 +384,25 @@ jobs:
         source .venv/bin/activate
         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redis-stack-server -k package
 
+    - name: check binaries exist [debug]
+      run: |
+        which wget
+        which base64
+        which security
+        which codesign
+        which xcrun
+
     - name: codesign all binaries
       run: |
-        wget -q https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer
-        # echo ${{ secrets.MAC_DEVINSTALLER_CERTIFICATE }} | base64 --decode > certificate.p12
+        echo ${{ secrets.MAC_DEVINSTALLER_CERTIFICATE }} | base64 --decode > certificate.p12
         security create-keychain -p notapassword build.keychain
         security default-keychain -s build.keychain
         security unlock-keychain -p notapassword build.keychain
+        security import certificate.p12 -k build.keychain -P ${{ secrets.MAC_DEVINSTALLER_CERTIFICATE_PASSWORD }} -T /usr/bin/codesign
+    - name: import apple certificate
+      run: |
+        wget https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer
         security import DeveloperIDG2CA.cer -k build.keychain
-        # security import certificate.p12 -k build.keychain -P ${{ secrets.MAC_DEVINSTALLER_CERTIFICATE_PASSWORD }} -T /usr/bin/codesign
         # CODESIGN_IDENTITY=`security find-identity -v|head -n 1|cut -d "\"" -f 2-2`
         # for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
         #   /usr/bin/codesign --force --timestamp --options runtime --sign "${CODESIGN_IDENTITY}" build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
