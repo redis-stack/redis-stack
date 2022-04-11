@@ -395,7 +395,7 @@ jobs:
         security import certificate.p12 -k build.keychain -P "${{ secrets.MAC_DEVINSTALLER_CERTIFICATE_PASSWORD }}" -T /usr/bin/codesign
         CODESIGN_IDENTITY=`security find-identity -v|head -n 1|cut -d "\"" -f 2-2`
         echo "=================="
-        security find-identity -v|head -n 1|cut -d "\"" -f 2-2
+        security find-identity
         echo "${CODESIGN_IDENTITY}"
         echo "==================="
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
