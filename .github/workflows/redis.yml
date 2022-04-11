@@ -387,19 +387,19 @@ jobs:
     - name: codesign all binaries
       run: |
         echo "${{ secrets.MAC_DEVINSTALLER_CERTIFICATE }}" | base64 --decode > certificate.p12
-        # wget https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer
-        # security create-keychain -p notapassword build.keychain
-        # security default-keychain -s build.keychain
-        # security unlock-keychain -p notapassword build.keychain
-        # security import DeveloperIDG2CA.cer -k build.keychain
-        # security import certificate.p12 -k build.keychain -P "${{ secrets.MAC_DEVINSTALLER_CERTIFICATE_PASSWORD }}" -T /usr/bin/codesign
-        # CODESIGN_IDENTITY=`security find-identity -v|head -n 1|cut -d "\"" -f 2-2`
-        # for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
-        #   /usr/bin/codesign --force --timestamp --options runtime --sign "${CODESIGN_IDENTITY}" build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
-        # done
-        # for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
-        #   /usr/bin/codesign --force --timestamp --options runtime --sign "${CODESIGN_IDENTITY}" build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
-        # done
+        wget https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer
+        security create-keychain -p notapassword build.keychain
+        security default-keychain -s build.keychain
+        security unlock-keychain -p notapassword build.keychain
+        security import DeveloperIDG2CA.cer -k build.keychain
+        security import certificate.p12 -k build.keychain -P "${{ secrets.MAC_DEVINSTALLER_CERTIFICATE_PASSWORD }}" -T /usr/bin/codesign
+        CODESIGN_IDENTITY=`security find-identity -v|head -n 1|cut -d "\"" -f 2-2`
+        for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
+          /usr/bin/codesign --force --timestamp --options runtime --sign "${CODESIGN_IDENTITY}" build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
+        done
+        for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
+          /usr/bin/codesign --force --timestamp --options runtime --sign "${CODESIGN_IDENTITY}" build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
+        done
 
     # - name: notarize the custom zip
     #   run: |
