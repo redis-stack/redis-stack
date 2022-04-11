@@ -397,11 +397,13 @@ jobs:
         echo "=================="
         security find-identity -v|head -n 1|cut -d "\"" -f 2-2
         echo "${CODESIGN_IDENTITY}"
-        echo "==================+"
+        echo "==================="
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
+          set -x
           /usr/bin/codesign --force --timestamp --options runtime --sign "${CODESIGN_IDENTITY}" build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
         done
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
+          set -x
           /usr/bin/codesign --force --timestamp --options runtime --sign "${CODESIGN_IDENTITY}" build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
         done
 
