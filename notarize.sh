@@ -19,7 +19,7 @@ PACKAGE_ID=`xcrun altool --notarize-app --primary-bundle-id ${BUNDLE} --username
 echo "Checking status for package ${PACKAGE_ID}"
 
 for i in `seq 1 10`; do
-    status=`xcrun altool --notarization-info ${PACKAGE_ID} --username "${USERNAME}" --password "${PASSWORD}"|grep "Status:" | cut -d ":" -f 2-2|awk '{print $1}'
+    status=`xcrun altool --notarization-info ${PACKAGE_ID} --username "${USERNAME}" --password "${PASSWORD}"|grep "Status:" | cut -d ":" -f 2-2|awk '{print $1}'`
     echo "Status is - ${status}"
     if [ "${status}" == "invalid" ]; then
         echo "Notarization failed, exiting."
