@@ -112,12 +112,17 @@ jobs:
           region: us-east-1
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: get gpg_keygrip
+        id: get_gpg_keygrip
+        run: |
+          keygrip=`gpg -k --with-keygrip |sed -n 5p|cut -d '=' -f 2-2`
+          echo "::set-output name=GPG_KEYGRIP::$keygrip"
       - name: publish debs
         run: |
           s3cmd get ${{env.s3root}}/*${{ steps.get_version.outputs.VERSION }}*${{ matrix.osnick }}*${{ matrix.arch }}.deb .
           echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
           gpg-connect-agent reloadagent /bye
-          /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ secrets.GPG_KEYGRIP }}
+          /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ steps.get_gpg_keygrip.outputs.GPG_KEYGRIP }}
           deb-s3 upload --s3-region us-east-2 \
             --bucket ${{env.s3publicreponame}} \
             --codename ${{ matrix.osnick }} \
