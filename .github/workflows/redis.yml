@@ -393,10 +393,10 @@ jobs:
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
         CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
-          /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
+          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
         done
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
-          /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
+          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
         done
 
     - name: build redis-stack-server zipfile
@@ -407,6 +407,13 @@ jobs:
           sha256sum $i |awk '{print $1}' > $i.sha256
         done
 
+    - name: persist the zipfile
+      uses: actions/upload-artifact@v2
+      with:
+        name: redis-stack-server-${{env.arch}}-${{env.distribution}}.zip
+        path: |
+          *.zip
+
     - name: notarize the custom zip
       run: |
         cd build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
@@ -415,14 +422,14 @@ jobs:
     - name: persist the codesigned artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: notarized-${{env.platform}}-${{env.arch}}.zip
+        name: codesigned-${{env.platform}}-${{env.arch}}
         path: |
           build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/*.zip
 
     - name: notarize the custom zip
       run: |
         cd build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
-        sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip redis-stack-server ${{ secrets.MAC_NOTARIZE_USER }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
+        sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
 
     - uses: s3-actions/s3cmd@v1.1
       with:
