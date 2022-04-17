@@ -58,13 +58,13 @@ class RedisStackServer(Recipe):
         # per os
         logger.debug("Copying redis-stack-server script")
         stackdest = os.path.join(self.__PATHS__.BINDIR, "redis-stack-server")
-        
+
         # generate redis-stack-server script, and include it
         src = os.path.join(self.__PATHS__.SCRIPTDIR, "scripts", f"redis-stack-server.{self.OSNAME}")
         generated_dest = os.path.join(self.__PATHS__.HERE, "redis-stack-server.generated")
         vars = {'product': self.PACKAGE_NAME, 'notdockerentrypoint': 1}
-        generate_from_template(src, dest, vars)
-        
+        generate_from_template(src, generated_dest, vars)
+
         shutil.copyfile(generated_dest, stackdest)
         os.chmod(stackdest, mode=0o755)
 
