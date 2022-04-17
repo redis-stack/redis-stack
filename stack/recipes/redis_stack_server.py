@@ -1,3 +1,4 @@
+from stack.utils import generate_from_template
 from . import Recipe
 from ..paths import Paths
 from ..components.modules import Modules
@@ -57,12 +58,14 @@ class RedisStackServer(Recipe):
         # per os
         logger.debug("Copying redis-stack-server script")
         stackdest = os.path.join(self.__PATHS__.BINDIR, "redis-stack-server")
-        shutil.copyfile(
-            os.path.join(
-                self.__PATHS__.SCRIPTDIR, "scripts", f"redis-stack-server.{self.OSNAME}"
-            ),
-            stackdest,
-        )
+        
+        # generate redis-stack-server script, and include it
+        src = os.path.join(self.__PATHS__.SCRIPTDIR, "scripts", f"redis-stack-server.{self.OSNAME}")
+        generated_dest = os.path.join(self.__PATHS__.HERE, "redis-stack-server.generated")
+        vars = {'product': self.PACKAGE_NAME, 'notdockerentrypoint': 1}
+        generate_from_template(src, dest, vars)
+        
+        shutil.copyfile(generated_dest, stackdest)
         os.chmod(stackdest, mode=0o755)
 
         if binary_dir is not None and not os.path.isdir(binary_dir):

@@ -2,8 +2,8 @@ from invoke import run, task
 import os
 import shutil
 import sys
-import jinja2
 from stack.paths import Paths
+from stack.utils import generate_from_template
 
 
 @task
@@ -52,24 +52,22 @@ def package_redis(c, version="", osname='macos', dist='monterey', publish=False,
 
 @task(
     help={
-        "docker_type": "docker type [redis-stack, redis-stack-server]",
+        "product": "product [redis-stack, redis-stack-server]",
     }
 )
-def dockergen(c, docker_type="redis-stack"):
+def dockergen(c, product="redis-stack"):
     """Generate docker compile files"""
-    here = os.path.abspath(os.path.dirname(__file__))
+    here = Paths(None, None).HERE
+    vars = {"product": product}
+    
     src = os.path.join("dockers", "dockerfile.tmpl")
-    dest = os.path.join(here, "dockers", f"Dockerfile.{docker_type}")
-    loader = jinja2.FileSystemLoader(here)
-    env = jinja2.Environment(loader=loader)
-    tmpl = loader.load(name=src, environment=env)
-
-    p = Paths(None, None)
-    vars = {"docker_type": docker_type, "SHAREDIR": p.SHAREDIR}
-    with open(dest, "w+") as fp:
-        fp.write(tmpl.render(vars))
-
-
+    dest = os.path.join(here, "dockers", f"Dockerfile.{product}")
+    generate_from_template(src, dest, vars)
+    
+    entrysrc = os.path.join("etc", "scripts", "entrypoint.tmpl")
+    entrydest = os.path.join(here, "entrypoint.generated.sh")
+    generate_from_template(entrysrc, entrydest, vars)
+    
 @task(
     help={
         "osname": "operating system name (eg: Linux)",

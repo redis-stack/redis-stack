@@ -1,6 +1,6 @@
 FROM ubuntu:focal
 
-RUN apt-get update -qqy
+RUN apt-get update -qqy --fix-missing
 RUN apt-get upgrade -qqy
 RUN apt-get install dumb-init
 RUN apt-get install -y libssl-dev libgomp1
@@ -8,9 +8,9 @@ ADD ./redis-stack /var/cache/apt/redis-stack/
 RUN mkdir -p /data/redis /data/redisinsight
 RUN touch /.dockerenv
 
-{% if docker_type == 'redis-stack-server' %}
+{% if product == 'redis-stack-server' %}
 RUN dpkg -i /var/cache/apt/redis-stack/redis-stack-server*.deb
-{% elif docker_type == 'redis-stack' %}
+{% elif product == 'redis-stack' %}
 # RUN dpkg -i /var/cache/apt/redis-stack/redis-stack*.deb
 RUN apt-get install -y libsecret-1-0
 RUN dpkg -i /var/cache/apt/redis-stack/redis-stack-server*.deb
@@ -18,20 +18,16 @@ RUN dpkg -i /var/cache/apt/redis-stack/redisinsight*.deb
 {% endif %}
 RUN rm -rf /var/cache/apt
 
-{% if docker_type == 'redis-stack-server' %}
-COPY ./etc/scripts/entrypoint.redis-stack-server.sh /entrypoint.sh
-{% elif docker_type == 'redis-stack' %}
-COPY ./etc/scripts/entrypoint.redis-stack.sh /entrypoint.sh
-{% endif %}
+COPY ./entrypoint.generated.sh /entrypoint.sh
 RUN chmod a+x /entrypoint.sh
 
-{% if docker_type == 'redis-stack-server' %}
+{% if product == 'redis-stack-server' %}
 EXPOSE 6379
-{% elif docker_type == 'redis-stack' %}
+{% elif product == 'redis-stack' %}
 EXPOSE 6379 8001
 {% endif %}
 
-{% if docker_type == 'redis-stack' %}
+{% if product == 'redis-stack' %}
 COPY etc/envfiles/insight.docker.env /opt/redis-stack/share/redisinsight/.env
 RUN chmod 0555 /opt/redis-stack/share/redisinsight/.env
 {% endif %}
