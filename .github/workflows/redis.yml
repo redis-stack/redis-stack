@@ -63,10 +63,17 @@ jobs:
       - name: install gpg key
         run: |
           cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
+
+      - name: get gpg id from key
+        id: get_gpg_id
+        run: |
+          gpg_id=`gpg --list-keys|sed -n 4p|awk '{print $1}'`
+          echo "::set-output name=GPG_ID::$gpg_id"
+
       - name: gpg sign package
         run: |
           echo '${{secrets.GPG_PASSWORD}}' > .passfile
-          dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{secrets.GPG_ID}} *.deb
+          dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{steps.get_gpg_id.outputs.GPG_ID}} *.deb
           for i in `ls *.deb`; do
             sha256sum $i |awk '{print $1}' > $i.sha256
           done
@@ -109,12 +116,8 @@ jobs:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
       GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_ID: ${{ secrets.GPG_ID }}
-      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
-
 
   bionic:
     uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
@@ -131,10 +134,7 @@ jobs:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
       GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_ID: ${{ secrets.GPG_ID }}
-      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   xenial:
@@ -152,10 +152,7 @@ jobs:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
       GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_ID: ${{ secrets.GPG_ID }}
-      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   rhel7:
@@ -173,10 +170,7 @@ jobs:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
       GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
-      GPG_ID: ${{ secrets.GPG_ID }}
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   rhel8:
@@ -196,10 +190,7 @@ jobs:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GPG_KEYGRIP: ${{ secrets.GPG_KEYGRIP }}
       GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_EMAIL: ${{ secrets.GPG_EMAIL }}
-      GPG_ID: ${{ secrets.GPG_ID }}
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   # osx is the only one of these that is really
@@ -208,7 +199,7 @@ jobs:
     env:
       arch: x86_64
       osnick: catalina
-      target: osxpkg
+      target: zip
       platform: catalina
       osname: macos
       redisversion: 7.0-rc2
@@ -259,14 +250,14 @@ jobs:
       run: |
         mkdir redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
         cp redis/src/redis-server \
-           redis/src/redis-sentinel \
-           redis/src/redis-check-aof \
-           redis/src/redis-check-rdb \
-           redis/src/redis-benchmark \
-           redis/src/redis-cli \
-           redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
+            redis/src/redis-sentinel \
+            redis/src/redis-check-aof \
+            redis/src/redis-check-rdb \
+            redis/src/redis-benchmark \
+            redis/src/redis-cli \
+            redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
         tar -czvf redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
-           redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
+            redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
 
     - uses: s3-actions/s3cmd@v1.1
       with:
@@ -308,10 +299,10 @@ jobs:
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
         CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
-          /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
+          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
         done
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
-          /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
+          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
         done
 
     - name: build the redis-stack-server zipfile (for homebrew)
@@ -325,12 +316,30 @@ jobs:
         mkdir s3dist
         cp *.zip *.sha256 s3dist
 
-    - name: perist redis-stack package
+    - name: perist the zipfile
       uses: actions/upload-artifact@v2
       with:
         name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
         path: |
           redis-stack/redis-stack-*.zip
+
+    - name: create the zip for notarization
+      run: |
+        cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
+        zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
+
+    - name: persist the codesigned artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: codesigned-${{env.platform}}-${{env.arch}}
+        path: |
+          redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/*.zip
+
+    - name: notarize the custom zip
+      run: |
+        cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
+        sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
+
     - uses: s3-actions/s3cmd@v1.1
       with:
         provider: aws
@@ -401,10 +410,10 @@ jobs:
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
         CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
-          /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
+          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
         done
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
-          /usr/bin/codesign --force -s ${CODESIGN_IDENTITY}  build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
+          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
         done
 
     - name: build redis-stack-server zipfile
@@ -414,6 +423,30 @@ jobs:
         for i in `ls *.zip`; do
           sha256sum $i |awk '{print $1}' > $i.sha256
         done
+
+    - name: persist the zipfile
+      uses: actions/upload-artifact@v2
+      with:
+        name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
+        path: |
+          *.zip
+
+    - name: create the zip for notarization
+      run: |
+        cd build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
+        zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
+
+    - name: persist the codesigned artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: codesigned-${{env.platform}}-${{env.arch}}
+        path: |
+          build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/*.zip
+
+    - name: notarize the custom zip
+      run: |
+        cd build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
+        sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
 
     - uses: s3-actions/s3cmd@v1.1
       with:

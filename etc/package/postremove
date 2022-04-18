@@ -1,7 +1,17 @@
 #!/bin/sh
 
-if [ -f /usr/bin/systemctl ]; then
+if [ -f /etc/systemd/system/redis-stack-server.service ]; then
+    rm -f /etc/systemd/system/redis-stack-server.service
+fi
+
+if [ -f /etc/systemd/system/redis-stack.service ]; then
     rm -f /etc/systemd/system/redis-stack.service
+fi
+
+if [ -f /etc/systemd/system/redis-stack-redis.service ]; then
     rm -f /etc/systemd/system/redis-stack-redis.service
+fi
+
+if [ -f /etc/systemd/system/redisinsight.service ]; then
     rm -f /etc/systemd/system/redisinsight.service
 fi
