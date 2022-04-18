@@ -65,9 +65,13 @@ For the various pytest markers, see the *pyproject.toml*
 
 ### Releasing
 
-To make a release, use the GitHub release drafter. By creating a tag, in the release drafter, a release is made. Versions are taken from the *config.yaml*.
+1. To make a release, use the GitHub release drafter. By creating a tag, in the release drafter, a release is made. Versions are taken from the *config.yaml*. 
 
-The process of releasing copies existing built artifacts (dockers, rpms, snaps, etc) from the snapshot directories, and re-uploading them to the root s3 folder (s3://redismodules/redis-stack/). No compilation or testing of releases occur, as that has already happened as prat of the continuous integration process.
+    The process of releasing copies existing built artifacts (dockers, rpms, snaps, etc) from the snapshot directories, and re-uploading them to the root s3 folder (s3://redismodules/redis-stack/). No compilation or testing of releases occur, as that has already happened as part of the continuous integration process.
+
+2. Tag the [rpm repository](https://github.com/redis-stack/redis-stack-rpm) and wait for the [publish action to complete](https://github.com/redis-stack/redis-stack-rpm/actions/workflows/release.yml).
+3. Tag the [debian repository](https://github.com/redis-stack/redis-stack-deb)
+4. Update [homebrew](https://github.com/redis-stack/homebrew-redis-stack) with the latest version
 
 ------------------------
 
