@@ -7,7 +7,7 @@ This repository builds redis, and downloads various components (modules, RedisIn
 * Python > 3.9 (for this toolkit) and [poetry](https://python-poetry.org)
 * Ruby > 2.7 (for [fpm](https://github.com/jordansissel/fpm))
 * Docker (to build a docker)
-* zip/apt/deb/tar depending on your target outputs.  
+* zip/apt/deb/tar depending on your target outputs.
 
 ## Building
 
@@ -65,9 +65,9 @@ For the various pytest markers, see the *pyproject.toml*
 
 ### Releasing
 
-1. To make a release, use the GitHub release drafter. By creating a tag, in the release drafter, a release is made. Versions are taken from the *config.yaml*. 
+1. To make a release, use the GitHub release drafter. By creating a tag, in the release drafter, a release is made. Versions are taken from the *config.yaml*.
 
-    The process of releasing copies existing built artifacts (dockers, rpms, snaps, etc) from the snapshot directories, and re-uploading them to the root s3 folder (s3://redismodules/redis-stack/). No compilation or testing of releases occur, as that has already happened as part of the continuous integration process.
+    The process of releasing copies existing built artifacts (dockers, rpms, snaps, etc) from the snapshot directories, and re-uploading them to the root s3 folder (s3://redismodules/redis-stack/). No compilation or testing of releases occur, as that has already happened as part of the continuous integration process. As of this writing, this repository releases the dockers as well.
 
 2. Tag the [rpm repository](https://github.com/redis-stack/redis-stack-rpm) and wait for the [publish action to complete](https://github.com/redis-stack/redis-stack-rpm/actions/workflows/release.yml).
 3. Tag the [debian repository](https://github.com/redis-stack/redis-stack-deb)
@@ -88,4 +88,4 @@ Today, to modify the way a service starts, the following files all need editing:
 Versions for all packages are defined in the config.yaml file, and within a function named *generate_url* for each source type. In the case where you need to test a package that has been built to a custom location, set a variable named <module>-url-override in the config file at the top level.  For example, to override the rejson package location create a variable named *rejson-url-override*.  In the case of RedisInsight, all packages would derive from *redisinsight-url-override*.
 
 Do not commit this change to a mainline branch.
- 
+
