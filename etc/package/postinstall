@@ -7,6 +7,6 @@ for i in redis-cli redis-benchmark redis-check-aof redis-check-rdb redis-cli red
 done
 
 if [ -f /usr/bin/systemctl ]; then
-    systemctl enable redis-stack
-    systemctl start redis-stack
+    systemctl enable redis-stack-server
+    systemctl start redis-stack-server
 fi
