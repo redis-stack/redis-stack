@@ -104,7 +104,69 @@ class RedisTestMixin:
         assert "doc1" in docs
 
 
-class InDockerTestEnv(RedisTestMixin, object):
+class RedisPackagingMixin:
+    @property
+    def basepath(self):
+        basepath = getattr(self, "BASEPATH", None)
+        if basepath is None:
+            return "/opt/redis-stack"
+        return basepath
+
+    def test_binaries_present(self):
+        res, out = self.container.exec_run(f"ls {self.basepath}/bin")
+        content = out.decode().strip()
+        binaries = [
+            "redis-server",
+            "redis-stack-server",
+            "redis-cli",
+            "redis-benchmark",
+            "redis-check-rdb",
+            "redis-sentinel",
+            "redis-check-aof",
+        ]
+        for i in binaries:
+            assert i in content
+
+    def test_modules_present(self):
+        res, out = self.container.exec_run(f"ls {self.basepath}/lib")
+        content = out.decode().strip()
+        libs = [
+            "rejson.so",
+            "redisearch.so",
+            "redisgraph.so",
+            "redisbloom.so",
+            "redistimeseries.so",
+        ]
+        for i in libs:
+            assert i in content
+
+    def test_config_present(self):
+        res, out = self.container.exec_run(
+            f"ls /etc/redis-stack.conf {self.basepath}/etc/redis-stack.conf"
+        )
+        content = out.decode().strip()
+        for i in ["/etc/redis-stack.conf", f"{self.basepath}/etc/redis-stack.conf"]:
+            assert i in content
+
+    def test_binaries_execute(self):
+        binaries = [
+            "redis-server",
+            "redis-cli",
+            "redis-benchmark",
+            "redis-check-rdb",
+            "redis-sentinel",
+            "redis-check-aof",
+        ]
+
+        for b in binaries:
+            res, out = self.container.exec_run(f"{self.basepath}/bin/{b} -h")
+            assert res in [0, 1]  # no segfault
+
+        res, out = self.container.exec_run(f"{self.basepath}/bin/redis-stack-server -h")
+        assert out.decode().lower().find("redis-stack-server") != -1
+
+
+class InDockerTestEnv(RedisTestMixin, RedisPackagingMixin, object):
 
     IN_DOCKER = True
 
@@ -121,56 +183,3 @@ class InDockerTestEnv(RedisTestMixin, object):
     @property
     def container(self):
         return self.__CONTAINER__
-
-    def test_binaries_present(self):
-        res, out = self.container.exec_run("ls /opt/redis-stack/bin")
-        content = out.decode().strip()
-        binaries = [
-            "redis-server",
-            "redis-stack-server",
-            "redis-cli",
-            "redis-benchmark",
-            "redis-check-rdb",
-            "redis-sentinel",
-            "redis-check-aof",
-        ]
-        for i in binaries:
-            assert i in content
-
-    def test_modules_present(self):
-        res, out = self.container.exec_run("ls /opt/redis-stack/lib")
-        content = out.decode().strip()
-        libs = [
-            "rejson.so",
-            "redisearch.so",
-            "redisgraph.so",
-            "redisbloom.so",
-            "redistimeseries.so",
-        ]
-        for i in libs:
-            assert i in content
-
-    def test_config_present(self):
-        res, out = self.container.exec_run(
-            "ls /etc/redis-stack.conf /opt/redis-stack/etc/redis-stack.conf"
-        )
-        content = out.decode().strip()
-        for i in ["/etc/redis-stack.conf", "/opt/redis-stack/etc/redis-stack.conf"]:
-            assert i in content
-
-    def test_binaries_execute(self):
-        binaries = [
-            "redis-server",
-            "redis-cli",
-            "redis-benchmark",
-            "redis-check-rdb",
-            "redis-sentinel",
-            "redis-check-aof",
-        ]
-
-        for b in binaries:
-            res, out = self.container.exec_run(f"/opt/redis-stack/bin/{b} -h")
-            assert res in [0, 1]  # no segfault
-
-        res, out = self.container.exec_run("/opt/redis-stack/bin/redis-stack-server -h")
-        assert out.decode().lower().find("redis-stack-server") != -1
