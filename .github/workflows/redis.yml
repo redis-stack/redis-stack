@@ -395,6 +395,13 @@ jobs:
         gem install fpm -v ${{env.fpmversion}}
         poetry install
 
+### Once https://github.com/actions/runner/issues/805 is resolved we can do this ###
+### For now, this is how it is manually built, on the platform ###
+#    - name: build redis from source
+#      run: |
+#        cd redis
+#        make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a" CFLAGS="-I /opt/homebrew/opt/openssl@1.1/include"
+#
     - name: collect dependencies prior to packaging
       run: |
         source .venv/bin/activate
