@@ -385,7 +385,7 @@ jobs:
       working-directory: redis-stack
       run: unzip redis-stack-server*.${{env.target}} -d redis-stack-server
     - name: run osx tests
-      run: pytest -m macos
+      run: .venv/bin/pytest -m macos
 
     # - name: upload snapshots
     #   run: |
