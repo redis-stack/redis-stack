@@ -381,11 +381,10 @@ jobs:
     - run: ls -R redis-stack
     - name: unzip the zipfile
       working-directory: redis-stack
-      run: redis-stack-server*.${{env.target}} -d redis-stack-server
+      run: unzip redis-stack-server*.${{env.target}} -d redis-stack-server
     - run: ls -R redis-stack
     - name: run osx tests
       run: pytest -m macos
-
 
     # - name: upload snapshots
     #   run: |
