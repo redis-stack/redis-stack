@@ -299,10 +299,10 @@ jobs:
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
         CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
-          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
+          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} --entitlements etc/entitlements -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
         done
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
-          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
+          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} --entitlements etc/entitlements -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
         done
 
     - name: build the redis-stack-server zipfile (for homebrew)
@@ -410,10 +410,10 @@ jobs:
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
         CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
-          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
+          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} --entitlements etc/entitlements -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
         done
         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
-          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
+          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} --entitlements etc/entitlements -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
         done
 
     - name: build redis-stack-server zipfile
