@@ -112,7 +112,7 @@ jobs:
       target: deb
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig
-      redisversion: 7.0-rc3
+      redisversion: 7.0.0
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -130,7 +130,7 @@ jobs:
       target: deb
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig
-      redisversion: 7.0-rc3
+      redisversion: 7.0.0
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -148,7 +148,7 @@ jobs:
       target: deb
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig
-      redisversion: 7.0-rc3
+      redisversion: 7.0.0
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -166,7 +166,7 @@ jobs:
       target: rpm
       build_deps: yum install -y epel-release gcc make jemalloc-devel openssl-devel python3 python3-pip
       packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2
-      redisversion: 7.0-rc3
+      redisversion: 7.0.0
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -186,7 +186,7 @@ jobs:
         dnf install -y oracle-epel-release-el8
         dnf install -y gcc make jemalloc-devel openssl-devel tar git python3 python3-pip
       packaging_deps: sudo apt-get install -y rpm unzip
-      redisversion: 7.0-rc3
+      redisversion: 7.0.0
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -202,7 +202,7 @@ jobs:
       target: zip
       platform: catalina
       osname: macos
-      redisversion: 7.0-rc3
+      redisversion: 7.0.0
       pythonversion: 3.9
       fpmversion: 1.14.1
       rubyversion: 2.7.2
@@ -359,7 +359,7 @@ jobs:
       target: zip
       platform: monterey
       osname: macos
-      redisversion: 7.0-rc3
+      redisversion: 7.0.0
       pythonversion: 3.9
       fpmversion: 1.14.1
       rubyversion: 2.7.2
@@ -395,6 +395,13 @@ jobs:
         gem install fpm -v ${{env.fpmversion}}
         poetry install
 
+### Once https://github.com/actions/runner/issues/805 is resolved we can do this ###
+### For now, this is how it is manually built, on the platform ###
+#    - name: build redis from source
+#      run: |
+#        cd redis
+#        make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a" CFLAGS="-I /opt/homebrew/opt/openssl@1.1/include"
+#
     - name: collect dependencies prior to packaging
       run: |
         source .venv/bin/activate
