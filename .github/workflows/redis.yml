@@ -381,7 +381,8 @@ jobs:
     - run: ls -R redis-stack
     - name: unzip the zipfile
       working-directory: redis-stack
-      run: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}.zip -d redis-stack-server
+      run: redis-stack-${{env.platform}}-*.${{env.target}} -d redis-stack-server
+    - run: ls -R redis-stack
     - name: run osx tests
       run: pytest -m macos
 
