@@ -48,16 +48,10 @@ on:
         required: true
       AWS_SECRET_ACCESS_KEY:
         required: true
-      GPG_ID:
-        required: true
       GPG_KEY:
         required: true
       GPG_PASSWORD:
         required: true
-      GPG_KEYGRIP:
-        required: false
-      GPG_EMAIL:
-        required: false
 
 jobs:
 
@@ -190,22 +184,48 @@ jobs:
         run: |
           cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
 
+      - name: get gpg id from key
+        id: get_gpg_id  
+        run: |
+          gpg_id=`gpg --list-keys|sed -n 4p|awk '{print $1}'`
+          echo "::set-output name=GPG_ID::$gpg_id"
+
+      - name: get gpg email address
+        id: get_gpg_email
+        run: |
+          gpg_email=`gpg -k|grep uid|cut -d '<' -f 2-2|cut -d '>' -f 1-1`
+          echo "::set-output name=GPG_EMAIL::$gpg_email"
+
+      - name: get gpg_keygrip
+        id: get_gpg_keygrip
+        run: |
+          keygrip=`gpg -k --with-keygrip |sed -n 5p|cut -d '=' -f 2-2`
+          echo "::set-output name=GPG_KEYGRIP::$keygrip"
+
       - name: gpg sign package
         if: ${{ env.target }} = 'deb'
         run: |
           if [ -f /usr/bin/dpkg-sig ]; then
             echo '${{secrets.GPG_PASSWORD}}' > .passfile
-            dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{secrets.GPG_ID}} *.deb
+            dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{steps.get_gpg_id.outputs.GPG_ID}} *.deb
             rm -f .passfile
           elif [ -f /usr/bin/rpm ]; then
-            gpg --export -a '${{ secrets.GPG_EMAIL }}' > key
+            gpg --export -a '${{ steps.get_gpg_email.outputs.GPG_EMAIL }}' > key
             rpm --import key
             echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
             gpg-connect-agent reloadagent /bye
-            /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ secrets.GPG_KEYGRIP }}
-            rpmsign --addsign --key-id ${{ secrets.GPG_ID }} *.rpm
+            /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ steps.get_gpg_keygrip.outputs.GPG_KEYGRIP }}
+            rpmsign --addsign --key-id ${{ steps.get_gpg_id.outputs.GPG_ID}} *.rpm
             rm key
           fi
+
+      - name: run tests
+        run: |
+          source .venv/bin/activate
+          mkdir redis-stack
+          cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
+          cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
+          pytest -m ${{env.platform}}
 
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
@@ -225,6 +245,10 @@ jobs:
         run: |
           mkdir -p s3uploads
           cp *.${{env.target}} *.tar.gz s3uploads
+          cd s3uploads
+          for i in `ls`; do
+            sha256sum $i |awk '{print $1}' > $i.sha256
+          done
       - uses: s3-actions/s3cmd@v1.1
         with:
           provider: aws
@@ -235,61 +259,3 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') != true
         run: |
           s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/
-      - name: upload release
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          s3cmd put -P s3uploads/* s3://redismodules/redis-stack/
-
-   test-packages:
-      env:
-        platform: ${{inputs.platform}}
-        arch: ${{inputs.arch}}
-        target: ${{inputs.target}}
-        pythonversion: ${{inputs.pythonversion}}
-      needs: [package]
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v2
-        - name: install python
-          uses: actions/setup-python@v2
-          with:
-            python-version: ${{env.pythonversion}}
-        - uses: actions/cache@v2
-          with:
-            path: |
-              /var/cache/apt
-              /var/cache/yum
-              ~/.cache/pip
-              ~/.cache/pypoetry
-              ~/.local/share/gem
-            key: pypoetry-${{hashFiles('pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
-        - name: install poetry
-          uses: snok/install-poetry@v1
-          with:
-            version: latest
-            virtualenvs-in-project: true
-            virtualenvs-create: true
-            installer-parallel: true
-        - name: get package version
-          id: get_version
-          run: |
-            poetry install
-            source .venv/bin/activate
-            realversion=`invoke version -p redis-stack-server`
-            echo "::set-output name=VERSION::$realversion"
-
-        # now, fetch from s3 and install to the redis-stack directory
-        - name: get packages from s3
-          run: |
-            mkdir redis-stack
-            wget -q \
-              https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}-1.${{env.platform}}.${{env.arch}}.${{env.target}} \
-              -O redis-stack/redis-stack-server.${{env.target}}
-            wget -q \
-              https://redismodules.s3.amazonaws.com/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}-1.${{env.platform}}.${{env.arch}}.tar.gz \
-              -O redis-stack/redis-stack-server.tar.gz
-
-        - name: validate packages
-          run: |
-            source .venv/bin/activate
-            pytest -m ${{env.platform}}

@@ -7,6 +7,7 @@ from typing import Union
 
 import requests
 from loguru import logger
+import urllib
 
 from ..config import Config
 from ..paths import Paths
@@ -32,7 +33,15 @@ class RedisInsightBase(object):
             arch = "x64"
         else:
             arch = self.ARCH
-        return f"https://s3.amazonaws.com/redisinsight.test/public/rs-ri-builds/{version}/redisstack/RedisInsight-preview-{self.APPTYPE}-{osname}.{arch}.tar.gz"
+            
+        url_base_override = self.C.get_key(f"redisinsight-url-override")
+        if url_base_override is not None:
+            return urllib.parse.urljoin(
+                f"{url_base_override}",
+                f"RedisInsight-v2-{self.APPTYPE}.{osname}-{arch}.tar.gz",
+            )
+
+        return f"https://s3.amazonaws.com/redisinsight.test/public/rs-ri-builds/{version}/redisstack/RedisInsight-v2-{self.APPTYPE}-{osname}.{arch}.tar.gz"
 
     def _fetch_and_unzip(self, url: str, destfile: str):
         logger.debug(f"Package URL: {url}")

@@ -1,4 +1,5 @@
 import os
+from typing import Union
 
 import yaml
 
@@ -22,8 +23,5 @@ class Config(object):
             #     raise AttributeError(f"No key found in yaml for {item}.")
             # return k
 
-    def get_key(self, item: str) -> str:
-        k = self.CONTENT.get(item)
-        if k is None:
-            raise AttributeError(f"No key found in yaml for {item}.")
-        return k
+    def get_key(self, item: str) -> Union[str, None]:
+        return self.CONTENT.get(item)

@@ -12,6 +12,43 @@ def build_redis(c, redis_repo_path="redis", build_args="all build_tls=yes"):
     redispath = os.path.join(os.getcwd(), redis_repo_path, "src")
     run(f"make -C {redispath} -j `nproc` {build_args}")
 
+@task(
+    help={
+        "osname": "operating system name (eg: Linux)",
+        "dist": "package distribution to generate (eg: bionic)",
+        "redis_repo_path": "path to pre-build redis binaries",
+        "arch": "architecture (eg: x86_64)",
+        "version": "the version string for this redis build",
+        "publish": "upload to s3, via aws s3 cp, if set",
+    }
+)
+def package_redis(c, version="", osname='macos', dist='monterey', publish=False, arch="amd64", redis_repo_path="redis"):
+    """package, a compiled redis"""
+    redispath = os.path.abspath(os.path.join(os.getcwd(), redis_repo_path, "src"))
+    dest = f"redis-{version}-{osname}-{dist}-{arch}"
+    if os.path.isdir(dest):
+        shutil.rmtree(dest)
+    os.mkdir(dest)
+    binaries = ['redis-cli', 'redis-server', 'redis-sentinel', 'redis-benchmark', 'redis-check-rdb', 'redis-check-aof']
+
+    for b in binaries:
+        shutil.copyfile(os.path.join(redispath, b), os.path.join(dest, b))
+
+    tarball = f"{dest}.tgz"
+    tarcmd = f"tar -czvf {tarball} {dest}"
+    run(tarcmd)
+
+    if publish:
+        cmd = ["aws",
+               "s3",
+               "cp",
+               "-P",
+               "--public-acl",
+               tarball,
+               f"s3://redismodules/redis-stack/dependencies/{tarball}",
+        ]
+        run(cmd)
+
 
 @task(
     help={
@@ -41,7 +78,6 @@ def dockergen(c, docker_type="redis-stack"):
         "redis_bin": "path to pre-build redis binaries",
         "target": "target package type to build (eg: deb)",
         "arch": "architecture (eg: x86_64)",
-        "build_number": "build number (defaults to 1)",
         "package": "package to build {redis-stack|redis-stack-server|redisinsight|redisinsight-web}",
         "skip": "[Optional] set to fetch or package to determine which step to skip",
         "redismodule_version": "[Optional] set to use a single, specified version for all redis modules",
@@ -55,7 +91,6 @@ def package(
     redis_bin="../redis",
     target="deb",
     arch="x86_64",
-    build_number=1,
     package="redis-stack-server",
     skip="",
     redismodule_version="",
@@ -72,7 +107,6 @@ def package(
         f"-d {dist}",
         f"-a {arch}",
         f"-r {redis_bin}",
-        f"-b {build_number}",
         f"-t {target}",
         f"-p {package}",
         f"-x",

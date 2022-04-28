@@ -2,14 +2,17 @@
 
 # module versions
 versions:
-  rejson: 2.0.7
+  rejson: 2.0.8
   redistimeseries: 1.6.9
-  redisearch: 2.2.9
-  redisgraph: 2.8.9
+  redisearch: 2.4.5
+  redisgraph: 2.8.12
   redisbloom: 2.2.14
-  redisinsight: 22128
   nodejs: v14.19.0
-  redis: 7.0-rc2
+  redis: 7.0.0
+  redis-stack: 99.99.99
+  redis-stack-server: 99.99.99
+  redisinsight: 2.0.5
+  redisinsight-web: 2.0.5
 
 # common package variables
 email: Redis OSS <oss@redislabs.com>
@@ -18,7 +21,6 @@ vendor: Redis Inc
 url: "https://redis.io"
 
 redis-stack:
-  version: 7.0.0
   product: redis-stack
   summary: redis-stack installs a Redis server with additional database capabilities and the visualisation tool RedisInsight.
   description: |
@@ -33,7 +35,6 @@ redis-stack:
     Manage your Redis server and view your data with the RedisInsight graphical tool, which is also included in this package.
 
 redis-stack-server:
-  version: 7.0.0
   product: redis-stack-server
   summary: Redis Stack Server installs a Redis server with additional database capabilities.
   description: |
@@ -47,13 +48,11 @@ redis-stack-server:
 
 # note the version - no underscores or hyphens allowed
 redisinsight-web:
-  version: 2.0.4preview
   product: redisinsight-web
   summary: A graphical tool for visualizing data and managing Redis databases
   description: RedisInsight is an easy to use graphical tool that enables you to visualize and manage data in Redis databases.  Connect to multiple Redis servers, browse and edit data, and view operating metrics.  Use RedisInsight with open source Redis, Redis Cloud, Redis Enterprise and Amazon ElastiCache.  RedisInsight has specialized views for many Redis data types, and supports popular modules including RediSearch and RedisJSON.
 
 redisinsight:
-  version: 2.0.4preview
   product: redisinsight
   summary: A graphical tool for visualizing data and managing Redis databases
   description: RedisInsight is an easy to use graphical tool that enables you to visualize and manage data in Redis databases.  Connect to multiple Redis servers, browse and edit data, and view operating metrics.  Use RedisInsight with open source Redis, Redis Cloud, Redis Enterprise and Amazon ElastiCache.  RedisInsight has specialized views for many Redis data types, and supports popular modules including RediSearch and RedisJSON.

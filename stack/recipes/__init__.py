@@ -41,20 +41,14 @@ class Recipe(object):
             return "99.99.99"
 
         # get the current tag
-        tagcmd = ["git", "tag", "--points-at", "HEAD"]
-        r = subprocess.run(tagcmd, stdout=subprocess.PIPE, text=True)
-        version = r.stdout.strip().replace("v", "")
-        if version != "":
-            return version
-        # any branch - just takes the version
         config = Config()
-        return config.get_key(self.PACKAGE_NAME)["version"]
+        return config.get_key("versions")[self.PACKAGE_NAME]
 
-    def deb(self, fpmargs, build_number, distribution):
+    def deb(self, fpmargs, distribution):
         fpmargs.append("--depends libssl-dev")
         fpmargs.append("--depends libgomp1")  # redisgraph
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.deb"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.{self.ARCH}.deb"
         )
         fpmargs.append(f"--deb-user {self.C.get_key('product_user')}")
         fpmargs.append(f"--deb-group {self.C.get_key('product_group')}")
@@ -85,12 +79,12 @@ class Recipe(object):
 
         return fpmargs
 
-    def rpm(self, fpmargs, build_number, distribution):
+    def rpm(self, fpmargs, distribution):
         fpmargs.append("--depends openssl-devel")
         fpmargs.append("--depends jemalloc-devel")
         fpmargs.append("--depends libgomp")
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.rpm"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.{self.ARCH}.rpm"
         )
         fpmargs.append(f"--rpm-user {self.C.get_key('product_user')}")
         fpmargs.append(f"--rpm-group {self.C.get_key('product_group')}")
@@ -121,9 +115,9 @@ class Recipe(object):
             fpmargs.append(f"--config-files {(os.path.join(self.__PATHS__.SVCDIR, i))}")
         return fpmargs
 
-    def pacman(self, fpmargs, build_number, distribution):
+    def pacman(self, fpmargs, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.pacman"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.{self.ARCH}.pacman"
         )
         fpmargs.append(
             f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}"
@@ -140,31 +134,31 @@ class Recipe(object):
         fpmargs.append("-t pacman")
         return fpmargs
 
-    def osxpkg(self, fpmargs, build_number, distribution):
+    def osxpkg(self, fpmargs, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.osxpkg"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.{self.ARCH}.osxpkg"
         )
         fpmargs.append("-t osxpkg")
         return fpmargs
 
-    def zip(self, fpmargs, build_number, distribution):
+    def zip(self, fpmargs, distribution):
 
         # zipfiles really just include the root of the package
         fpmargs.remove(f"-C {self.__PATHS__.WORKDIR}")
         fpmargs.append(f"-C {self.__PATHS__.BASEDIR}")
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.zip"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.{self.ARCH}.zip"
         )
         fpmargs.append("-t zip")
         return fpmargs
 
-    def tar(self, fpmargs, build_number, distribution):
+    def tar(self, fpmargs, distribution):
 
         # tar, like zip begins at the root of the package
         # fpm compresses the output only if it ends in .tar.gz
         fpmargs.remove(f"-C {self.__PATHS__.WORKDIR}")
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}-{build_number}.{distribution}.{self.ARCH}.tar.gz"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.{self.ARCH}.tar.gz"
         )
         fpmargs.append("-t tar")
 
@@ -179,7 +173,7 @@ class Recipe(object):
 
         return fpmargs
 
-    def snap(self, fpmargs, build_number, distribution):
+    def snap(self, fpmargs, distribution):
         snap_grade = "stable"
         snap_confinement = "classic"
 
@@ -205,7 +199,7 @@ class Recipe(object):
             fp.write(generated)
 
         fpmargs.append(
-            f"-p {self.PACKAGE_NAME}-{self.version}-{build_number}.{self.ARCH}.snap"
+            f"-p {self.PACKAGE_NAME}-{self.version}.{self.ARCH}.snap"
         )
         fpmargs.append(f"--snap-confinement {snap_confinement}")
         fpmargs.append(f"--snap-grade {snap_grade}")
@@ -216,30 +210,28 @@ class Recipe(object):
     def package(
         self,
         package_type: str = "deb",
-        build_number: int = 1,
         distribution: str = "bionic",
     ):
         logger.info(f"Building {package_type} package")
         fpmargs = self.__package_base_args__
-        fpmargs.append(f"--iteration {build_number}")
 
         if package_type == "deb":
-            fpmargs = self.deb(fpmargs, build_number, distribution)
+            fpmargs = self.deb(fpmargs, distribution)
 
         elif package_type == "rpm":
-            fpmargs = self.rpm(fpmargs, build_number, distribution)
+            fpmargs = self.rpm(fpmargs, distribution)
 
         elif package_type == "osxpkg":
-            fpmargs = self.osxpkg(fpmargs, build_number, distribution)
+            fpmargs = self.osxpkg(fpmargs, distribution)
 
         elif package_type == "pacman":
-            fpmargs = self.pacman(fpmargs, build_number, distribution)
+            fpmargs = self.pacman(fpmargs, distribution)
         elif package_type == "zip":
-            fpmargs = self.zip(fpmargs, build_number, distribution)
+            fpmargs = self.zip(fpmargs, distribution)
         elif package_type == "tar":
-            fpmargs = self.tar(fpmargs, build_number, distribution)
+            fpmargs = self.tar(fpmargs, distribution)
         elif package_type == "snap":
-            fpmargs = self.snap(fpmargs, build_number, distribution)
+            fpmargs = self.snap(fpmargs, distribution)
         else:
             raise AttributeError(f"{package_type} is an invalid package type")
 
