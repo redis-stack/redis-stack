@@ -259,16 +259,16 @@ jobs:
         tar -czvf redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
             redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
 
-    - uses: s3-actions/s3cmd@v1.1
-      with:
-        provider: aws
-        region: us-east-1
-        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    - name: persist redis to s3
-      run: |
-        s3cmd put -P redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
-        s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
+    # - uses: s3-actions/s3cmd@v1.1
+    #   with:
+    #     provider: aws
+    #     region: us-east-1
+    #     access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    # - name: persist redis to s3
+    #   run: |
+    #     s3cmd put -P redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
+    #     s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
 
     - name: perist redis
       uses: actions/upload-artifact@v2
@@ -323,29 +323,29 @@ jobs:
         path: |
           redis-stack/redis-stack-*.zip
 
-    - name: create the zip for notarization
-      run: |
-        cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
-        zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
+    # - name: create the zip for notarization
+    #   run: |
+    #     cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
+    #     zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
 
-    - name: persist the codesigned artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: codesigned-${{env.platform}}-${{env.arch}}
-        path: |
-          redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/*.zip
+    # - name: persist the notarized artifacts
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: codesigned-${{env.platform}}-${{env.arch}}
+    #     path: |
+    #       redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/*.zip
 
-    - name: notarize the custom zip
-      run: |
-        cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
-        sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
+    # - name: notarize the custom zip
+    #   run: |
+    #     cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
+    #     sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
 
-    - uses: s3-actions/s3cmd@v1.1
-      with:
-        provider: aws
-        region: us-east-1
-        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    # - uses: s3-actions/s3cmd@v1.1
+    #   with:
+    #     provider: aws
+    #     region: us-east-1
+    #     access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   test-osx-intel:
     name: Mac (Intel) Tests
@@ -377,8 +377,14 @@ jobs:
       uses: actions/download-artifact@v2
       with: 
         path: redis-stack
-        name: codesigned-${{ env.osnick }}-${{ env.arch }}
+        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
     - run: ls -R redis-stack
+    - name: unzip the zipfile
+      working-directory: redis-stack
+      run: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}.zip -d redis-stack-server
+    - name: run osx tests
+      run: pytest -m macos
+
 
     # - name: upload snapshots
     #   run: |
