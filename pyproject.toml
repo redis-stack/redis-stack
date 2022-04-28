@@ -28,7 +28,8 @@ markers = [
     "rhel7: RedHat 7 (rhel7) tests",
     "rhel8: RedHat 8 (rhel8) tests",
     "dockers: test the built dockers",
-    "snaps: test the snapcraft snaps"
+    "snaps: test the snapcraft snaps",
+    "macos: osx specific tests"
 ]
 
 

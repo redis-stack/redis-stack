@@ -371,6 +371,9 @@ jobs:
         virtualenvs-in-project: true
         virtualenvs-create: true
         installer-parallel: true
+    - name: install dependencies
+      run: |
+        poetry install
     - name: checkout sources
       uses: actions/checkout@v2
     - name: gather pre-build artifacts
@@ -378,11 +381,9 @@ jobs:
       with: 
         path: redis-stack
         name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
-    - run: ls -R redis-stack
     - name: unzip the zipfile
       working-directory: redis-stack
       run: unzip redis-stack-server*.${{env.target}} -d redis-stack-server
-    - run: ls -R redis-stack
     - name: run osx tests
       run: pytest -m macos
 
