@@ -13,6 +13,10 @@ class OSXTestBase(BaseMetalPackagingMixin, RedisTestMixin, object):
     def setup_class(cls):
         if os.path.isfile("/usr/local/var/db/redis-stack/dump.rdb"):
             os.unlink("/usr/local/var/db/redis-stack/dump.rdb")
+
+        import sys
+        print(f"{cls.BASEPATH}/bin/redis-stack-server")
+        
         r = subprocess.Popen(
             [f"{cls.BASEPATH}/bin/redis-stack-server"],
             stdout=subprocess.PIPE,
@@ -30,7 +34,6 @@ class OSXTestBase(BaseMetalPackagingMixin, RedisTestMixin, object):
 
 @pytest.mark.macos
 class TestOSXZip(OSXTestBase):
-
 
     BASEPATH = os.path.abspath(os.path.join(ROOT, 'redis-stack', 'redis-stack-server'))
 
