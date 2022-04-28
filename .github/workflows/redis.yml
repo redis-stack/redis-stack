@@ -372,10 +372,10 @@ jobs:
         virtualenvs-create: true
         installer-parallel: true
     - name: checkout sources
+      uses: actions/checkout@v2
     - name: install dependencies
       run: |
         poetry install
-      uses: actions/checkout@v2
     - name: gather pre-build artifacts
       uses: actions/download-artifact@v2
       with: 
