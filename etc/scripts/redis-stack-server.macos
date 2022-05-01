@@ -1,5 +1,9 @@
 #!/bin/sh
 
+realpath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
 thiscript=`readlink $0`
 if [ $? -ne 0 ]; then
     thiscript=$0
@@ -54,7 +58,7 @@ if [ -f "${1}" ]; then
 elif [ -f ${BREW_BASE}/etc/redis-stack.conf ]; then
     CONFFILE=${BREW_BASE}/etc/redis-stack.conf
 fi
-MODULEDIR=${BASEDIR}/lib
+MODULEDIR=$(realpath ${BASEDIR})/lib
 
 if [ -z ${REDISEARCH_ARGS} ]; then
 REDISEARCH_ARGS="MAXSEARCHRESULTS 10000 MAXAGGREGATERESULTS 10000"
