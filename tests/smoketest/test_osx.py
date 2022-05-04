@@ -19,7 +19,7 @@ class TestOSX(RedisTestMixin, object):
             cls.teardown_class()
         except Exception:
             pass
-        
+
         rdbfile = f"{cls.BASEPATH}/var/db/redis-stack/dump.rdb"
         if os.path.isfile(rdbfile):
             os.unlink(rdbfile)
@@ -90,7 +90,6 @@ class TestOSX(RedisTestMixin, object):
             "redis-sentinel",
             "redis-check-aof",
         ]:
-            print(i)
             assert os.path.exists(f"{self.BASEPATH}/bin/{i}")
 
     def test_config_present(self):

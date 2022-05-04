@@ -6,7 +6,7 @@ authors = ["Your Name <you@example.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.6.2,<4.0"
 PyYAML = "^6.0"
 
 [tool.poetry.dev-dependencies]

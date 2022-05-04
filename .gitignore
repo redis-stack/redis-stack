@@ -21,3 +21,4 @@ dockers/Docker*
 
 *.rdb
 *.lock
+.vagrant
