@@ -68,7 +68,7 @@ services:
     image: "redis/{self.DOCKER_IMAGE}:{self.VERSION}"
     ports:
       - 6379:6379
-    env:
+    environment:
         REDIS_ARGS="--maxmemory 100mb"
 """
         return content
@@ -87,7 +87,7 @@ services:
     image: "redis/{self.DOCKER_IMAGE}:{self.VERSION}"
     ports:
       - 6379:6379
-    env:
+    environment:
         REDIS_ARGS="--maxmemory 100mb"
 """
         return content
