@@ -618,4 +618,5 @@ jobs:
       - name: publish docker
         if: github.ref == 'refs/heads/master'
         run: |
+          docker tag redis/${{ matrix.package }}:testing redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
           docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
