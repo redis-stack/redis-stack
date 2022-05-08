@@ -11,14 +11,15 @@ class OSXTestBase(BaseMetalPackagingMixin, RedisTestMixin, object):
 
     @classmethod
     def setup_class(cls):
-        if os.path.isfile("/usr/local/var/db/redis-stack/dump.rdb"):
-            os.unlink("/usr/local/var/db/redis-stack/dump.rdb")
+        for i in ['/opt/homebrew/redis-stack', '/usr/local/']:
+            if os.path.isfile(f"{i}/var/db/redis-stack/dump.rdb"):
+                os.unlink(f"{i}/var/db/redis-stack/dump.rdb")
 
-        import sys
-        print(f"{cls.BASEPATH}/bin/redis-stack-server")
-        
+        rss_binary = f"{cls.BASEPATH}/bin/redis-stack-server"
+        print(os.getcwd())
+        print(rss_binary)
         r = subprocess.Popen(
-            [f"{cls.BASEPATH}/bin/redis-stack-server"],
+            [rss_binary],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
@@ -29,9 +30,9 @@ class OSXTestBase(BaseMetalPackagingMixin, RedisTestMixin, object):
     @classmethod
     def teardown_class(cls):
         subprocess.run(["pkill", "-TERM", "-P", str(cls.PROC)])
-        if os.path.isfile("/usr/local/var/db/redis-stack/dump.rdb"):
-            os.unlink("/usr/local/var/db/redis-stack/dump.rdb")
-
+        for i in ['/opt/homebrew/redis-stack', '/usr/local/']:
+            if os.path.isfile(f"{i}/var/db/redis-stack/dump.rdb"):
+                os.unlink(f"{i}/var/db/redis-stack/dump.rdb")
 @pytest.mark.macos
 class TestOSXZip(OSXTestBase):
 

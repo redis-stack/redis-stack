@@ -348,7 +348,7 @@ jobs:
     #     secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   test-osx-intel:
-    name: Mac (Intel) Tests
+    name: Mac (x86_64) Tests
     needs: ['build-package-osx']
     runs-on: macos-latest
     env:
