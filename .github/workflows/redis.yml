@@ -600,7 +600,8 @@ jobs:
 
       - name: test docker build
         run: |
-          matrixdocker="${matrix.package//-/_}""
+          matrixvar=`echo ${{matrix.package}}`
+          matrixdocker="${matrixvar//-/_}"
           source .venv/bin/activate
           VERSION=testing pytest -m dockers_$matrixdocker
 
