@@ -6,7 +6,7 @@ from helpers import RedisInsightTestMixin, RedisTestMixin
 
 class DockerComposeBase(RedisTestMixin, object):
 
-    VERSION = os.getenv("REDIS_STACK_VERSION", "edge")
+    VERSION = os.getenv("VERSION", "edge")
     COMPOSEFILE = "/tmp/docker-compose.yml"
 
     @classmethod
@@ -37,7 +37,7 @@ class DockerComposeBase(RedisTestMixin, object):
         cmd = ['docker-compose', '-f', cls.COMPOSEFILE, 'down']
         subprocess.run(cmd)
 
-@pytest.mark.dockers
+@pytest.mark.dockers_redis_stack_server
 class TestDockerComposeRedisStackServer(DockerComposeBase):
 
     DOCKER_IMAGE = "redis-stack-server"
@@ -54,7 +54,7 @@ services:
 """
         return content
     
-@pytest.mark.dockers
+@pytest.mark.dockers_redis_stack_server
 class TestDockerComposeRedisStackServerEnvVars(DockerComposeBase):
 
     DOCKER_IMAGE = "redis-stack-server"
@@ -73,8 +73,27 @@ services:
 """
         return content
 
+@pytest.mark.dockers_redis_stack
+class TestDockerComposeRedisStackEnvVars(DockerComposeBase):
 
-@pytest.mark.dockers
+    DOCKER_IMAGE = "redis-stack"
+
+    def generate(self):
+        content = f"""
+version: "3.9"
+services:
+  redis:
+    container_name: {self.DOCKER_IMAGE}-dockercompose
+    image: "redis/{self.DOCKER_IMAGE}:{self.VERSION}"
+    ports:
+      - 6379:6379
+    env:
+        REDIS_ARGS="--maxmemory 100mb"
+"""
+        return content
+
+
+@pytest.mark.dockers_redis_stack
 class TestDockerComposeRedisStack(RedisInsightTestMixin, DockerComposeBase):
 
     DOCKER_IMAGE = "redis-stack"
