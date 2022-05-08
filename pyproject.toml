@@ -27,9 +27,10 @@ markers = [
     "focal: ubuntu focal tests",
     "rhel7: RedHat 7 (rhel7) tests",
     "rhel8: RedHat 8 (rhel8) tests",
-    "dockers: test the built dockers",
-    "snaps: test the snapcraft snaps",
-    "macos: osx specific tests"
+    "dockers_redis_stack: test the redis_stack docker",
+    "dockers_redis_stack_server: test the redis_stack_server docker",
+     "macos: osx specific tests",
+    "snaps: test the snapcraft snaps"
 ]
 
 

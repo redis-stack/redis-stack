@@ -38,10 +38,17 @@ def stack_dockloader(cls):
 
 class RedisInsightTestMixin:
     def test_basic_redisinsight(self):
-        stack_dockloader(self)
-        c = urlopen("http://localhost:8001")
-        content = c.read().decode()
-        assert content.lower().find("redisinsight") != -1
+        c = 0
+        while c < 9:
+            stack_dockloader(self)
+            try:
+                c = urlopen("http://localhost:8001")
+                content = c.read().decode()
+                assert content.lower().find("redisinsight") != -1
+                break
+            except ConnectionResetError:
+                time.sleep(0.5)
+                c += 1
 
 
 class RedisTestMixin:

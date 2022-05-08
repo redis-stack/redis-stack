@@ -10,7 +10,7 @@ class DockerTestBase(InDockerTestEnv, object):
     @classmethod
     def setup_class(cls):
 
-        VERSION = os.getenv("REDIS_STACK_VERSION", "edge")
+        VERSION = os.getenv("VERSION", "edge")
         cls.env = docker.from_env()
         container = cls.env.containers.run(
             image=f"{cls.DOCKER_NAME}:{VERSION}",
@@ -25,7 +25,7 @@ class DockerTestBase(InDockerTestEnv, object):
         time.sleep(3)
 
 
-@pytest.mark.dockers
+@pytest.mark.dockers_redis_stack
 class TestRedisStack(RedisInsightTestMixin, DockerTestBase):
 
     DOCKER_NAME = "redis/redis-stack"
@@ -33,7 +33,7 @@ class TestRedisStack(RedisInsightTestMixin, DockerTestBase):
     PORTMAP = {"6379/tcp": 6379, "8001/tcp": 8001}
 
 
-@pytest.mark.dockers
+@pytest.mark.dockers_redis_stack_server
 class TestRedisStackServer(DockerTestBase):
 
     DOCKER_NAME = "redis/redis-stack-server"
