@@ -208,7 +208,3 @@ jobs:
       run: |
         ls -R
         .venv/bin/pytest tests/smoketest/test_osx.py::TestOSXZip::test_basic_redis -s
-
-    # - name: upload snapshots
-    #   run: |
-    #     s3cmd put -P redis-stack/s3dist/* s3://redismodules/redis-stack/snapshots/
