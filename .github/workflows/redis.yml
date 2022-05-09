@@ -15,6 +15,7 @@ jobs:
 
   # osx is the only one of these that is really
   build-package-osx:
+
     name: Mac (x86_64) Build
     env:
       arch: x86_64
@@ -151,7 +152,7 @@ jobs:
     - name: persist the notarized artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: codesigned-${{env.platform}}-${{env.arch}}
+        name: codesigned-${{env.platform}}-${{env.arch}}.${{env.target}}
         path: |
           redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/*.zip
 
@@ -159,13 +160,6 @@ jobs:
       run: |
         cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
         sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
-
-    # - uses: s3-actions/s3cmd@v1.1
-    #   with:
-    #     provider: aws
-    #     region: us-east-1
-    #     access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #     secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   test-osx-intel:
     name: Mac (x86_64) Tests
@@ -199,9 +193,9 @@ jobs:
         poetry install
     - name: gather pre-build artifacts
       uses: actions/download-artifact@v2
-      with: 
+      with:
         path: redis-stack
-        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
+        name: codesigned-${{env.platform}}-${{env.arch}}.${{env.target}}
     - name: unzip the zipfile
       working-directory: redis-stack
       run: unzip redis-stack-server*.${{env.target}} -d redis-stack-server
@@ -209,3 +203,23 @@ jobs:
       run: |
         ls -R
         .venv/bin/pytest tests/smoketest/test_osx.py::TestOSXZip::test_basic_redis -s
+    - name: get package version
+      id: get_version
+      run: |
+        poetry install
+        source .venv/bin/activate
+        realversion=`invoke version -p redis-stack-server -d true`
+        echo "::set-output name=VERSION::$realversion"
+
+    - uses: s3-actions/s3cmd@v1.1
+      with:
+        provider: aws
+        region: us-east-1
+        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: persist redis to s3
+      run: |
+        cd redis-stack
+        s3cmd put -P redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}} \
+        s3://redismodules/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.${{env.target}}
