@@ -29,7 +29,7 @@ markers = [
     "rhel8: RedHat 8 (rhel8) tests",
     "dockers_redis_stack: test the redis_stack docker",
     "dockers_redis_stack_server: test the redis_stack_server docker",
-     "macos: osx specific tests",
+    "macos: osx specific tests",
     "snaps: test the snapcraft snaps"
 ]
 
