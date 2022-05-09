@@ -235,9 +235,6 @@ jobs:
       - name: run physical tests
         run: |
           source .venv/bin/activate
-          mkdir redis-stack
-          cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
-          cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
           pytest -m "${{env.platform}} and physical"
 
       - name: perist ${{env.target}} package

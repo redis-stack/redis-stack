@@ -121,7 +121,13 @@ class RedisPackagingMixin:
             "redis-check-aof",
         ]
 
-        if self.HOST_TYPE == "docker":
+        host_type = getattr(self, "HOST_TYPE", None)
+        if host_type is None:
+            r = subprocess.run(f"{self.basepath}/bin/{i} -h",
+                    stout=subprocess.PIPE,
+                    stderr=subprocess.PIPE)
+            assert r.returncode in [0, 1]
+        elif host_type == "docker":
             for b in binaries:
                 res, out = self.container.exec_run(f"{self.basepath}/bin/{b} -h")
                 assert res in [0, 1]  # no segfault
@@ -130,7 +136,7 @@ class RedisPackagingMixin:
                 f"{self.basepath}/bin/redis-stack-server -h"
             )
             assert out.decode().lower().find("redis-stack-server") != -1
-        elif self.HOST_TYPE == "vagrant":
+        elif host_type == "vagrant":
             for b in binaries:
                 r = subprocess.run(
                     ["vagrant", "ssh", "-c", f"/opt/redis-stack/bin/{b} -h"],
