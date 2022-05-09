@@ -1,9 +1,10 @@
-import pytest
-import os
 import getpass
+import os
 import subprocess
-from helpers import RedisTestMixin
 import time
+
+import pytest
+from helpers import RedisTestMixin
 
 
 @pytest.mark.snaps

@@ -1,101 +1,86 @@
-from helpers import RedisTestMixin, ROOT
-import os
+# from helpers import RedisTestMixin, ROOT
+# import os
 import subprocess
-import time
+
+# import time
 import pytest
+from env import VagrantTestEnv
+from mixins import RedisPackagingMixin, RedisTestMixin
+
+# class VagrantBase(RedisTestMixin, object):
+#     """Test the pre-installed package on bare metal"""
+#
+# PACKAGE_NAME = "redis-stack-server"
+# HOST_TYPE = "vagrant"
 
 
-class VagrantBase(RedisTestMixin, object):
-    """Test the pre-installed package on bare metal"""
+# def _assert_path_exists(self, path):
+#     cmd = ["vagrant", "ssh", "-c", f"ls -l {path}"]
+#     res = subprocess.run(cmd, cwd=self.workdir)
+#     assert res.returncode == 0
 
-    PACKAGE_NAME = "redis-stack-server"
+# def test_config_present(self):
+#     # self._assert_path_exists("/opt/redis-stack/etc/redis-stack.conf")
 
-    VAGRANT_BASEDIR = os.path.join(ROOT, "envs", "vagrants")
+# def test_modules_present(self):
+#     for i in [
+#         "rejson.so",
+#         "redisgraph.so",
+#         "redisearch.so",
+#         "redisbloom.so",
+#         "redistimeseries.so",
+#     ]:
+#         self._assert_path_exists(f"/opt/redis-stack/lib/{i}")
 
-    @classmethod
-    def setup_class(cls):
-        cls.workdir = os.path.join(cls.VAGRANT_BASEDIR, cls.OSNICK)
-        try:
-            cls.teardown_class()
-        except:
-            pass
+# def test_binaries_present(self):
+#     for i in [
+#         "redis-server",
+#         "redis-stack-server",
+#         "redis-cli",
+#         "redis-benchmark",
+#         "redis-check-rdb",
+#         "redis-sentinel",
+#         "redis-check-aof",
+#     ]:
+#         self._assert_path_exists(f"/opt/redis-stack/bin/{i}")
 
-        if os.path.isfile(os.path.join(ROOT, "poetry.lock")):
-            os.unlink(os.path.join(ROOT, "poetry.lock"))
+# def test_binaries_execute(self):
+#     binaries = [
+#         "redis-server",
+#         "redis-cli",
+#         "redis-benchmark",
+#         "redis-check-rdb",
+#         "redis-sentinel",
+#         "redis-check-aof",
+#     ]
 
-        cmd = ["vagrant", "up", "--provision"]
-        res = subprocess.run(cmd, cwd=cls.workdir)
-        assert res.returncode == 0
+#     for b in binaries:
+#         r = subprocess.run(
+#             ["vagrant", "ssh", "-c", f"/opt/redis-stack/bin/{b} -h"],
+#             stdout=subprocess.PIPE,
+#             stderr=subprocess.PIPE,
+#         )
+#         assert r.returncode in [0, 1]  # no segfault
 
-        cls.install(cls)
 
-        # start redis-stack
-        subprocess.Popen(
-            ["vagrant", "ssh", "-c", "/opt/redis-stack/bin/redis-stack-server"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=cls.workdir,
-        )
-        time.sleep(5)
-
-    @classmethod
-    def teardown_class(cls):
-        cls.uninstall(cls)
-        cmd = ["vagrant", "destroy", "-f"]
-        res = subprocess.run(cmd, cwd=cls.workdir)
-        assert res.returncode == 0
-
-    def _assertPathExists(self, path):
-        cmd = ["vagrant", "ssh", "-c", f"ls -l {path}"]
-        res = subprocess.run(cmd, cwd=self.workdir)
-        assert res.returncode == 0
-
-    def test_config_present(self):
-        self._assertPathExists("/opt/redis-stack/etc/redis-stack.conf")
-
-    def test_modules_present(self):
-        for i in [
-            "rejson.so",
-            "redisgraph.so",
-            "redisearch.so",
-            "redisbloom.so",
-            "redistimeseries.so",
-        ]:
-            self._assertPathExists(f"/opt/redis-stack/lib/{i}")
-
-    def test_binaries_present(self):
-        for i in [
-            "redis-server",
-            "redis-stack-server",
-            "redis-cli",
-            "redis-benchmark",
-            "redis-check-rdb",
-            "redis-sentinel",
-            "redis-check-aof",
-        ]:
-            self._assertPathExists(f"/opt/redis-stack/bin/{i}")
-
-    def test_binaries_execute(self):
-        binaries = [
-            "redis-server",
-            "redis-cli",
-            "redis-benchmark",
-            "redis-check-rdb",
-            "redis-sentinel",
-            "redis-check-aof",
-        ]
-
-        for b in binaries:
-            r = subprocess.run(
-                ["vagrant", "ssh", "-c", f"/opt/redis-stack/bin/{b} -h"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            assert r.returncode in [0, 1]  # no segfault
+class VagrantBase(VagrantTestEnv, RedisPackagingMixin, RedisTestMixin):
+    pass
 
 
 class DebVagrant(VagrantBase):
     def install(self):
+
+        res = subprocess.run(
+            ["vagrant", "ssh", "-c", "sudo apt-get update"], cwd=self.workdir
+        )
+        assert res.returncode == 0
+
+        res = subprocess.run(
+            ["vagrant", "ssh", "-c", "sudo apt install -y gdebi-core"],
+            cwd=self.workdir,
+        )
+        assert res.returncode == 0
+
         cmd = [
             "vagrant",
             "ssh",
@@ -104,7 +89,7 @@ class DebVagrant(VagrantBase):
         ]
         res = subprocess.run(cmd, cwd=self.workdir)
         assert res.returncode == 0
-        
+
     def uninstall(self):
         cmd = [
             "vagrant",
@@ -114,10 +99,9 @@ class DebVagrant(VagrantBase):
         ]
         res = subprocess.run(cmd, cwd=self.workdir)
         assert res.returncode == 0
-        
-        
+
+
 class RPMVagrant(VagrantBase):
-    
     def install(self):
         cmd = [
             "vagrant",
@@ -127,17 +111,12 @@ class RPMVagrant(VagrantBase):
         ]
         res = subprocess.run(cmd, cwd=self.workdir)
         assert res.returncode in [0, 1]
-        
+
     def uninstall(self):
-        cmd = [
-            "vagrant",
-            "ssh",
-            "-c",
-            "sudo yum remove -y redis-stack-server"
-        ]
+        cmd = ["vagrant", "ssh", "-c", "sudo yum remove -y redis-stack-server"]
         res = subprocess.run(cmd, cwd=self.workdir)
         assert res.returncode == 0
-        
+
 
 @pytest.mark.focal
 @pytest.mark.physical

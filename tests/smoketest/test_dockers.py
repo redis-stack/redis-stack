@@ -1,12 +1,14 @@
-import pytest
-import docker
-import time
 import os
-from helpers import InDockerTestEnv, RedisInsightTestMixin
+import time
 from urllib.request import urlopen
 
+import docker
+import pytest
+from env import DockerTestEnv
+from mixins import RedisInsightTestMixin, RedisPackagingMixin, RedisTestMixin
 
-class DockerTestBase(InDockerTestEnv, object):
+
+class DockerTestBase(DockerTestEnv, RedisPackagingMixin, RedisTestMixin, object):
     @classmethod
     def setup_class(cls):
 
@@ -23,6 +25,16 @@ class DockerTestBase(InDockerTestEnv, object):
 
         # time for the docker to settle
         time.sleep(3)
+
+    @classmethod
+    def teardown_class(cls):
+        container = cls.env.containers.get(cls.CONTAINER_NAME)
+        try:
+            container.kill()
+        except docker.errors.APIError:
+            pass
+        finally:
+            container.remove()
 
 
 @pytest.mark.dockers_redis_stack

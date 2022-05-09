@@ -1,12 +1,14 @@
-from . import Recipe
-from ..paths import Paths
+import os
+import shutil
+
+import requests
+from loguru import logger
+
 from ..components.modules import Modules
 from ..components.redis import Redis
 from ..config import Config
-import requests
-import os
-import shutil
-from loguru import logger
+from ..paths import Paths
+from . import Recipe
 
 
 class RedisStackServer(Recipe):

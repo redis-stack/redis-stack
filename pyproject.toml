@@ -8,13 +8,14 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = ">=3.6.2,<4.0"
 PyYAML = "^6.0"
+isort = "^5.10.1"
 
 [tool.poetry.dev-dependencies]
 invoke = "^1.6.0"
 requests = "^2.27.1"
 loguru = "^0.6.0"
 Jinja2 = "^3.0.3"
-redis = "^4.2.2"
+redis = "^4.3.1"
 pytest = "^7.0.0"
 docker = "^5.0.3"
 flake8 = "^4.0.1"

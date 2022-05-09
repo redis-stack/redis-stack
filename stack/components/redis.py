@@ -1,11 +1,13 @@
+import os
+import shutil
+import tarfile
+from typing import Union
+
+import requests
+from loguru import logger
+
 from ..config import Config
 from ..paths import Paths
-from loguru import logger
-import requests
-import os
-import tarfile
-import shutil
-from typing import Union
 
 
 class Redis(object):

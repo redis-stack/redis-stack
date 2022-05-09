@@ -1,31 +1,10 @@
-import docker
 import pytest
-from helpers import InDockerTestEnv, ROOT
+from env import DockerTestEnv
+from mixins import RedisPackagingMixin, RedisTestMixin
 
 
-class DEBTestBase(InDockerTestEnv, object):
-    @classmethod
-    def setup_class(cls):
-        cls.env = docker.from_env()
-
-        # cleanup attempt, in case one was running previously
-        try:
-            cls.teardown_class()
-        except Exception:
-            pass
-
-        m = docker.types.Mount("/build", ROOT, read_only=True, type="bind")
-        container = cls.env.containers.run(
-            image=cls.DOCKER_NAME,
-            name=cls.CONTAINER_NAME,
-            detach=True,
-            mounts=[m],
-            command="sleep 1200",
-            publish_all_ports=True,
-            ports={"6379/tcp": 6379},
-        )
-        cls.__CONTAINER__ = container
-
+class DEBTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
+    def install(self, container):
         res, out = container.exec_run("apt update -q")
         assert res == 0
 
@@ -44,6 +23,11 @@ class DEBTestBase(InDockerTestEnv, object):
         res, out = container.exec_run(
             "gdebi -n /build/redis-stack/redis-stack-server.deb"
         )
+        if res != 0:
+            raise IOError(out)
+
+    def uninstall(self, container):
+        res, out = container.exec_run("apt remove -y redis-stack-server")
         if res != 0:
             raise IOError(out)
 

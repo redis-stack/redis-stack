@@ -1,9 +1,9 @@
 import os
-import time
-from helpers import RedisTestMixin
 import platform
 import subprocess
 import time
+
+from helpers import RedisTestMixin
 
 
 class TestOSX(RedisTestMixin, object):

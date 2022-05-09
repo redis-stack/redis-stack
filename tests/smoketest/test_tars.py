@@ -1,7 +1,6 @@
 import docker
 import pytest
-
-from helpers import InDockerTestEnv, ROOT
+from helpers import ROOT, InDockerTestEnv
 
 
 class TARTestBase(InDockerTestEnv, object):

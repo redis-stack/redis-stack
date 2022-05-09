@@ -1,31 +1,10 @@
-from helpers import InDockerTestEnv, ROOT
-import docker
 import pytest
+from env import DockerTestEnv
+from mixins import RedisPackagingMixin, RedisTestMixin
 
 
-class RPMTestBase(InDockerTestEnv, object):
-    @classmethod
-    def setup_class(cls):
-        cls.env = docker.from_env()
-
-        # cleanup attempt, in case one was running previously
-        try:
-            cls.teardown_class()
-        except Exception:
-            pass
-
-        m = docker.types.Mount("/build", ROOT, read_only=True, type="bind")
-        container = cls.env.containers.run(
-            image=cls.DOCKER_NAME,
-            name=cls.CONTAINER_NAME,
-            detach=True,
-            mounts=[m],
-            command="sleep 1200",
-            publish_all_ports=True,
-            ports={"6379/tcp": 6379},
-        )
-        cls.__CONTAINER__ = container
-
+class RPMTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
+    def install(self, container):
         res, out = container.exec_run("yum install -y epel-release tar")
         assert res == 0
 
@@ -37,6 +16,11 @@ class RPMTestBase(InDockerTestEnv, object):
         res, out = container.exec_run(
             "yum install -y /build/redis-stack/redis-stack-server.rpm"
         )
+        if res != 0:
+            raise IOError(out)
+
+    def uninstall(self, container):
+        res, out = container.exec_run("yum remove -y redis-stack-server")
         if res != 0:
             raise IOError(out)
 

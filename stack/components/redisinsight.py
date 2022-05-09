@@ -1,13 +1,12 @@
 import os
 import shutil
-
 # import zipfile
 import tarfile
+import urllib
 from typing import Union
 
 import requests
 from loguru import logger
-import urllib
 
 from ..config import Config
 from ..paths import Paths
