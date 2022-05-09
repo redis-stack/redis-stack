@@ -144,6 +144,7 @@ jobs:
             ~/.cache/pip
             ~/.cache/pypoetry
             ~/.local/share/gem
+            ~/.vagrant.d/boxes
           key: pypoetry-${{hashFiles('pyproject.toml')}}-${{inputs.platform}}-${{inputs.arch}}-package
 
       - uses: ruby/setup-ruby@v1
@@ -159,10 +160,14 @@ jobs:
           virtualenvs-create: true
           installer-parallel: true
 
-      - name: install packaging tools
+      - name: install packaging and testing tools
         run: |
           sudo ${{inputs.packaging_deps}}
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install vagrant
           poetry install
+
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
@@ -219,13 +224,21 @@ jobs:
             rm key
           fi
 
-      - name: run tests
+      - name: run tests in dockers
         run: |
           source .venv/bin/activate
           mkdir redis-stack
           cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
           cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
-          pytest -m ${{env.platform}}
+          pytest -m "${{env.platform}} and not physical"
+
+      - name: run physical tests
+        run: |
+          source .venv/bin/activate
+          mkdir redis-stack
+          cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
+          cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
+          pytest -m "${{env.platform}} and physical"
 
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2

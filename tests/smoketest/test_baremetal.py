@@ -2,6 +2,7 @@ from helpers import RedisTestMixin, ROOT
 import os
 import subprocess
 import time
+import pytest
 
 
 class VagrantBase(RedisTestMixin, object):
@@ -9,10 +10,11 @@ class VagrantBase(RedisTestMixin, object):
 
     PACKAGE_NAME = "redis-stack-server"
 
-    VAGRANT_BASEDIR = os.path.join(ROOT, "vagrants")
+    VAGRANT_BASEDIR = os.path.join(ROOT, "envs", "vagrants")
 
     @classmethod
     def setup_class(cls):
+        cls.workdir = os.path.join(cls.VAGRANT_BASEDIR, cls.OSNICK)
         try:
             cls.teardown_class()
         except:
@@ -25,7 +27,7 @@ class VagrantBase(RedisTestMixin, object):
         res = subprocess.run(cmd, cwd=cls.workdir)
         assert res.returncode == 0
 
-        # cls.install(cls)
+        cls.install(cls)
 
         # start redis-stack
         subprocess.Popen(
@@ -34,17 +36,14 @@ class VagrantBase(RedisTestMixin, object):
             stderr=subprocess.PIPE,
             cwd=cls.workdir,
         )
-        time.sleep(2)
+        time.sleep(5)
 
     @classmethod
     def teardown_class(cls):
+        cls.uninstall(cls)
         cmd = ["vagrant", "destroy", "-f"]
         res = subprocess.run(cmd, cwd=cls.workdir)
         assert res.returncode == 0
-
-    @property
-    def workdir(self):
-        return os.path.join(VagrantBase.VAGRANT_BASEDIR, self.OSNICK)
 
     def _assertPathExists(self, path):
         cmd = ["vagrant", "ssh", "-c", f"ls -l {path}"]
@@ -104,10 +103,21 @@ class DebVagrant(VagrantBase):
             "sudo gdebi -n /data/redis-stack/redis-stack-server*.deb",
         ]
         res = subprocess.run(cmd, cwd=self.workdir)
-        assert res.returncode in [0, 1]
-
-
+        assert res.returncode == 0
+        
+    def uninstall(self):
+        cmd = [
+            "vagrant",
+            "ssh",
+            "-c",
+            "sudo apt remove -y redis-stack-server",
+        ]
+        res = subprocess.run(cmd, cwd=self.workdir)
+        assert res.returncode == 0
+        
+        
 class RPMVagrant(VagrantBase):
+    
     def install(self):
         cmd = [
             "vagrant",
@@ -117,28 +127,48 @@ class RPMVagrant(VagrantBase):
         ]
         res = subprocess.run(cmd, cwd=self.workdir)
         assert res.returncode in [0, 1]
+        
+    def uninstall(self):
+        cmd = [
+            "vagrant",
+            "ssh",
+            "-c",
+            "sudo yum remove -y redis-stack-server"
+        ]
+        res = subprocess.run(cmd, cwd=self.workdir)
+        assert res.returncode == 0
+        
 
-
+@pytest.mark.focal
+@pytest.mark.physical
 class TestFocal(DebVagrant):
 
     OSNICK = "focal"
 
 
+@pytest.mark.bionic
+@pytest.mark.physical
 class TestBionic(VagrantBase):
 
     OSNICK = "bionic"
 
 
+@pytest.mark.xenial
+@pytest.mark.physical
 class TestXenial(VagrantBase):
 
     OSNICK = "xenial"
 
 
+@pytest.mark.rhel7
+@pytest.mark.physical
 class TestCentos7(RPMVagrant):
 
     OSNICK = "centos7"
 
 
+@pytest.mark.rhel8
+@pytest.mark.physical
 class TestCentos8(RPMVagrant):
 
     OSNICK = "centos8"
