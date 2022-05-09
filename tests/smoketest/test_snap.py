@@ -4,7 +4,7 @@ import subprocess
 import time
 
 import pytest
-from helpers import RedisTestMixin
+from mixins import RedisTestMixin
 
 
 @pytest.mark.snaps

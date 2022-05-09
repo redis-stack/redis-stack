@@ -3,7 +3,7 @@ import platform
 import subprocess
 import time
 
-from helpers import RedisTestMixin
+from mixins import RedisTestMixin
 
 
 class TestOSX(RedisTestMixin, object):

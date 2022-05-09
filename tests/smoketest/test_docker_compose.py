@@ -2,7 +2,7 @@ import subprocess
 import os
 import pytest
 import time
-from helpers import RedisInsightTestMixin, RedisTestMixin
+from mixins import RedisInsightTestMixin, RedisTestMixin
 
 class DockerComposeBase(RedisTestMixin, object):
 
