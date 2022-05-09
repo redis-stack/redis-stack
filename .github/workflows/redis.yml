@@ -198,7 +198,7 @@ jobs:
         name: codesigned-${{env.platform}}-${{env.arch}}.${{env.target}}
     - name: unzip the zipfile
       working-directory: redis-stack
-      run: unzip redis-stack-server*.${{env.target}} -d redis-stack-server
+      run: unzip codesigned*.${{env.target}} -d redis-stack-server
     - name: run osx tests
       run: |
         ls -R
