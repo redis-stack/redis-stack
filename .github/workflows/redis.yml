@@ -149,13 +149,6 @@ jobs:
         cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
         zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
 
-    - name: persist the notarized artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: codesigned-${{env.platform}}-${{env.arch}}.${{env.target}}
-        path: |
-          redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/*.zip
-
     - name: notarize the custom zip
       run: |
         cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
@@ -194,13 +187,13 @@ jobs:
     - name: gather artifacts
       uses: actions/download-artifact@v2
       with:
-        path: codesigned
-        name: codesigned-${{env.platform}}-${{env.arch}}.${{env.target}}
+        path: redis-stack 
+        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
     - name: unzip the zipfile
       run: |
         ls -R
         mkdir redis-stack
-        unzip codesigned/notarized-${{env.platform}}-${{env.arch}}.${{env.target}} -d redis-stack/redis-stack-server
+        unzip redis-stack/redis-stack*.${{env.target}} -d redis-stack/redis-stack-server
     - name: run osx tests
       run: |
         .venv/bin/pytest -m macos
@@ -221,5 +214,5 @@ jobs:
 
     - name: persist redis to s3
       run: |
-        s3cmd put -P codesigned/notarized-${{env.platform}}-${{env.arch}}.${{env.target}} \
+        s3cmd put -P redis-stack/redis-stack-server*.${{env.target}} \
         s3://redismodules/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.${{env.target}}
