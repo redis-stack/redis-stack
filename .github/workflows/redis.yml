@@ -13,32 +13,6 @@ on:
 
 jobs:
 
-  mac-vagrant-test-ghing:
-    runs-on: macos-10.15
-    steps:
-      - uses: actions/checkout@v2
-      - name: Cache mac-vagrant-test
-        uses: actions/cache@v2
-        with:
-          path: ~/.vagrand.d/boxes
-          key: vagrant-test
-          restore-keys: |
-            vagrant-test
-      - run: vagrant --version
-      - name: test vagrant up
-        run: |
-          cd envs/vagrants/focal
-          vagrant up
-      - name: validate vagrant ssh
-        run:
-          cd envs/vagrants/focal
-          vagrant ssh -c "echo 'hello world!'"
-      - name: vagrant destroy
-        run: |
-          cd envs/vagrants/focal
-          vagrant destroy -f
-
-
 #   focal-redisinsight-web:
 #     runs-on: ubuntu-latest
 #     env:
@@ -127,59 +101,59 @@ jobs:
 #         run: |
 #           s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/
 
-#   focal:
-#     uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-#     with:
-#       image_name: ubuntu:focal
-#       platform: focal
-#       osname: Linux
-#       osnick: ubuntu20.04
-#       arch: x86_64
-#       target: deb
-#       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-#       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-#       redisversion: 7.0.0
-#     secrets:
-#       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#       GPG_KEY: ${{ secrets.GPG_KEY }}
-#       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+  focal:
+    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+    with:
+      image_name: ubuntu:focal
+      platform: focal
+      osname: Linux
+      osnick: ubuntu20.04
+      arch: x86_64
+      target: deb
+      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
+      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
+      redisversion: 7.0.0
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
-#   bionic:
-#     uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-#     with:
-#       image_name: ubuntu:bionic
-#       platform: bionic
-#       osname: Linux
-#       osnick: ubuntu18.04
-#       arch: x86_64
-#       target: deb
-#       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-#       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-#       redisversion: 7.0.0
-#     secrets:
-#       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#       GPG_KEY: ${{ secrets.GPG_KEY }}
-#       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+  bionic:
+    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+    with:
+      image_name: ubuntu:bionic
+      platform: bionic
+      osname: Linux
+      osnick: ubuntu18.04
+      arch: x86_64
+      target: deb
+      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
+      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
+      redisversion: 7.0.0
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
-#   xenial:
-#     uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-#     with:
-#       image_name: ubuntu:xenial
-#       platform: xenial
-#       osname: Linux
-#       osnick: ubuntu16.04
-#       arch: x86_64
-#       target: deb
-#       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-#       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-#       redisversion: 7.0.0
-#     secrets:
-#       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#       GPG_KEY: ${{ secrets.GPG_KEY }}
-#       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+  xenial:
+    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+    with:
+      image_name: ubuntu:xenial
+      platform: xenial
+      osname: Linux
+      osnick: ubuntu16.04
+      arch: x86_64
+      target: deb
+      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
+      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
+      redisversion: 7.0.0
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
 #   rhel7:
 #     uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
