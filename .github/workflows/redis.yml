@@ -194,13 +194,14 @@ jobs:
     - name: gather artifacts
       uses: actions/download-artifact@v2
       with:
-        path: redis-stack
+        path: redis-stack/codesigned.zip
         name: codesigned-${{env.platform}}-${{env.arch}}.${{env.target}}
     - name: unzip the zipfile
       working-directory: redis-stack
       run: |
         cd redis-stack
-        unzip codesigned*.${{env.target}} -d redis-stack-server
+        unzip codesigned.zip
+        unzip notarizd-${{env.platform}}-${{env.arch}}.${{env.target}} -d redis-stack-server
     - name: run osx tests
       run: |
         ls -R
