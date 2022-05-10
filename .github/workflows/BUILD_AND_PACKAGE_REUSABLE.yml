@@ -325,4 +325,5 @@ jobs:
           s3cmd get s3://redismodules/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}.${{inputs.platform}}.${{inputs.arch}}.${{inputs.target}} redis-stack-server.${{inputs.target}}
       - name: run tests in vagrants
         run: |
+          source .venv/bin/activate
           pytest -m "${{env.platform}} and physical"
