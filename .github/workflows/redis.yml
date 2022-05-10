@@ -2,621 +2,647 @@ name: Build Redis
 
 on:
   push:
-    paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
-      - '.github/worfklows/release.yml'
-    branches:
-      - master
-      - '[0-9].[0-9]'
-  pull_request:
+  #   paths-ignore:
+  #     - 'docs/**'
+  #     - '**/*.md'
+  #     - '.github/worfklows/release.yml'
+  #   branches:
+  #     - master
+  #     - '[0-9].[0-9]'
+  # pull_request:
 
 jobs:
 
-  focal-redisinsight-web:
-    runs-on: ubuntu-latest
-    env:
-      platform: focal
-      arch: x86_64
-      target: deb
-      osname: Linux
-      osnick: ubuntu20.04
-      pythonversion: 3.9
-      fpmversion: 1.14.1
-      rubyversion: 2.7.2
+  mac-vagrant-test-ghing:
+    runs-on: macos-10.15
     steps:
       - uses: actions/checkout@v2
-      - name: Cache dependencies
+      - name: Cache mac-vagrant-test
         uses: actions/cache@v2
         with:
-          path: |
-            /var/cache/apt
-            /var/cache/yum
-            ~/.cache/pip
-            ~/.cache/pypoetry
-            ~/.local/share/gem
-          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{inputs.platform}}-${{inputs.arch}}-package
-
-      - uses: ruby/setup-ruby@v1
-      - name: install python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{env.pythonversion}}
-      - name: install poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: latest
-          virtualenvs-in-project: true
-          virtualenvs-create: true
-          installer-parallel: true
-      - name: install packaging tools
+          path: ~/.vagrand.d/boxes
+          key: vagrant-test
+          restore-keys: |
+            vagrant-test
+      - run: vagrant --version
+      - name: test vagrant up
         run: |
-          sudo apt-get install unzip libterm-readkey-perl dpkg-sig
-          poetry install
-      - run: gem install fpm -v ${{env.fpmversion}}
-
-      - name: build redisinsight-web
+          cd envs/vagrants/focal
+          vagrant up
+      - name: validate vagrant ssh
+        run:
+          cd envs/vagrants/focal
+          vagrant ssh -c "echo 'hello world!'"
+      - name: vagrant destroy
         run: |
-          source .venv/bin/activate
-          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redisinsight-web
+          cd envs/vagrants/focal
+          vagrant destroy -f
 
-      - name: install gpg key
-        run: |
-          cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
 
-      - name: get gpg id from key
-        id: get_gpg_id
-        run: |
-          gpg_id=`gpg --list-keys|sed -n 4p|awk '{print $1}'`
-          echo "::set-output name=GPG_ID::$gpg_id"
+#   focal-redisinsight-web:
+#     runs-on: ubuntu-latest
+#     env:
+#       platform: focal
+#       arch: x86_64
+#       target: deb
+#       osname: Linux
+#       osnick: ubuntu20.04
+#       pythonversion: 3.9
+#       fpmversion: 1.14.1
+#       rubyversion: 2.7.2
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Cache dependencies
+#         uses: actions/cache@v2
+#         with:
+#           path: |
+#             /var/cache/apt
+#             /var/cache/yum
+#             ~/.cache/pip
+#             ~/.cache/pypoetry
+#             ~/.local/share/gem
+#           key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{inputs.platform}}-${{inputs.arch}}-package
 
-      - name: gpg sign package
-        run: |
-          echo '${{secrets.GPG_PASSWORD}}' > .passfile
-          dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{steps.get_gpg_id.outputs.GPG_ID}} *.deb
-          for i in `ls *.deb`; do
-            sha256sum $i |awk '{print $1}' > $i.sha256
-          done
-          rm -f .passfile
+#       - uses: ruby/setup-ruby@v1
+#       - name: install python
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: ${{env.pythonversion}}
+#       - name: install poetry
+#         uses: snok/install-poetry@v1
+#         with:
+#           version: latest
+#           virtualenvs-in-project: true
+#           virtualenvs-create: true
+#           installer-parallel: true
+#       - name: install packaging tools
+#         run: |
+#           sudo apt-get install unzip libterm-readkey-perl dpkg-sig
+#           poetry install
+#       - run: gem install fpm -v ${{env.fpmversion}}
 
-      - name: perist ${{env.target}} package
-        uses: actions/upload-artifact@v2
-        with:
-          name: redisinsight-web-${{env.platform}}-${{env.arch}}.${{env.target}}
-          path: |
-            redisinsight-web*.${{env.target}}
+#       - name: build redisinsight-web
+#         run: |
+#           source .venv/bin/activate
+#           invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redisinsight-web
 
-      - name: gather packages for s3 upload
-        continue-on-error: true
-        run: |
-          mkdir -p s3uploads
-          cp *.${{env.target}} *.sha256 s3uploads
-      - uses: s3-actions/s3cmd@v1.1
-        with:
-          provider: aws
-          region: us-east-1
-          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: upload snapshots
-        run: |
-          s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/
+#       - name: install gpg key
+#         run: |
+#           cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
 
-  focal:
-    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-    with:
-      image_name: ubuntu:focal
-      platform: focal
-      osname: Linux
-      osnick: ubuntu20.04
-      arch: x86_64
-      target: deb
-      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-      redisversion: 7.0.0
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+#       - name: get gpg id from key
+#         id: get_gpg_id
+#         run: |
+#           gpg_id=`gpg --list-keys|sed -n 4p|awk '{print $1}'`
+#           echo "::set-output name=GPG_ID::$gpg_id"
 
-  bionic:
-    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-    with:
-      image_name: ubuntu:bionic
-      platform: bionic
-      osname: Linux
-      osnick: ubuntu18.04
-      arch: x86_64
-      target: deb
-      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-      redisversion: 7.0.0
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+#       - name: gpg sign package
+#         run: |
+#           echo '${{secrets.GPG_PASSWORD}}' > .passfile
+#           dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{steps.get_gpg_id.outputs.GPG_ID}} *.deb
+#           for i in `ls *.deb`; do
+#             sha256sum $i |awk '{print $1}' > $i.sha256
+#           done
+#           rm -f .passfile
 
-  xenial:
-    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-    with:
-      image_name: ubuntu:xenial
-      platform: xenial
-      osname: Linux
-      osnick: ubuntu16.04
-      arch: x86_64
-      target: deb
-      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-      redisversion: 7.0.0
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+#       - name: perist ${{env.target}} package
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: redisinsight-web-${{env.platform}}-${{env.arch}}.${{env.target}}
+#           path: |
+#             redisinsight-web*.${{env.target}}
 
-  rhel7:
-    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-    with:
-      image_name: centos:7
-      platform: rhel7
-      osname: Linux
-      osnick: rhel7
-      arch: x86_64
-      target: rpm
-      build_deps: yum install -y epel-release gcc make jemalloc-devel openssl-devel python3 python3-pip
-      packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2 curl
-      redisversion: 7.0.0
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+#       - name: gather packages for s3 upload
+#         continue-on-error: true
+#         run: |
+#           mkdir -p s3uploads
+#           cp *.${{env.target}} *.sha256 s3uploads
+#       - uses: s3-actions/s3cmd@v1.1
+#         with:
+#           provider: aws
+#           region: us-east-1
+#           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#       - name: upload snapshots
+#         run: |
+#           s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/
 
-  rhel8:
-    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-    with:
-      image_name: oraclelinux:8
-      platform: rhel8
-      osname: Linux
-      osnick: rhel8
-      arch: x86_64
-      target: rpm
-      build_deps: |
-        dnf install -y oracle-epel-release-el8
-        dnf install -y gcc make jemalloc-devel openssl-devel tar git python3 python3-pip
-      packaging_deps: sudo apt-get install -y rpm unzip curl gnupg2
-      redisversion: 7.0.0
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      GPG_KEY: ${{ secrets.GPG_KEY }}
-      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+#   focal:
+#     uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+#     with:
+#       image_name: ubuntu:focal
+#       platform: focal
+#       osname: Linux
+#       osnick: ubuntu20.04
+#       arch: x86_64
+#       target: deb
+#       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
+#       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
+#       redisversion: 7.0.0
+#     secrets:
+#       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#       GPG_KEY: ${{ secrets.GPG_KEY }}
+#       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
-  # osx is the only one of these that is really
-  build-package-osx:
-    name: Mac (x86_64) Build
-    env:
-      arch: x86_64
-      osnick: catalina
-      target: zip
-      platform: catalina
-      osname: macos
-      redisversion: 7.0.0
-      pythonversion: 3.9
-      fpmversion: 1.14.1
-      rubyversion: 2.7.2
+#   bionic:
+#     uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+#     with:
+#       image_name: ubuntu:bionic
+#       platform: bionic
+#       osname: Linux
+#       osnick: ubuntu18.04
+#       arch: x86_64
+#       target: deb
+#       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
+#       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
+#       redisversion: 7.0.0
+#     secrets:
+#       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#       GPG_KEY: ${{ secrets.GPG_KEY }}
+#       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
-    runs-on: macos-latest
-    steps:
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{env.rubyversion}}
-    - name: install python
-      uses: actions/setup-python@v2
-      with:
-        python-version: "${{ env.pythonversion }}"
-    - name: install poetry
-      uses: snok/install-poetry@v1
-      with:
-        version: latest
-        virtualenvs-in-project: true
-        virtualenvs-create: true
-        installer-parallel: true
+#   xenial:
+#     uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+#     with:
+#       image_name: ubuntu:xenial
+#       platform: xenial
+#       osname: Linux
+#       osnick: ubuntu16.04
+#       arch: x86_64
+#       target: deb
+#       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
+#       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
+#       redisversion: 7.0.0
+#     secrets:
+#       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#       GPG_KEY: ${{ secrets.GPG_KEY }}
+#       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
-    - name: checkout sources
-      uses: actions/checkout@v2
-      with:
-        path: redis-stack
-    - name: clone redis
-      uses: actions/checkout@v2
-      with:
-        repository: redis/redis
-        path: redis
-        ref: ${{env.redisversion}}
+#   rhel7:
+#     uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+#     with:
+#       image_name: centos:7
+#       platform: rhel7
+#       osname: Linux
+#       osnick: rhel7
+#       arch: x86_64
+#       target: rpm
+#       build_deps: yum install -y epel-release gcc make jemalloc-devel openssl-devel python3 python3-pip
+#       packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2 curl
+#       redisversion: 7.0.0
+#     secrets:
+#       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#       GPG_KEY: ${{ secrets.GPG_KEY }}
+#       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
-    - name: install dependencies
-      run: |
-        brew install openssl@3
-        gem install fpm -v ${{env.fpmversion}}
-        cd redis-stack
-        poetry install
-    - name: build redis from source
-      run: |
-        cd redis
-        make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a"
+#   rhel8:
+#     uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+#     with:
+#       image_name: oraclelinux:8
+#       platform: rhel8
+#       osname: Linux
+#       osnick: rhel8
+#       arch: x86_64
+#       target: rpm
+#       build_deps: |
+#         dnf install -y oracle-epel-release-el8
+#         dnf install -y gcc make jemalloc-devel openssl-devel tar git python3 python3-pip
+#       packaging_deps: sudo apt-get install -y rpm unzip curl gnupg2
+#       redisversion: 7.0.0
+#     secrets:
+#       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#       GPG_KEY: ${{ secrets.GPG_KEY }}
+#       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
-    - name: package redis for s3
-      run: |
-        mkdir redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
-        cp redis/src/redis-server \
-            redis/src/redis-sentinel \
-            redis/src/redis-check-aof \
-            redis/src/redis-check-rdb \
-            redis/src/redis-benchmark \
-            redis/src/redis-cli \
-            redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
-        tar -czvf redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
-            redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
+#   # osx is the only one of these that is really
+#   build-package-osx:
+#     name: Mac (x86_64) Build
+#     env:
+#       arch: x86_64
+#       osnick: catalina
+#       target: zip
+#       platform: catalina
+#       osname: macos
+#       redisversion: 7.0.0
+#       pythonversion: 3.9
+#       fpmversion: 1.14.1
+#       rubyversion: 2.7.2
 
-    - uses: s3-actions/s3cmd@v1.1
-      with:
-        provider: aws
-        region: us-east-1
-        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    - name: persist redis to s3
-      run: |
-        s3cmd put -P redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
-        s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
+#     runs-on: macos-latest
+#     steps:
+#     - uses: ruby/setup-ruby@v1
+#       with:
+#         ruby-version: ${{env.rubyversion}}
+#     - name: install python
+#       uses: actions/setup-python@v2
+#       with:
+#         python-version: "${{ env.pythonversion }}"
+#     - name: install poetry
+#       uses: snok/install-poetry@v1
+#       with:
+#         version: latest
+#         virtualenvs-in-project: true
+#         virtualenvs-create: true
+#         installer-parallel: true
 
-    - name: perist redis
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-${{env.redisversion}}-osx
-        path: |
-          redis/src/redis-server
-          redis/src/redis-sentinel
-          redis/src/redis-check-aof
-          redis/src/redis-check-rdb
-          redis/src/redis-benchmark
-          redis/src/redis-cli
+#     - name: checkout sources
+#       uses: actions/checkout@v2
+#       with:
+#         path: redis-stack
+#     - name: clone redis
+#       uses: actions/checkout@v2
+#       with:
+#         repository: redis/redis
+#         path: redis
+#         ref: ${{env.redisversion}}
 
-    - name: collect dependencies prior to zipping
-      run: |
-        cd redis-stack
-        source .venv/bin/activate
-        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server -k package
+#     - name: install dependencies
+#       run: |
+#         brew install openssl@3
+#         gem install fpm -v ${{env.fpmversion}}
+#         cd redis-stack
+#         poetry install
+#     - name: build redis from source
+#       run: |
+#         cd redis
+#         make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a"
 
-    - name: codesign all binaries
-      run: |
-        cd redis-stack
-        echo ${{secrets.MACOS_CERTIFICATE}} | base64 --decode > certificate.p12
-        security create-keychain -p ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
-        security default-keychain -s build.keychain
-        security unlock-keychain -p ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
-        security import certificate.p12 -k build.keychain -P ${{ secrets.MACOS_CERTIFICATE_PASSWORD }} -T /usr/bin/codesign
-        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
-        CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
-        for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
-          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} --entitlements etc/entitlements -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
-        done
-        for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
-          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} --entitlements etc/entitlements -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
-        done
+#     - name: package redis for s3
+#       run: |
+#         mkdir redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
+#         cp redis/src/redis-server \
+#             redis/src/redis-sentinel \
+#             redis/src/redis-check-aof \
+#             redis/src/redis-check-rdb \
+#             redis/src/redis-benchmark \
+#             redis/src/redis-cli \
+#             redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
+#         tar -czvf redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
+#             redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
 
-    - name: build the redis-stack-server zipfile (for homebrew)
-      run: |
-        cd redis-stack
-        source .venv/bin/activate
-        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server -k fetch
-        for i in `ls *.zip`; do
-          sha256sum $i |awk '{print $1}' > $i.sha256
-        done
-        mkdir s3dist
-        cp *.zip *.sha256 s3dist
+#     - uses: s3-actions/s3cmd@v1.1
+#       with:
+#         provider: aws
+#         region: us-east-1
+#         access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#     - name: persist redis to s3
+#       run: |
+#         s3cmd put -P redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
+#         s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
 
-    - name: perist the zipfile
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
-        path: |
-          redis-stack/redis-stack-*.zip
+#     - name: perist redis
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: redis-${{env.redisversion}}-osx
+#         path: |
+#           redis/src/redis-server
+#           redis/src/redis-sentinel
+#           redis/src/redis-check-aof
+#           redis/src/redis-check-rdb
+#           redis/src/redis-benchmark
+#           redis/src/redis-cli
 
-    - name: create the zip for notarization
-      run: |
-        cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
-        zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
+#     - name: collect dependencies prior to zipping
+#       run: |
+#         cd redis-stack
+#         source .venv/bin/activate
+#         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server -k package
 
-    - name: persist the codesigned artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: codesigned-${{env.platform}}-${{env.arch}}
-        path: |
-          redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/*.zip
+#     - name: codesign all binaries
+#       run: |
+#         cd redis-stack
+#         echo ${{secrets.MACOS_CERTIFICATE}} | base64 --decode > certificate.p12
+#         security create-keychain -p ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
+#         security default-keychain -s build.keychain
+#         security unlock-keychain -p ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
+#         security import certificate.p12 -k build.keychain -P ${{ secrets.MACOS_CERTIFICATE_PASSWORD }} -T /usr/bin/codesign
+#         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
+#         CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
+#         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
+#           /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} --entitlements etc/entitlements -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
+#         done
+#         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
+#           /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} --entitlements etc/entitlements -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
+#         done
 
-    - name: notarize the custom zip
-      run: |
-        cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
-        sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
+#     - name: build the redis-stack-server zipfile (for homebrew)
+#       run: |
+#         cd redis-stack
+#         source .venv/bin/activate
+#         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server -k fetch
+#         for i in `ls *.zip`; do
+#           sha256sum $i |awk '{print $1}' > $i.sha256
+#         done
+#         mkdir s3dist
+#         cp *.zip *.sha256 s3dist
 
-    - uses: s3-actions/s3cmd@v1.1
-      with:
-        provider: aws
-        region: us-east-1
-        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    - name: upload snapshots
-      run: |
-        s3cmd put -P redis-stack/s3dist/* s3://redismodules/redis-stack/snapshots/
+#     - name: perist the zipfile
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
+#         path: |
+#           redis-stack/redis-stack-*.zip
 
-  # the m1 requires a zip file so that homebrew can unpack it
-  build-package-osx-m1:
-    name: Mac (M1) Package
-    env:
-      arch: arm64
-      osnick: monterey
-      target: zip
-      platform: monterey
-      osname: macos
-      redisversion: 7.0.0
-      pythonversion: 3.9
-      fpmversion: 1.14.1
-      rubyversion: 2.7.2
-    runs-on: macos-latest
-    steps:
-    - name: checkout sources
-      uses: actions/checkout@v2
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{env.rubyversion}}
-    - name: install python
-      uses: actions/setup-python@v2
-      with:
-        python-version: "${{ env.pythonversion }}"
-    - name: install poetry
-      uses: snok/install-poetry@v1
-      with:
-        version: latest
-        virtualenvs-in-project: true
-        virtualenvs-create: true
-        installer-parallel: true
-    - name: Cache dependencies
-      uses: actions/cache@v2
-      with:
-        path: |
-          /var/cache/apt
-          ~/.cache/pip
-          ~/.cache/pypoetry
-          ~/.local/share/gem
-        key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
-    - name: install packaging tools
-      run: |
-        gem install fpm -v ${{env.fpmversion}}
-        poetry install
+#     - name: create the zip for notarization
+#       run: |
+#         cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
+#         zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
 
-### Once https://github.com/actions/runner/issues/805 is resolved we can do this ###
-### For now, this is how it is manually built, on the platform ###
-#    - name: build redis from source
-#      run: |
-#        cd redis
-#        make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a" CFLAGS="-I /opt/homebrew/opt/openssl@1.1/include"
-#
-    - name: collect dependencies prior to packaging
-      run: |
-        source .venv/bin/activate
-        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redis-stack-server -k package
+#     - name: persist the codesigned artifacts
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: codesigned-${{env.platform}}-${{env.arch}}
+#         path: |
+#           redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/*.zip
 
-    - name: codesign all binaries
-      run: |
-        echo ${{secrets.MACOS_CERTIFICATE}} | base64 --decode > certificate.p12
-        security create-keychain -p ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
-        security default-keychain -s build.keychain
-        security unlock-keychain -p ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
-        security import certificate.p12 -k build.keychain -P ${{ secrets.MACOS_CERTIFICATE_PASSWORD }} -T /usr/bin/codesign
-        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
-        CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
-        for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
-          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} --entitlements etc/entitlements -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
-        done
-        for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
-          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} --entitlements etc/entitlements -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
-        done
+#     - name: notarize the custom zip
+#       run: |
+#         cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
+#         sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
 
-    - name: build redis-stack-server zipfile
-      run: |
-        source .venv/bin/activate
-        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redis-stack-server -k fetch
-        for i in `ls *.zip`; do
-          sha256sum $i |awk '{print $1}' > $i.sha256
-        done
+#     - uses: s3-actions/s3cmd@v1.1
+#       with:
+#         provider: aws
+#         region: us-east-1
+#         access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#     - name: upload snapshots
+#       run: |
+#         s3cmd put -P redis-stack/s3dist/* s3://redismodules/redis-stack/snapshots/
 
-    - name: persist the zipfile
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
-        path: |
-          *.zip
+#   # the m1 requires a zip file so that homebrew can unpack it
+#   build-package-osx-m1:
+#     name: Mac (M1) Package
+#     env:
+#       arch: arm64
+#       osnick: monterey
+#       target: zip
+#       platform: monterey
+#       osname: macos
+#       redisversion: 7.0.0
+#       pythonversion: 3.9
+#       fpmversion: 1.14.1
+#       rubyversion: 2.7.2
+#     runs-on: macos-latest
+#     steps:
+#     - name: checkout sources
+#       uses: actions/checkout@v2
+#     - uses: ruby/setup-ruby@v1
+#       with:
+#         ruby-version: ${{env.rubyversion}}
+#     - name: install python
+#       uses: actions/setup-python@v2
+#       with:
+#         python-version: "${{ env.pythonversion }}"
+#     - name: install poetry
+#       uses: snok/install-poetry@v1
+#       with:
+#         version: latest
+#         virtualenvs-in-project: true
+#         virtualenvs-create: true
+#         installer-parallel: true
+#     - name: Cache dependencies
+#       uses: actions/cache@v2
+#       with:
+#         path: |
+#           /var/cache/apt
+#           ~/.cache/pip
+#           ~/.cache/pypoetry
+#           ~/.local/share/gem
+#         key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
+#     - name: install packaging tools
+#       run: |
+#         gem install fpm -v ${{env.fpmversion}}
+#         poetry install
 
-    - name: create the zip for notarization
-      run: |
-        cd build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
-        zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
+# ### Once https://github.com/actions/runner/issues/805 is resolved we can do this ###
+# ### For now, this is how it is manually built, on the platform ###
+# #    - name: build redis from source
+# #      run: |
+# #        cd redis
+# #        make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a" CFLAGS="-I /opt/homebrew/opt/openssl@1.1/include"
+# #
+#     - name: collect dependencies prior to packaging
+#       run: |
+#         source .venv/bin/activate
+#         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redis-stack-server -k package
 
-    - name: persist the codesigned artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: codesigned-${{env.platform}}-${{env.arch}}
-        path: |
-          build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/*.zip
+#     - name: codesign all binaries
+#       run: |
+#         echo ${{secrets.MACOS_CERTIFICATE}} | base64 --decode > certificate.p12
+#         security create-keychain -p ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
+#         security default-keychain -s build.keychain
+#         security unlock-keychain -p ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
+#         security import certificate.p12 -k build.keychain -P ${{ secrets.MACOS_CERTIFICATE_PASSWORD }} -T /usr/bin/codesign
+#         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
+#         CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
+#         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
+#           /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} --entitlements etc/entitlements -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
+#         done
+#         for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib`; do
+#           /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} --entitlements etc/entitlements -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/lib/$i
+#         done
 
-    - name: notarize the custom zip
-      run: |
-        cd build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
-        sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
+#     - name: build redis-stack-server zipfile
+#       run: |
+#         source .venv/bin/activate
+#         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redis-stack-server -k fetch
+#         for i in `ls *.zip`; do
+#           sha256sum $i |awk '{print $1}' > $i.sha256
+#         done
 
-    - uses: s3-actions/s3cmd@v1.1
-      with:
-        provider: aws
-        region: us-east-1
-        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    - name: upload snapshots
-      run: |
-        s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
-        s3cmd put -P *.sha256 s3://redismodules/redis-stack/snapshots/
+#     - name: persist the zipfile
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
+#         path: |
+#           *.zip
 
-  snap:
-    name: ${{matrix.package}} snap
-    runs-on: ubuntu-latest
-    needs: [focal]
-    strategy:
-      matrix:
-        package: ['redis-stack-server']
-    env:
-      platform: focal
-      arch: x86_64
-      osnick: ubuntu20.04
-      target: snap
-      osname: Linux
-      pythonversion: 3.9
-      fpmversion: 1.14.1
-      rubyversion: 2.7.2
-    steps:
-      - uses: actions/checkout@v2
-      - name: install python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{env.pythonversion}}
-      - uses: ruby/setup-ruby@v1
+#     - name: create the zip for notarization
+#       run: |
+#         cd build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
+#         zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
 
-      - uses: actions/cache@v2
-        with:
-          path: |
-            /var/cache/apt
-            /var/cache/yum
-            ~/.cache/pip
-            ~/.cache/pypoetry
-            ~/.local/share/gem
-          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
+#     - name: persist the codesigned artifacts
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: codesigned-${{env.platform}}-${{env.arch}}
+#         path: |
+#           build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/*.zip
 
-      - name: install poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: latest
-          virtualenvs-in-project: true
-          virtualenvs-create: true
-          installer-parallel: true
-      - name: install packaging tools
-        run: |
-          gem install fpm -v ${{env.fpmversion}}
-          poetry install
-      - name: build snap
-        run: |
-          source .venv/bin/activate
-          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p ${{ matrix.package }}
-          for i in `ls *.snap`; do
-            sha256 $i | awk '{print $1}' > $i.sha256
-          done
+#     - name: notarize the custom zip
+#       run: |
+#         cd build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
+#         sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
 
-      - name: validate packages
-        run: |
-          mkdir redis-stack
-          cp *.snap redis-stack/${{ matrix.package }}.${{ env.target }}
-          sudo .venv/bin/pytest -m snaps
+#     - uses: s3-actions/s3cmd@v1.1
+#       with:
+#         provider: aws
+#         region: us-east-1
+#         access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#     - name: upload snapshots
+#       run: |
+#         s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+#         s3cmd put -P *.sha256 s3://redismodules/redis-stack/snapshots/
 
-      - uses: s3-actions/s3cmd@v1.1
-        with:
-          provider: aws
-          region: us-east-1
-          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: upload snapshots
-        run: |
-          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
-          s3cmd put -P *.sha256 s3://redismodules/redis-stack/snapshots/
+#   snap:
+#     name: ${{matrix.package}} snap
+#     runs-on: ubuntu-latest
+#     needs: [focal]
+#     strategy:
+#       matrix:
+#         package: ['redis-stack-server']
+#     env:
+#       platform: focal
+#       arch: x86_64
+#       osnick: ubuntu20.04
+#       target: snap
+#       osname: Linux
+#       pythonversion: 3.9
+#       fpmversion: 1.14.1
+#       rubyversion: 2.7.2
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: install python
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: ${{env.pythonversion}}
+#       - uses: ruby/setup-ruby@v1
 
-  dockers:
-    name: ${{matrix.package}} docker
-    strategy:
-      matrix:
-        package: ['redis-stack-server', 'redis-stack']
-    env:
-      platform: focal
-      arch: x86_64
+#       - uses: actions/cache@v2
+#         with:
+#           path: |
+#             /var/cache/apt
+#             /var/cache/yum
+#             ~/.cache/pip
+#             ~/.cache/pypoetry
+#             ~/.local/share/gem
+#           key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
 
-    runs-on: ubuntu-latest
-    needs: [focal, focal-redisinsight-web]
-    steps:
-      - uses: actions/checkout@v2
-      - name: install python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
+#       - name: install poetry
+#         uses: snok/install-poetry@v1
+#         with:
+#           version: latest
+#           virtualenvs-in-project: true
+#           virtualenvs-create: true
+#           installer-parallel: true
+#       - name: install packaging tools
+#         run: |
+#           gem install fpm -v ${{env.fpmversion}}
+#           poetry install
+#       - name: build snap
+#         run: |
+#           source .venv/bin/activate
+#           invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p ${{ matrix.package }}
+#           for i in `ls *.snap`; do
+#             sha256 $i | awk '{print $1}' > $i.sha256
+#           done
 
-      - uses: actions/cache@v2
-        with:
-          path: |
-            /var/cache/apt
-            /var/cache/yum
-            ~/.cache/pip
-            ~/.cache/pypoetry
-            ~/.local/share/gem
-          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
+#       - name: validate packages
+#         run: |
+#           mkdir redis-stack
+#           cp *.snap redis-stack/${{ matrix.package }}.${{ env.target }}
+#           sudo .venv/bin/pytest -m snaps
 
-      - name: install poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: latest
-          virtualenvs-in-project: true
-          virtualenvs-create: true
-          installer-parallel: true
+#       - uses: s3-actions/s3cmd@v1.1
+#         with:
+#           provider: aws
+#           region: us-east-1
+#           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#       - name: upload snapshots
+#         run: |
+#           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
+#           s3cmd put -P *.sha256 s3://redismodules/redis-stack/snapshots/
 
-      - uses: actions/download-artifact@v2
-        with:
-          name: redis-stack-server-${{env.platform}}-${{env.arch}}.deb
-          path: redis-stack
-      - uses: actions/download-artifact@v2
-        with:
-          name: redisinsight-web-${{env.platform}}-${{env.arch}}.deb
-          path: redis-stack
-      - name: display structure
-        run: ls -R
+#   dockers:
+#     name: ${{matrix.package}} docker
+#     strategy:
+#       matrix:
+#         package: ['redis-stack-server', 'redis-stack']
+#     env:
+#       platform: focal
+#       arch: x86_64
 
-      - name: get package version
-        id: get_version
-        run: |
-          poetry install
-          source .venv/bin/activate
-          realversion=`invoke version -p ${{ matrix.package }} -d true`
-          echo "::set-output name=VERSION::$realversion"
-      - name: generate docker file
-        run: |
-          source .venv/bin/activate
-          invoke dockergen -d ${{ matrix.package }}
-      - name: build docker
-        run: |
-          docker build -f dockers/Dockerfile.${{ matrix.package }} -t redis/${{ matrix.package }}:testing .
+#     runs-on: ubuntu-latest
+#     needs: [focal, focal-redisinsight-web]
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: install python
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: 3.9
 
-      - name: test docker build
-        run: |
-          matrixvar=`echo ${{matrix.package}}`
-          matrixdocker="${matrixvar//-/_}"
-          source .venv/bin/activate
-          VERSION=testing pytest -m dockers_$matrixdocker
+#       - uses: actions/cache@v2
+#         with:
+#           path: |
+#             /var/cache/apt
+#             /var/cache/yum
+#             ~/.cache/pip
+#             ~/.cache/pypoetry
+#             ~/.local/share/gem
+#           key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
 
-      - name: Log in to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: publish docker
-        if: github.ref != 'refs/heads/master'
-        run: |
-          docker tag redis/${{ matrix.package }}:testing redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-edge
-          docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-edge
-      - name: publish docker
-        if: github.ref == 'refs/heads/master'
-        run: |
-          docker tag redis/${{ matrix.package }}:testing redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
-          docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
+#       - name: install poetry
+#         uses: snok/install-poetry@v1
+#         with:
+#           version: latest
+#           virtualenvs-in-project: true
+#           virtualenvs-create: true
+#           installer-parallel: true
+
+#       - uses: actions/download-artifact@v2
+#         with:
+#           name: redis-stack-server-${{env.platform}}-${{env.arch}}.deb
+#           path: redis-stack
+#       - uses: actions/download-artifact@v2
+#         with:
+#           name: redisinsight-web-${{env.platform}}-${{env.arch}}.deb
+#           path: redis-stack
+#       - name: display structure
+#         run: ls -R
+
+#       - name: get package version
+#         id: get_version
+#         run: |
+#           poetry install
+#           source .venv/bin/activate
+#           realversion=`invoke version -p ${{ matrix.package }} -d true`
+#           echo "::set-output name=VERSION::$realversion"
+#       - name: generate docker file
+#         run: |
+#           source .venv/bin/activate
+#           invoke dockergen -d ${{ matrix.package }}
+#       - name: build docker
+#         run: |
+#           docker build -f dockers/Dockerfile.${{ matrix.package }} -t redis/${{ matrix.package }}:testing .
+
+#       - name: test docker build
+#         run: |
+#           matrixvar=`echo ${{matrix.package}}`
+#           matrixdocker="${matrixvar//-/_}"
+#           source .venv/bin/activate
+#           VERSION=testing pytest -m dockers_$matrixdocker
+
+#       - name: Log in to DockerHub
+#         uses: docker/login-action@v1
+#         with:
+#           username: ${{ secrets.DOCKERHUB_USERNAME }}
+#           password: ${{ secrets.DOCKERHUB_TOKEN }}
+#       - name: publish docker
+#         if: github.ref != 'refs/heads/master'
+#         run: |
+#           docker tag redis/${{ matrix.package }}:testing redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-edge
+#           docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-edge
+#       - name: publish docker
+#         if: github.ref == 'refs/heads/master'
+#         run: |
+#           docker tag redis/${{ matrix.package }}:testing redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
+#           docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
