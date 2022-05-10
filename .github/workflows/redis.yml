@@ -194,14 +194,15 @@ jobs:
     - name: gather artifacts
       uses: actions/download-artifact@v2
       with:
-        path: redis-stack/codesigned.zip
+        path: codesigned.zip
         name: codesigned-${{env.platform}}-${{env.arch}}.${{env.target}}
     - name: unzip the zipfile
       working-directory: redis-stack
       run: |
+        ls -R
+        unzip codesigned.zip -d redis-stack
         cd redis-stack
-        unzip codesigned.zip
-        unzip notarizd-${{env.platform}}-${{env.arch}}.${{env.target}} -d redis-stack-server
+        unzip notarized-${{env.platform}}-${{env.arch}}.${{env.target}} -d redis-stack-server
     - name: run osx tests
       run: |
         ls -R
@@ -224,5 +225,5 @@ jobs:
     - name: persist redis to s3
       run: |
         cd redis-stack
-        s3cmd put -P redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}} \
+        s3cmd put -P notarized-${{env.platform}}-${{env.arch}}.${{env.target}} \
         s3://redismodules/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.${{env.target}}
