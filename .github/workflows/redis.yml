@@ -200,7 +200,7 @@ jobs:
       run: |
         ls -R
         mkdir redis-stack
-        unzip codesigned.zip/notarized-${{env.platform}}-${{env.arch}}.${{env.target}} -d redis-stack/redis-stack-server
+        unzip codesigned/notarized-${{env.platform}}-${{env.arch}}.${{env.target}} -d redis-stack/redis-stack-server
     - name: run osx tests
       run: |
         .venv/bin/pytest tests/smoketest/test_osx.py::TestOSXZip::test_basic_redis -s
