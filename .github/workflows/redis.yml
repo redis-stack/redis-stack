@@ -197,11 +197,11 @@ jobs:
         path: codesigned.zip
         name: codesigned-${{env.platform}}-${{env.arch}}.${{env.target}}
     - name: unzip the zipfile
-      working-directory: redis-stack
       run: |
         ls -R
+        mkdir redis-stack
         unzip codesigned.zip
-        unzip notarized-${{env.platform}}-${{env.arch}}.${{env.target}} -d redis-stack-server
+        unzip notarized-${{env.platform}}-${{env.arch}}.${{env.target}} -d redis-stack/redis-stack-server
     - name: run osx tests
       run: |
         .venv/bin/pytest tests/smoketest/test_osx.py::TestOSXZip::test_basic_redis -s
