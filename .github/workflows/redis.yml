@@ -203,7 +203,7 @@ jobs:
         unzip codesigned/notarized-${{env.platform}}-${{env.arch}}.${{env.target}} -d redis-stack/redis-stack-server
     - name: run osx tests
       run: |
-        .venv/bin/pytest tests/smoketest/test_osx.py::TestOSXZip::test_basic_redis -s
+        .venv/bin/pytest -m macos
     - name: get package version
       id: get_version
       run: |
@@ -221,6 +221,5 @@ jobs:
 
     - name: persist redis to s3
       run: |
-        cd redis-stack
-        s3cmd put -P notarized-${{env.platform}}-${{env.arch}}.${{env.target}} \
+        s3cmd put -P codesigned/notarized-${{env.platform}}-${{env.arch}}.${{env.target}} \
         s3://redismodules/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.${{env.target}}
