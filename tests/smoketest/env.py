@@ -62,9 +62,6 @@ class VagrantTestEnv:
         except Exception:
             pass
 
-        if os.path.isfile(os.path.join(ROOT, "poetry.lock")):
-            os.unlink(os.path.join(ROOT, "poetry.lock"))
-
         cmd = ["vagrant", "up", "--provision"]
         res = subprocess.run(cmd, cwd=cls.workdir)
         assert res.returncode == 0
@@ -80,9 +77,9 @@ class VagrantTestEnv:
         )
         time.sleep(5)
 
-    @classmethod
-    def teardown_class(cls):
-        cls.uninstall(cls)
-        cmd = ["vagrant", "destroy", "-f"]
-        res = subprocess.run(cmd, cwd=cls.workdir)
-        assert res.returncode == 0
+   @classmethod
+   def teardown_class(cls):
+       cls.uninstall(cls)
+       cmd = ["vagrant", "destroy", "-f"]
+       res = subprocess.run(cmd, cwd=cls.workdir)
+       assert res.returncode == 0

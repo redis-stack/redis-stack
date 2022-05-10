@@ -52,7 +52,7 @@ class RPMVagrant(VagrantBase):
             "vagrant",
             "ssh",
             "-c",
-            "sudo rpm -i /data/redis-stack/redis-stack-server*.rpm",
+            "sudo yum install -y /data/redis-stack/redis-stack-server*.rpm",
         ]
         res = subprocess.run(cmd, cwd=self.workdir)
         assert res.returncode in [0, 1]

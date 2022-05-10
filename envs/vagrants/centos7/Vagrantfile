@@ -2,7 +2,7 @@
 #
 Vagrant.configure("2") do |config|
   config.vm.box = "bento/centos-7"
-  config.vm.synced_folder "../..", "/data"
+  config.vm.synced_folder "../../..", "/data"
   config.vm.network "forwarded_port", guest: 6379, host: 6379
 
   config.vm.provider "virtualbox" do |vb|
