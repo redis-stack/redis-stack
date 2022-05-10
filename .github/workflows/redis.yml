@@ -194,14 +194,13 @@ jobs:
     - name: gather artifacts
       uses: actions/download-artifact@v2
       with:
-        path: codesigned.zip
+        path: codesigned
         name: codesigned-${{env.platform}}-${{env.arch}}.${{env.target}}
     - name: unzip the zipfile
       run: |
         ls -R
         mkdir redis-stack
-        unzip codesigned.zip
-        unzip notarized-${{env.platform}}-${{env.arch}}.${{env.target}} -d redis-stack/redis-stack-server
+        unzip codesigned.zip/notarized-${{env.platform}}-${{env.arch}}.${{env.target}} -d redis-stack/redis-stack-server
     - name: run osx tests
       run: |
         .venv/bin/pytest tests/smoketest/test_osx.py::TestOSXZip::test_basic_redis -s
