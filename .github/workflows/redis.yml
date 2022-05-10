@@ -200,12 +200,10 @@ jobs:
       working-directory: redis-stack
       run: |
         ls -R
-        unzip codesigned.zip -d redis-stack
-        cd redis-stack
+        unzip codesigned.zip
         unzip notarized-${{env.platform}}-${{env.arch}}.${{env.target}} -d redis-stack-server
     - name: run osx tests
       run: |
-        ls -R
         .venv/bin/pytest tests/smoketest/test_osx.py::TestOSXZip::test_basic_redis -s
     - name: get package version
       id: get_version
