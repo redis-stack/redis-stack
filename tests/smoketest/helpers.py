@@ -2,8 +2,6 @@ import os
 import subprocess
 import time
 
-# from urllib.request import urlopen
-
 
 BASEPATH = "/opt/redis-stack"
 BINDIR = os.path.join(BASEPATH, "bin")

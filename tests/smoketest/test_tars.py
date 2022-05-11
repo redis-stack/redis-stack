@@ -6,19 +6,17 @@ from mixins import RedisPackagingMixin, RedisTestMixin
 
 
 class TARTestBase(DockerTestEnv, RedisPackagingMixin, RedisTestMixin, object):
-    
     def uninstall(self, container):  # no relevence here
         pass
-    
+
     def install(self, container):
-        
+
         if getattr(self, "__precommands__", None):
             for cmd in self.__precommands__(self):
                 out, run = container.exec_run(cmd)
                 assert out == 0
 
-       
-         # untar the package in default location
+        # untar the package in default location
         res, out = container.exec_run(
             "tar -zxpf /build/redis-stack/redis-stack-server.tar.gz",
         )
@@ -46,7 +44,7 @@ class TARTestBase(DockerTestEnv, RedisPackagingMixin, RedisTestMixin, object):
         # validate the path now exists
         res, out = container.exec_run("ls /opt/redis-stack")
         assert res == 0
-       
+
 
 @pytest.mark.bionic
 class TestBionic(TARTestBase):
