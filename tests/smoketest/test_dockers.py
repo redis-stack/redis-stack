@@ -4,11 +4,11 @@ from urllib.request import urlopen
 
 import docker
 import pytest
-from env import DockerTestEnv
 from mixins import RedisInsightTestMixin, RedisPackagingMixin, RedisTestMixin
 
 
-class DockerTestBase(DockerTestEnv, RedisPackagingMixin, RedisTestMixin, object):
+class DockerTestBase(RedisPackagingMixin, RedisTestMixin, object):
+    
     @classmethod
     def setup_class(cls):
 
@@ -35,7 +35,10 @@ class DockerTestBase(DockerTestEnv, RedisPackagingMixin, RedisTestMixin, object)
             pass
         finally:
             container.remove()
-
+            
+    @property
+    def container(self):
+        return self.__CONTAINER__
 
 @pytest.mark.dockers_redis_stack
 class TestRedisStack(RedisInsightTestMixin, DockerTestBase):

@@ -1,12 +1,8 @@
-# from helpers import RedisTestMixin, ROOT
-# import os
 import subprocess
-
-# import time
+import abc
 import pytest
 from env import VagrantTestEnv
 from mixins import RedisPackagingMixin, RedisTestMixin
-
 
 class VagrantBase(VagrantTestEnv, RedisPackagingMixin, RedisTestMixin):
     pass

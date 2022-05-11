@@ -4,6 +4,7 @@ from mixins import RedisPackagingMixin, RedisTestMixin
 
 
 class RPMTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
+
     def install(self, container):
         res, out = container.exec_run("yum install -y epel-release tar")
         assert res == 0

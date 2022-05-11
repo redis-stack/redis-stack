@@ -4,6 +4,7 @@ from mixins import RedisPackagingMixin, RedisTestMixin
 
 
 class DEBTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
+
     def install(self, container):
         res, out = container.exec_run("apt update -q")
         assert res == 0

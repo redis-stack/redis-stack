@@ -5,15 +5,21 @@ from urllib.request import urlopen
 from helpers import assert_path_exists, stack_dockloader
 from redis.commands.search.field import TextField
 from redis.commands.search.query import Query
+import time
 
 
 class RedisInsightTestMixin:
     def test_basic_redisinsight(self):
         stack_dockloader(self)
-        c = urlopen("http://localhost:8001")
-        content = c.read().decode()
+        count = 0
+        while count < 10:
+            count +=1
+            try:
+                c = urlopen("http://localhost:8001")
+                content = c.read().decode()
+            except:
+                time.sleep(5)
         assert content.lower().find("redisinsight") != -1
-
 
 class RedisTestMixin:
     def test_basic_redis(self, r):
@@ -122,15 +128,7 @@ class RedisPackagingMixin:
         ]
 
         host_type = getattr(self, "HOST_TYPE", None)
-        if host_type is None:
-            for b in binaries:
-                r = subprocess.run(
-                    f"{self.basepath}/bin/{b} -h",
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
-                assert r.returncode in [0, 1]
-        elif host_type == "docker":
+        if host_type == "docker":
             for b in binaries:
                 res, out = self.container.exec_run(f"{self.basepath}/bin/{b} -h")
                 assert res in [0, 1]  # no segfault

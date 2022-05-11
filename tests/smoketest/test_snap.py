@@ -9,6 +9,7 @@ from mixins import RedisTestMixin
 
 @pytest.mark.snaps
 class TestRedisStackServerSnap(RedisTestMixin, object):
+
     @classmethod
     def setup_class(cls):
         if getpass.getuser() != "root":
