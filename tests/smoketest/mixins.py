@@ -126,7 +126,7 @@ class RedisPackagingMixin:
             for b in binaries:
                 r = subprocess.run(
                     f"{self.basepath}/bin/{b} -h",
-                    stout=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                 )
                 assert r.returncode in [0, 1]

@@ -643,7 +643,7 @@ jobs:
           invoke dockergen -d ${{ matrix.package }}
       - name: build docker
         run: |
-          docker build -f dockers/Dockerfile.${{ matrix.package }} -t redis/${{ matrix.package }}:testing .
+          docker build -f envs/dockers/Dockerfile.${{ matrix.package }} -t redis/${{ matrix.package }}:testing .
 
       - name: test docker build
         run: |
