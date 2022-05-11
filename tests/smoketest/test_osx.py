@@ -1,9 +1,42 @@
 import os
 import time
-from helpers import RedisTestMixin
+from helpers import BaseMetalPackagingMixin, RedisTestMixin, ROOT
 import platform
 import subprocess
 import time
+import pytest
+
+
+class OSXTestBase(BaseMetalPackagingMixin, RedisTestMixin, object):
+
+    @classmethod
+    def setup_class(cls):
+        for i in ['/opt/homebrew/redis-stack', '/usr/local/']:
+            if os.path.isfile(f"{i}/var/db/redis-stack/dump.rdb"):
+                os.unlink(f"{i}/var/db/redis-stack/dump.rdb")
+
+        rss_binary = f"{cls.BASEPATH}/bin/redis-stack-server"
+        print(os.getcwd())
+        print(rss_binary)
+        r = subprocess.Popen(
+            [rss_binary],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        cls.PROC = r.pid
+        time.sleep(2)
+        assert cls.PROC > 0
+
+    @classmethod
+    def teardown_class(cls):
+        subprocess.run(["pkill", "-TERM", "-P", str(cls.PROC)])
+        for i in ['/opt/homebrew/redis-stack', '/usr/local/']:
+            if os.path.isfile(f"{i}/var/db/redis-stack/dump.rdb"):
+                os.unlink(f"{i}/var/db/redis-stack/dump.rdb")
+@pytest.mark.macos
+class TestOSXZip(OSXTestBase):
+
+    BASEPATH = os.path.abspath(os.path.join(ROOT, 'redis-stack', 'redis-stack-server'))
 
 
 class TestOSX(RedisTestMixin, object):

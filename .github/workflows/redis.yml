@@ -195,6 +195,7 @@ jobs:
 
   # osx is the only one of these that is really
   build-package-osx:
+
     name: Mac (x86_64) Build
     env:
       arch: x86_64
@@ -328,17 +329,61 @@ jobs:
         cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
         zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
 
-    - name: persist the codesigned artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: codesigned-${{env.platform}}-${{env.arch}}
-        path: |
-          redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/*.zip
-
     - name: notarize the custom zip
       run: |
         cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
         sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
+
+  test-osx-intel:
+    name: Mac (x86_64) Tests
+    needs: ['build-package-osx']
+    runs-on: macos-latest
+    env:
+      arch: x86_64
+      osnick: catalina
+      target: zip
+      platform: catalina
+      osname: macos
+      pythonversion: 3.9
+
+    steps:
+    - name: install python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "${{ env.pythonversion }}"
+    - name: install poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-in-project: true
+        virtualenvs-create: true
+        installer-parallel: true
+    - name: checkout sources
+      uses: actions/checkout@v2
+    - name: install dependencies
+      run: |
+        brew install libomp openssl
+        poetry install
+    - name: gather artifacts
+      uses: actions/download-artifact@v2
+      with:
+        path: redis-stack 
+        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
+    - name: unzip the zipfile
+      run: |
+        ls -R
+        mkdir -p redis-stack
+        unzip redis-stack/redis-stack*.${{env.target}} -d redis-stack/redis-stack-server
+    - name: run osx tests
+      run: |
+        .venv/bin/pytest -m macos
+    - name: get package version
+      id: get_version
+      run: |
+        poetry install
+        source .venv/bin/activate
+        realversion=`invoke version`
+        echo "::set-output name=VERSION::$realversion"
 
     - uses: s3-actions/s3cmd@v1.1
       with:
@@ -346,9 +391,11 @@ jobs:
         region: us-east-1
         access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    - name: upload snapshots
+
+    - name: persist redis to s3
       run: |
-        s3cmd put -P redis-stack/s3dist/* s3://redismodules/redis-stack/snapshots/
+        s3cmd put -P redis-stack/redis-stack-server*.${{env.target}} \
+        s3://redismodules/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.${{env.target}}
 
   # the m1 requires a zip file so that homebrew can unpack it
   build-package-osx-m1:

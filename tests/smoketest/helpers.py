@@ -2,6 +2,7 @@ import os
 import time
 from redis.commands.search.query import Query
 from redis.commands.search.field import TextField
+import subprocess
 import docker
 from urllib.request import urlopen
 
@@ -111,7 +112,77 @@ class RedisTestMixin:
         assert "doc1" in docs
 
 
-class RedisPackagingMixin:
+class BaseMetalPackagingMixin:
+
+    @property
+    def basepath(self):
+        return self.BASEPATH
+
+    def test_binaries_present(self):
+        binaries = [
+            "redis-server",
+            "redis-stack-server",
+            "redis-cli",
+            "redis-benchmark",
+            "redis-check-rdb",
+            "redis-sentinel",
+            "redis-check-aof",
+        ]
+        for i in binaries:
+            assert os.path.isfile(os.path.join(self.basepath, 'bin', i))
+
+    def test_modules_present(self):
+        libs = [
+            "rejson.so",
+            "redisearch.so",
+            "redisgraph.so",
+            "redisbloom.so",
+            "redistimeseries.so",
+        ]
+        for i in libs:
+            assert os.path.isfile(os.path.join(self.basepath, 'lib', i))
+
+    def test_config_present(self):
+        assert os.path.isfile(os.path.join(self.basepath, 'etc', 'redis-stack.conf'))
+
+    def test_binaries_execute(self):
+        binaries = [
+            "redis-server",
+            "redis-cli",
+            "redis-benchmark",
+            "redis-check-rdb",
+            "redis-sentinel",
+            "redis-check-aof",
+        ]
+
+        for b in binaries:
+            binary = os.path.join(self.basepath, 'bin', b)
+            res = subprocess.run([binary, "-h"], capture_output=True)
+            assert res.returncode in [0, 1]  # no segfault
+
+        binary = os.path.join(self.basepath, 'bin', 'redis-stack-server')
+        res = subprocess.run([binary, "-h"], capture_output=True)
+        assert res.stderr.decode().lower().find("redis-stack-server") == -1
+
+
+class InDockerTestEnv(RedisTestMixin, object):
+
+    IN_DOCKER = True
+
+    @classmethod
+    def teardown_class(cls):
+        container = cls.env.containers.get(cls.CONTAINER_NAME)
+        try:
+            container.kill()
+        except docker.errors.APIError:
+            pass
+        finally:
+            container.remove()
+
+    @property
+    def container(self):
+        return self.__CONTAINER__
+
     @property
     def basepath(self):
         basepath = getattr(self, "BASEPATH", None)
@@ -171,22 +242,3 @@ class RedisPackagingMixin:
 
         res, out = self.container.exec_run(f"{self.basepath}/bin/redis-stack-server -h")
         assert out.decode().lower().find("redis-stack-server") != -1
-
-
-class InDockerTestEnv(RedisTestMixin, RedisPackagingMixin, object):
-
-    IN_DOCKER = True
-
-    @classmethod
-    def teardown_class(cls):
-        container = cls.env.containers.get(cls.CONTAINER_NAME)
-        try:
-            container.kill()
-        except docker.errors.APIError:
-            pass
-        finally:
-            container.remove()
-
-    @property
-    def container(self):
-        return self.__CONTAINER__
