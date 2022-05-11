@@ -5,7 +5,7 @@ from env import VagrantTestEnv
 from mixins import RedisPackagingMixin, RedisTestMixin
 
 class VagrantBase(VagrantTestEnv, RedisPackagingMixin, RedisTestMixin):
-    pass
+    """Tests inside a vagrant, to simulate machines, rather than dockers"""
 
 
 class DebVagrant(VagrantBase):

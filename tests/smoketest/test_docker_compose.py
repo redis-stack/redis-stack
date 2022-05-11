@@ -6,6 +6,7 @@ from mixins import RedisInsightTestMixin, RedisTestMixin
 
 
 class DockerComposeBase(RedisTestMixin, object):
+    """Test running our dockers through docker compose"""
 
     VERSION = os.getenv("VERSION", "edge")
     COMPOSEFILE = "/tmp/docker-compose.yml"

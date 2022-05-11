@@ -6,6 +6,7 @@ from mixins import RedisPackagingMixin, RedisTestMixin
 
 
 class TARTestBase(DockerTestEnv, RedisPackagingMixin, RedisTestMixin, object):
+    """Tests, in dockers for the downloadable tarballs"""
 
     def uninstall(self, container):  # no relevence here
         pass

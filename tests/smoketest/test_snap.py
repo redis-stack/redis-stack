@@ -9,6 +9,7 @@ from mixins import RedisTestMixin
 
 @pytest.mark.snaps
 class TestRedisStackServerSnap(RedisTestMixin, object):
+    """Tests for the snap images"""
 
     @classmethod
     def setup_class(cls):

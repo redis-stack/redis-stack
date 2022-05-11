@@ -4,10 +4,11 @@ from urllib.request import urlopen
 
 import docker
 import pytest
-from mixins import RedisInsightTestMixin, RedisPackagingMixin, RedisTestMixin
+from mixins import RedisInsightTestMixin, RedisTestMixin
 
 
-class DockerTestBase(RedisPackagingMixin, RedisTestMixin, object):
+class DockerTestBase(RedisTestMixin, object):
+    """Tests to support the dockers we build"""
     
     @classmethod
     def setup_class(cls):
