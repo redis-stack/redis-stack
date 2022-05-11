@@ -123,12 +123,13 @@ class RedisPackagingMixin:
 
         host_type = getattr(self, "HOST_TYPE", None)
         if host_type is None:
-            r = subprocess.run(
-                f"{self.basepath}/bin/{i} -h",
-                stout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            assert r.returncode in [0, 1]
+            for b in binaries:
+                r = subprocess.run(
+                    f"{self.basepath}/bin/{b} -h",
+                    stout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                )
+                assert r.returncode in [0, 1]
         elif host_type == "docker":
             for b in binaries:
                 res, out = self.container.exec_run(f"{self.basepath}/bin/{b} -h")
