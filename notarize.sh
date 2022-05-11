@@ -18,7 +18,7 @@ fi
 PACKAGE_ID=`xcrun altool --notarize-app --primary-bundle-id ${BUNDLE} --username "${USERNAME}" --password "${PASSWORD}" --file ${ZIPFILE}|grep RequestUUID|cut -d "=" -f 2-2`
 echo "Checking status for package ${PACKAGE_ID}"
 
-for i in `seq 1 10`; do
+for i in `seq 1 20`; do
     status=`xcrun altool --notarization-info ${PACKAGE_ID} --username "${USERNAME}" --password "${PASSWORD}"|grep "Status:" | cut -d ":" -f 2-2|awk '{print $1}'`
     echo "Status is - ${status}"
     if [ "${status}" == "invalid" ]; then
