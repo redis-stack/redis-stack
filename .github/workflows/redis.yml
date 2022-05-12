@@ -14,7 +14,7 @@ on:
 jobs:
 
   bionic:
-    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+    uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
     with:
       image_name: ubuntu:bionic
       platform: bionic
