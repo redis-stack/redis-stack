@@ -64,7 +64,6 @@ jobs:
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
     runs-on: ubuntu-latest
-    container: ${{inputs.image_name}}
     steps:
     - uses: actions/checkout@v2
       with:
