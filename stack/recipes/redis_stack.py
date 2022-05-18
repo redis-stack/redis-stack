@@ -1,11 +1,13 @@
-from . import Recipe
-from ..config import Config
-from ..components.modules import Modules
-from ..paths import Paths
+import os
+import shutil
+
 import requests
 from loguru import logger
-import shutil
-import os
+
+from ..components.modules import Modules
+from ..config import Config
+from ..paths import Paths
+from . import Recipe
 
 # FUTURE this is a placeholder for the package depending on packages, in Linux
 # This is not a real package

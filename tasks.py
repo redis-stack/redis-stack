@@ -58,8 +58,8 @@ def package_redis(c, version="", osname='macos', dist='monterey', publish=False,
 def dockergen(c, docker_type="redis-stack"):
     """Generate docker compile files"""
     here = os.path.abspath(os.path.dirname(__file__))
-    src = os.path.join("dockers", "dockerfile.tmpl")
-    dest = os.path.join(here, "dockers", f"Dockerfile.{docker_type}")
+    src = os.path.join("envs", "dockers", "dockerfile.tmpl")
+    dest = os.path.join(here, "envs", "dockers", f"Dockerfile.{docker_type}")
     loader = jinja2.FileSystemLoader(here)
     env = jinja2.Environment(loader=loader)
     tmpl = loader.load(name=src, environment=env)

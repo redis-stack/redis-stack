@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ -f /usr/bin/systemctl ]; then
-    systemctl stop redis-stack-server
+    systemctl stop redis-stack-server &>/dev/null
 fi
 
 for i in redis-cli redis-benchmark redis-check-aof redis-check-rdb redis-cli redis-sentinel redis-server redis-stack-server; do

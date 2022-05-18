@@ -1,16 +1,19 @@
-import pytest
-import docker
-import time
 import os
-from helpers import InDockerTestEnv, RedisInsightTestMixin
+import time
 from urllib.request import urlopen
 
+import docker
+import pytest
+from mixins import RedisInsightTestMixin, RedisTestMixin
 
-class DockerTestBase(InDockerTestEnv, object):
+
+class DockerTestBase(RedisTestMixin, object):
+    """Tests to support the dockers we build"""
+    
     @classmethod
     def setup_class(cls):
 
-        VERSION = os.getenv("REDIS_STACK_VERSION", "edge")
+        VERSION = os.getenv("VERSION", "edge")
         cls.env = docker.from_env()
         container = cls.env.containers.run(
             image=f"{cls.DOCKER_NAME}:{VERSION}",
@@ -24,8 +27,21 @@ class DockerTestBase(InDockerTestEnv, object):
         # time for the docker to settle
         time.sleep(3)
 
+    @classmethod
+    def teardown_class(cls):
+        container = cls.env.containers.get(cls.CONTAINER_NAME)
+        try:
+            container.kill()
+        except docker.errors.APIError:
+            pass
+        finally:
+            container.remove()
+            
+    @property
+    def container(self):
+        return self.__CONTAINER__
 
-@pytest.mark.dockers
+@pytest.mark.dockers_redis_stack
 class TestRedisStack(RedisInsightTestMixin, DockerTestBase):
 
     DOCKER_NAME = "redis/redis-stack"
@@ -33,7 +49,7 @@ class TestRedisStack(RedisInsightTestMixin, DockerTestBase):
     PORTMAP = {"6379/tcp": 6379, "8001/tcp": 8001}
 
 
-@pytest.mark.dockers
+@pytest.mark.dockers_redis_stack_server
 class TestRedisStackServer(DockerTestBase):
 
     DOCKER_NAME = "redis/redis-stack-server"
