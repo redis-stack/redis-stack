@@ -27,10 +27,7 @@ class NodeJS(object):
     def node_arch(self):
         if self.ARCH == "x86_64":
             return "x64"
-        else:
-            raise AttributeError(
-                f"Fetching NodeJS for {self.OSNICK} {self.ARCH} {self.OSNAME} is unsupported."
-            )
+        return self.ARCH
 
     @property
     def node_osname(self):
