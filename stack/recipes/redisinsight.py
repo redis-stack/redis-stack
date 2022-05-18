@@ -1,10 +1,12 @@
-from . import Recipe
-from ..config import Config
-from ..paths import Paths
-from ..components.nodejs import NodeJS
 import os
 import shutil
+
 from loguru import logger
+
+from ..components.nodejs import NodeJS
+from ..config import Config
+from ..paths import Paths
+from . import Recipe
 
 
 class RedisInsightBase(Recipe):
