@@ -13,8 +13,8 @@ on:
 
 jobs:
 
-  bionic:
-    uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
+  arm64_bionic:
+    uses: ./.github/actions/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
     with:
       image_name: ubuntu:bionic
       platform: bionic
@@ -31,6 +31,32 @@ jobs:
       GPG_KEY: ${{ secrets.GPG_KEY }}
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
+  arm64-focal-redisinsight-web:
+    uses: ./.github/actions/REDISIGHT_WEB_REUSABLE.yml
+    with:
+      platform: focal
+      osname: Linux
+      osnick: ubuntu20.04
+      arch: arm64
+      target: deb
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+
+  x86_64-focal-redisinsight-web:
+    uses: ./.github/actions/REDISIGHT_WEB_REUSABLE.yml
+    with:
+      platform: focal
+      osname: Linux
+      osnick: ubuntu20.04
+      target: deb
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
 
 #  focal-redisinsight-web:
@@ -121,23 +147,23 @@ jobs:
 #        run: |
 #          s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/
 #
-#  focal:
-#    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-#    with:
-#      image_name: ubuntu:focal
-#      platform: focal
-#      osname: Linux
-#      osnick: ubuntu20.04
-#      arch: x86_64
-#      target: deb
-#      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-#      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-#      redisversion: 7.0.0
-#    secrets:
-#      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#      GPG_KEY: ${{ secrets.GPG_KEY }}
-#      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+ focal:
+   uses: ./.github/actions/BUILD_AND_PACKAGE_REUSABLE.yml
+   with:
+     image_name: ubuntu:focal
+     platform: focal
+     osname: Linux
+     osnick: ubuntu20.04
+     arch: x86_64
+     target: deb
+     build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
+     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
+     redisversion: 7.0.0
+   secrets:
+     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+     GPG_KEY: ${{ secrets.GPG_KEY }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 #
 #  bionic:
 #    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
@@ -613,7 +639,7 @@ jobs:
 #      arch: x86_64
 #
 #    runs-on: ubuntu-latest
-#    needs: [focal, focal-redisinsight-web]
+#    needs: [focal, x86_64-focal-redisinsight-web]
 #    steps:
 #      - uses: actions/checkout@v2
 #      - name: install python
