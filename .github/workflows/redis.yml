@@ -32,7 +32,7 @@ jobs:
 #      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 #
   arm64-focal-redisinsight-web:
-    uses: ./.github/workflows/REDINSIGHT_WEB_REUSABLE.yml
+    uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
     with:
       platform: focal
       osname: Linux
@@ -46,7 +46,7 @@ jobs:
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   x86_64-focal-redisinsight-web:
-    uses: ./.github/workflows/REDINSIGHT_WEB_REUSABLE.yml
+    uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
     with:
       platform: focal
       osname: Linux
