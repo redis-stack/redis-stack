@@ -82,7 +82,7 @@ jobs:
      - name: build redisinsight-web
        run: |
          source .venv/bin/activate
-         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redisinsight-web
+         invoke package -o ${{inputs.osname}} -s ${{inputs.osnick}} -d ${{inputs.platform}} -a ${{inputs.arch}} -t ${{inputs.target}} -p redisinsight-web
 
      - name: install gpg key
        run: |
@@ -103,18 +103,18 @@ jobs:
          done
          rm -f .passfile
 
-     - name: perist ${{env.target}} package
+     - name: perist ${{inputs.target}} package
        uses: actions/upload-artifact@v2
        with:
-         name: redisinsight-web-${{env.platform}}-${{env.arch}}.${{env.target}}
+         name: redisinsight-web-${{inputs.platform}}-${{inputs.arch}}.${{inputs.target}}
          path: |
-           redisinsight-web*.${{env.target}}
+           redisinsight-web*.${{inputs.target}}
 
      - name: gather packages for s3 upload
        continue-on-error: true
        run: |
          mkdir -p s3uploads
-         cp *.${{env.target}} *.sha256 s3uploads
+         cp *.${{inputs.target}} *.sha256 s3uploads
      - uses: s3-actions/s3cmd@v1.1
        with:
          provider: aws
