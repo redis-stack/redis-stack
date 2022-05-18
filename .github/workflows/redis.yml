@@ -34,7 +34,7 @@ jobs:
   arm64-bionic-redisinsight-web:
     uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
     with:
-      platform: focal
+      platform: bionic
       osname: Linux
       osnick: ubuntu20.04
       arch: arm64
@@ -45,20 +45,19 @@ jobs:
       GPG_KEY: ${{ secrets.GPG_KEY }}
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
-#  x86_64-focal-redisinsight-web:
-#    uses: ./.github/actions/REDISINSIGHT_WEB_REUSABLE.yml
-#    with:
-#      platform: focal
-#      osname: Linux
-#      osnick: ubuntu20.04
-#      target: deb
-#    secrets:
-#      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#      GPG_KEY: ${{ secrets.GPG_KEY }}
-#      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
-#
-#
+  x86_64-focal-redisinsight-web:
+    uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
+    with:
+      platform: focal
+      osname: Linux
+      osnick: ubuntu20.04
+      target: deb
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+
 #  focal-redisinsight-web:
 #    runs-on: ubuntu-latest
 #    env:

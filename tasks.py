@@ -53,9 +53,10 @@ def package_redis(c, version="", osname='macos', dist='monterey', publish=False,
 @task(
     help={
         "docker_type": "docker type [redis-stack, redis-stack-server]",
+        "arch": "architectures [x86_64, arm64]"
     }
 )
-def dockergen(c, docker_type="redis-stack"):
+def dockergen(c, docker_type="redis-stack", arch="x86_64"):
     """Generate docker compile files"""
     here = os.path.abspath(os.path.dirname(__file__))
     src = os.path.join("envs", "dockers", "dockerfile.tmpl")
@@ -65,7 +66,7 @@ def dockergen(c, docker_type="redis-stack"):
     tmpl = loader.load(name=src, environment=env)
 
     p = Paths(None, None)
-    vars = {"docker_type": docker_type, "SHAREDIR": p.SHAREDIR}
+    vars = {"docker_type": docker_type, "SHAREDIR": p.SHAREDIR, "arch": arch}
     with open(dest, "w+") as fp:
         fp.write(tmpl.render(vars))
 
