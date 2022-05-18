@@ -1,13 +1,16 @@
-import pytest
-import os
 import getpass
+import os
 import subprocess
-from helpers import RedisTestMixin
 import time
+
+import pytest
+from mixins import RedisTestMixin
 
 
 @pytest.mark.snaps
 class TestRedisStackServerSnap(RedisTestMixin, object):
+    """Tests for the snap images"""
+
     @classmethod
     def setup_class(cls):
         if getpass.getuser() != "root":

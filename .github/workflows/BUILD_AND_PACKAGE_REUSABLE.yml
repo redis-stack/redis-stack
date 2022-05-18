@@ -28,10 +28,10 @@ on:
       packaging_deps:
         required: true
         type: string
-      redisversion: 
+      redisversion:
         required: false
         type: string
-      pythonversion: 
+      pythonversion:
         required: false
         type: string
         default: 3.9
@@ -159,10 +159,14 @@ jobs:
           virtualenvs-create: true
           installer-parallel: true
 
-      - name: install packaging tools
+      - name: install packaging and testing tools
         run: |
           sudo ${{inputs.packaging_deps}}
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install vagrant virtualbox
           poetry install
+
       - run: gem install fpm -v ${{env.fpmversion}}
       - uses: actions/download-artifact@v2
         with:
@@ -185,7 +189,7 @@ jobs:
           cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
 
       - name: get gpg id from key
-        id: get_gpg_id  
+        id: get_gpg_id
         run: |
           gpg_id=`gpg --list-keys|sed -n 4p|awk '{print $1}'`
           echo "::set-output name=GPG_ID::$gpg_id"
@@ -219,13 +223,13 @@ jobs:
             rm key
           fi
 
-      - name: run tests
+      - name: run tests in dockers
         run: |
           source .venv/bin/activate
           mkdir redis-stack
           cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
           cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
-          pytest -m ${{env.platform}}
+          pytest -m "${{env.platform}} and not physical"
 
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
@@ -259,3 +263,67 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') != true
         run: |
           s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/
+
+   physical_tests:
+    name: Test in VT-x
+    runs-on: macos-10.15
+    needs: [package]
+    env:
+      pythonversion: ${{inputs.pythonversion}}
+      platform: ${{inputs.platform}}
+      osname: ${{inputs.osname}}
+      osnick: ${{inputs.osnick}}
+      arch: ${{inputs.arch}}
+      target: ${{inputs.target}}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.vagrant.d/boxes
+          key: vagrant-${{inputs.platform}}-${{inputs.osname}}-${{inputs.osnick}}
+          restore-keys: vagrant-${{inputs.platform}}-${{inputs.osname}}-${{inputs.osnick}}
+      - run: vagrant --version
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+      - uses: s3-actions/s3cmd@v1.1
+        with:
+          provider: aws
+          region: us-east-1
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: install dependencies
+        run: |
+          poetry install
+      - name: get package version
+        id: get_version
+        run: |
+          poetry install
+          source .venv/bin/activate
+          realversion=`invoke version`
+          echo "::set-output name=VERSION::$realversion"
+      - uses: s3-actions/s3cmd@v1.1
+        with:
+          provider: aws
+          region: us-east-1
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: fetch package
+        run: |
+          mkdir redis-stack
+          cd redis-stack
+          s3cmd get s3://redismodules/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}.${{inputs.platform}}.${{inputs.arch}}.${{inputs.target}} redis-stack-server.${{inputs.target}}
+      - name: run tests in vagrants
+        run: |
+          source .venv/bin/activate
+          pytest -m "${{env.platform}} and physical"
