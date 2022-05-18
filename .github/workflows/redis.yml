@@ -14,7 +14,7 @@ on:
 jobs:
 
 #  arm64_bionic:
-#    uses: ./.github/actions/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
+#    uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
 #    with:
 #      image_name: ubuntu:bionic
 #      platform: bionic
@@ -32,7 +32,7 @@ jobs:
 #      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 #
   arm64-focal-redisinsight-web:
-    uses: ./.github/actions/REDISIGHT_WEB_REUSABLE.yml
+    uses: ./.github/workflows/REDISIGHT_WEB_REUSABLE.yml
     with:
       platform: focal
       osname: Linux
@@ -46,7 +46,7 @@ jobs:
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   x86_64-focal-redisinsight-web:
-    uses: ./.github/actions/REDISIGHT_WEB_REUSABLE.yml
+    uses: ./.github/workflows/REDISIGHT_WEB_REUSABLE.yml
     with:
       platform: focal
       osname: Linux
@@ -148,7 +148,7 @@ jobs:
 #          s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/
 #
   focal:
-    uses: ./.github/actions/BUILD_AND_PACKAGE_REUSABLE.yml
+    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
     with:
       image_name: ubuntu:focal
       platform: focal
