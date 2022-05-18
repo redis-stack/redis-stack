@@ -111,7 +111,7 @@ jobs:
       arch: x86_64
       target: deb
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-      packaging_deps: sudo apt-get install -y unzip dpkg-sig
+      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
       redisversion: 6.2.7
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -129,7 +129,7 @@ jobs:
       arch: x86_64
       target: deb
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-      packaging_deps: sudo apt-get install -y unzip dpkg-sig
+      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
       redisversion: 6.2.7
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -147,7 +147,7 @@ jobs:
       arch: x86_64
       target: deb
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-      packaging_deps: sudo apt-get install -y unzip dpkg-sig
+      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
       redisversion: 6.2.7
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -165,7 +165,7 @@ jobs:
       arch: x86_64
       target: rpm
       build_deps: yum install -y epel-release gcc make jemalloc-devel openssl-devel python3 python3-pip
-      packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2
+      packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2 curl
       redisversion: 6.2.7
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -185,7 +185,7 @@ jobs:
       build_deps: |
         dnf install -y oracle-epel-release-el8
         dnf install -y gcc make jemalloc-devel openssl-devel tar git python3 python3-pip
-      packaging_deps: sudo apt-get install -y rpm unzip
+      packaging_deps: sudo apt-get install -y rpm unzip curl gnupg2
       redisversion: 6.2.7
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -195,6 +195,7 @@ jobs:
 
   # osx is the only one of these that is really
   build-package-osx:
+
     name: Mac (x86_64) Build
     env:
       arch: x86_64
@@ -328,17 +329,61 @@ jobs:
         cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
         zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
 
-    - name: persist the codesigned artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: codesigned-${{env.platform}}-${{env.arch}}
-        path: |
-          redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/*.zip
-
     - name: notarize the custom zip
       run: |
         cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
         sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
+
+  test-osx-intel:
+    name: Mac (x86_64) Tests
+    needs: ['build-package-osx']
+    runs-on: macos-latest
+    env:
+      arch: x86_64
+      osnick: catalina
+      target: zip
+      platform: catalina
+      osname: macos
+      pythonversion: 3.9
+
+    steps:
+    - name: install python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "${{ env.pythonversion }}"
+    - name: install poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-in-project: true
+        virtualenvs-create: true
+        installer-parallel: true
+    - name: checkout sources
+      uses: actions/checkout@v2
+    - name: install dependencies
+      run: |
+        brew install libomp openssl
+        poetry install
+    - name: gather artifacts
+      uses: actions/download-artifact@v2
+      with:
+        path: redis-stack
+        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
+    - name: unzip the zipfile
+      run: |
+        ls -R
+        mkdir -p redis-stack
+        unzip redis-stack/redis-stack*.${{env.target}} -d redis-stack/redis-stack-server
+    - name: run osx tests
+      run: |
+        .venv/bin/pytest -m macos
+    - name: get package version
+      id: get_version
+      run: |
+        poetry install
+        source .venv/bin/activate
+        realversion=`invoke version`
+        echo "::set-output name=VERSION::$realversion"
 
     - uses: s3-actions/s3cmd@v1.1
       with:
@@ -346,9 +391,11 @@ jobs:
         region: us-east-1
         access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    - name: upload snapshots
+
+    - name: persist redis to s3
       run: |
-        s3cmd put -P redis-stack/s3dist/* s3://redismodules/redis-stack/snapshots/
+        s3cmd put -P redis-stack/redis-stack-server*.${{env.target}} \
+        s3://redismodules/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}.${{env.osnick}}.${{env.arch}}.${{env.target}}
 
   # the m1 requires a zip file so that homebrew can unpack it
   build-package-osx-m1:
@@ -395,6 +442,13 @@ jobs:
         gem install fpm -v ${{env.fpmversion}}
         poetry install
 
+### Once https://github.com/actions/runner/issues/805 is resolved we can do this ###
+### For now, this is how it is manually built, on the platform ###
+#    - name: build redis from source
+#      run: |
+#        cd redis
+#        make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a" CFLAGS="-I /opt/homebrew/opt/openssl@1.1/include"
+#
     - name: collect dependencies prior to packaging
       run: |
         source .venv/bin/activate
@@ -587,20 +641,22 @@ jobs:
         run: |
           source .venv/bin/activate
           invoke dockergen -d ${{ matrix.package }}
-      - name: Log in to DockreHub
+      - name: build docker
+        run: |
+          docker build -f envs/dockers/Dockerfile.${{ matrix.package }} -t redis/${{ matrix.package }}:testing .
+
+      - name: test docker build
+        run: |
+          matrixvar=`echo ${{matrix.package}}`
+          matrixdocker="${matrixvar//-/_}"
+          source .venv/bin/activate
+          VERSION=testing pytest -m dockers_$matrixdocker
+
+      - name: Log in to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: build docker
-        run: |
-          docker build -f dockers/Dockerfile.${{ matrix.package }} -t redis/${{ matrix.package }}:testing .
-
-      - name: test docker build
-        run: |
-          source .venv/bin/activate
-          pytest -m dockers
-
       - name: publish docker
         if: github.ref != 'refs/heads/master'
         run: |
@@ -609,4 +665,5 @@ jobs:
       - name: publish docker
         if: github.ref == 'refs/heads/master'
         run: |
+          docker tag redis/${{ matrix.package }}:testing redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
           docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
