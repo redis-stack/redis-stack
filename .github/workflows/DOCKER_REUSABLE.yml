@@ -1,0 +1,106 @@
+name: Docker
+
+on:
+  workflow_call:
+    inputs:
+      pythonversion:
+        required: false
+        type: string
+        default: 3.9
+      arch:
+        required: false
+        type: string
+        default: x86_64
+      platform:
+        required: true
+        type: string
+    secrets:
+      DOCKERHUB_TOKEN:
+        required: true
+      DOCKERHUB_USERNAME:
+        required: true
+
+jobs:
+
+  dockers:
+    name: ${{matrix.package}} docker
+    strategy:
+      matrix:
+        package: ['redis-stack-server', 'redis-stack']
+
+    runs-on: ubuntu-latest
+    needs: [${{inputs.platform}}, ${{inputs.arch}}-${{inputs.platform}}-redisinsight-web]
+    steps:
+      - uses: actions/checkout@v2
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{inputs.pythonversion}}
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            /var/cache/apt
+            /var/cache/yum
+            ~/.cache/pip
+            ~/.cache/pypoetry
+            ~/.local/share/gem
+          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{inputs.platform}}-${{inputs.arch}}-package
+
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: redis-stack-server-${{inputs.platform}}-${{inputs.arch}}.deb
+          path: redis-stack
+      - uses: actions/download-artifact@v2
+        with:
+          name: redisinsight-web-${{inputs.platform}}-${{inputs.arch}}.deb
+          path: redis-stack
+      - name: display structure
+        run: ls -R
+
+      - name: get package version
+        id: get_version
+        run: |
+          poetry install
+          source .venv/bin/activate
+          realversion=`invoke version -p ${{ matrix.package }} -d true`
+          echo "::set-output name=VERSION::$realversion"
+      - name: generate docker file
+        run: |
+          source .venv/bin/activate
+          invoke dockergen -d ${{ matrix.package }}
+      - name: build docker
+        if: ${{inputs.arch}} = "x86_64"
+        run: |
+          docker build -f envs/dockers/Dockerfile.${{ matrix.package }} -t redis/${{ matrix.package }}:testing .
+
+      - name: test docker build
+        run: |
+          matrixvar=`echo ${{matrix.package}}`
+          matrixdocker="${matrixvar//-/_}"
+          source .venv/bin/activate
+          VERSION=testing pytest -m dockers_$matrixdocker
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: publish docker
+        if: github.ref != 'refs/heads/master'
+        run: |
+          docker tag redis/${{ matrix.package }}:testing redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-edge
+          docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-edge
+      - name: publish docker
+        if: github.ref == 'refs/heads/master'
+        run: |
+          docker tag redis/${{ matrix.package }}:testing redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
+          docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}

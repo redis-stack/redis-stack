@@ -14,7 +14,7 @@ on:
 jobs:
 
   arm64_bionic:
-    uses: ./.github/actions/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
+    uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
     with:
       image_name: ubuntu:bionic
       platform: bionic
@@ -32,7 +32,7 @@ jobs:
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
   arm64-bionic-redisinsight-web:
-    uses: ./.github/actions/REDISINSIGHT_WEB_REUSABLE.yml
+    uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
     with:
       platform: focal
       osname: Linux
