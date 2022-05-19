@@ -87,12 +87,10 @@ jobs:
           source .venv/bin/activate
           invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:testing -r .
 
-      # - name: test docker build
-      #   run: |
-      #     matrixvar=`echo ${{matrix.package}}`
-      #     matrixdocker="${matrixvar//-/_}"
-      #     source .venv/bin/activate
-      #     VERSION=testing pytest -m dockers_$matrixdocker
+      - name: test docker build
+        run: |
+          source .venv/bin/activate
+          invoke test-ci-dockers -d ${{matrix.package}} -a ${{inputs.arch}} -v testing
 
       - name: Log in to DockerHub
         uses: docker/login-action@v1

@@ -32,6 +32,7 @@ class TestRHEL7(RPMTestBase):
 
     DOCKER_NAME = "centos:7"
     CONTAINER_NAME = "redis-stack-centos7"
+    PLATFORM = "linux/amd64"
 
 
 @pytest.mark.rhel8
@@ -39,3 +40,4 @@ class TestRHEL8(RPMTestBase):
 
     DOCKER_NAME = "oraclelinux:8"
     CONTAINER_NAME = "redis-stack-centos8"
+    PLATFORM = "linux/amd64"

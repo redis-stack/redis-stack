@@ -13,13 +13,14 @@ class RedisInsightTestMixin:
         stack_dockloader(self)
         count = 0
         while count < 10:
-            count +=1
+            count += 1
             try:
                 c = urlopen("http://localhost:8001")
                 content = c.read().decode()
             except:
                 time.sleep(5)
         assert content.lower().find("redisinsight") != -1
+
 
 class RedisTestMixin:
     def test_basic_redis(self, r):

@@ -229,7 +229,8 @@ jobs:
           mkdir redis-stack
           cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
           cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
-          pytest -m "${{env.platform}} and not physical"
+          # pytest -m "${{env.platform}} and not physical and not arm"
+          invoke test -m ${{env.platform}} -n physical -n arm
 
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
@@ -304,11 +305,11 @@ jobs:
   #         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   #     - name: install dependencies
   #       run: |
+  #         source .venv/bin/activate
   #         poetry install
   #     - name: get package version
   #       id: get_version
   #       run: |
-  #         poetry install
   #         source .venv/bin/activate
   #         realversion=`invoke version`
   #         echo "::set-output name=VERSION::$realversion"
@@ -326,4 +327,5 @@ jobs:
   #     - name: run tests in vagrants
   #       run: |
   #         source .venv/bin/activate
+  #         invoke test -m ${{env.platform}} -m physical -n arm
   #         pytest -m "${{env.platform}} and physical"
