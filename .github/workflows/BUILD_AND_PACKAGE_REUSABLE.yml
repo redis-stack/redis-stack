@@ -168,21 +168,21 @@ jobs:
           poetry install
 
       - run: gem install fpm -v ${{env.fpmversion}}
-      - uses: actions/download-artifact@v2
-        with:
-          name: redis-${{env.redisversion}}-${{env.platform}}
-          path: deps/redis-${{env.redisversion}}-${{env.platform}}
+      # - uses: actions/download-artifact@v2
+      #   with:
+      #     name: redis-${{env.redisversion}}-${{env.platform}}
+      #     path: deps/redis-${{env.redisversion}}-${{env.platform}}
       - name: display structure
         run: ls -R
       - name: build ${{matrix.package}}
         run: |
           source .venv/bin/activate
-          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
+          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p ${{ matrix.package }}
 
       - name: build downloadable tarball
         run: |
           source .venv/bin/activate
-          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t tar -p ${{ matrix.package }}
+          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t tar -p ${{ matrix.package }}
 
       - name: install gpg key
         run: |

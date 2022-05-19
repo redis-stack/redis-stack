@@ -45,6 +45,18 @@ jobs:
       GPG_KEY: ${{ secrets.GPG_KEY }}
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
+  arm64-docker:
+    uses: ./.github/workflows/DOCKER_REUSABLE.yml
+    needs: [arm64-bionic, arm64-bionic-redisinsight-web]
+    with:
+      pythonversion: 3.9
+      arch: arm64
+      platform: bionic
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
+
+
   x86_64-focal-redisinsight-web:
     uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
     with:
@@ -84,9 +96,52 @@ jobs:
       arch: x86_64
       platform: focal
     secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
 
+  docker-push:
+    needs: [x86_64-docker, arm64-docker]
+    name: Push ${{matrix.package}} manifest
+    strategy:
+      matrix:
+        package: ['redis-stack-server', 'redis-stack']
+    env:
+      pythonversion: 3.9
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{inputs.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+      - name: get package version
+        id: get_version
+        run: |
+          poetry install
+          source .venv/bin/activate
+          realversion=`invoke version -p ${{ matrix.package }} -d true`
+          echo "::set-output name=VERSION::$realversion"
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
+      - name: create the manifest
+        run: |
+          docker manifest create redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-edge \
+            redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-x86_64-edge \
+            redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-arm64-edge
+      - name: push the manifest
+        run: |
+          docker manifest push redisfab/${{matrix.package}}::${{steps.get_version.outputs.VERSION}}-edge
 
 #  bionic:
 #    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
