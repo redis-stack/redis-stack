@@ -76,6 +76,18 @@ jobs:
       GPG_KEY: ${{ secrets.GPG_KEY }}
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
+  x86_64-docker:
+    uses: ./.github/workflows/DOCKER_REUSABLE.yml
+    needs: [x86_64-focal, x86_64-focal-redisinsight-web]
+    with:
+      pythonversion: 3.9
+      arch: x86_64
+      platform: focal
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+
 #  bionic:
 #    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
 #    with:

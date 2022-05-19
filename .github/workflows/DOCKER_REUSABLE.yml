@@ -30,7 +30,6 @@ jobs:
         package: ['redis-stack-server', 'redis-stack']
 
     runs-on: ubuntu-latest
-    needs: [ ${{inputs.arch}}-${{inputs.platform}}, ${{inputs.arch}}-${{inputs.platform}}-redisinsight-web ]
     steps:
       - uses: actions/checkout@v2
       - name: install python
