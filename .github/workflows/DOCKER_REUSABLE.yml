@@ -54,6 +54,10 @@ jobs:
           virtualenvs-in-project: true
           virtualenvs-create: true
           installer-parallel: true
+      - name: Set up Docker Buildx      
+        uses: crazy-max/ghaction-docker-buildx@v1      
+        with:        
+          version: latest 
 
       - uses: actions/download-artifact@v2
         with:
@@ -78,9 +82,15 @@ jobs:
         run: |
           source .venv/bin/activate
           invoke dockergen -d ${{ matrix.package }}
-      - name: build docker
+      - name: build docker ${{inputs.arch}}
+        if: ${{inputs.arch}} == x86_64
         run: |
           docker build -f envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{ matrix.package }}:testing .
+
+      - name: build docker ${{inputs.arch}}
+        if: ${{inputs.arch}} == arm64
+        run: |
+          docker buildx build -f envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{ matrix.package }}:testing .
 
       # - name: test docker build
       #   run: |
