@@ -22,6 +22,7 @@ on:
 
 jobs:
 
+
   dockers:
     name: ${{matrix.package}} docker
     strategy:
@@ -29,7 +30,7 @@ jobs:
         package: ['redis-stack-server', 'redis-stack']
 
     runs-on: ubuntu-latest
-    needs: [${{inputs.platform}}, ${{inputs.arch}}-${{inputs.platform}}-redisinsight-web]
+    needs: [ ${{inputs.arch}}-${{inputs.platform}}, ${{inputs.arch}}-${{inputs.platform}}-redisinsight-web ]
     steps:
       - uses: actions/checkout@v2
       - name: install python
@@ -82,25 +83,25 @@ jobs:
         run: |
           docker build -f envs/dockers/Dockerfile.${{ matrix.package }} -t redis/${{ matrix.package }}:testing .
 
-      - name: test docker build
-        run: |
-          matrixvar=`echo ${{matrix.package}}`
-          matrixdocker="${matrixvar//-/_}"
-          source .venv/bin/activate
-          VERSION=testing pytest -m dockers_$matrixdocker
+      # - name: test docker build
+      #   run: |
+      #     matrixvar=`echo ${{matrix.package}}`
+      #     matrixdocker="${matrixvar//-/_}"
+      #     source .venv/bin/activate
+      #     VERSION=testing pytest -m dockers_$matrixdocker
 
-      - name: Log in to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: publish docker
-        if: github.ref != 'refs/heads/master'
-        run: |
-          docker tag redis/${{ matrix.package }}:testing redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-edge
-          docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-edge
-      - name: publish docker
-        if: github.ref == 'refs/heads/master'
-        run: |
-          docker tag redis/${{ matrix.package }}:testing redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
-          docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
+      # - name: Log in to DockerHub
+      #   uses: docker/login-action@v1
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - name: publish docker
+      #   if: github.ref != 'refs/heads/master'
+      #   run: |
+      #     docker tag redis/${{ matrix.package }}:testing redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-edge
+      #     docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-edge
+      # - name: publish docker
+      #   if: github.ref == 'refs/heads/master'
+      #   run: |
+      #     docker tag redis/${{ matrix.package }}:testing redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
+      #     docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}

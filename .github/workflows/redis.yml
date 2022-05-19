@@ -13,7 +13,7 @@ on:
 
 jobs:
 
-  arm64_bionic:
+  arm64-bionic:
     uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
     with:
       image_name: ubuntu:bionic
@@ -58,112 +58,24 @@ jobs:
       GPG_KEY: ${{ secrets.GPG_KEY }}
       GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
-#  focal-redisinsight-web:
-#    runs-on: ubuntu-latest
-#    env:
-#      platform: focal
-#      arch: x86_64
-#      target: deb
-#      osname: Linux
-#      osnick: ubuntu20.04
-#      pythonversion: 3.9
-#      fpmversion: 1.14.1
-#      rubyversion: 2.7.2
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Cache dependencies
-#        uses: actions/cache@v2
-#        with:
-#          path: |
-#            /var/cache/apt
-#            /var/cache/yum
-#            ~/.cache/pip
-#            ~/.cache/pypoetry
-#            ~/.local/share/gem
-#          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{inputs.platform}}-${{inputs.arch}}-package
-#
-#      - uses: ruby/setup-ruby@v1
-#      - name: install python
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: ${{env.pythonversion}}
-#      - name: install poetry
-#        uses: snok/install-poetry@v1
-#        with:
-#          version: latest
-#          virtualenvs-in-project: true
-#          virtualenvs-create: true
-#          installer-parallel: true
-#      - name: install packaging tools
-#        run: |
-#          sudo apt-get install unzip libterm-readkey-perl dpkg-sig
-#          poetry install
-#      - run: gem install fpm -v ${{env.fpmversion}}
-#
-#      - name: build redisinsight-web
-#        run: |
-#          source .venv/bin/activate
-#          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redisinsight-web
-#
-#      - name: install gpg key
-#        run: |
-#          cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
-#
-#      - name: get gpg id from key
-#        id: get_gpg_id
-#        run: |
-#          gpg_id=`gpg --list-keys|sed -n 4p|awk '{print $1}'`
-#          echo "::set-output name=GPG_ID::$gpg_id"
-#
-#      - name: gpg sign package
-#        run: |
-#          echo '${{secrets.GPG_PASSWORD}}' > .passfile
-#          dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{steps.get_gpg_id.outputs.GPG_ID}} *.deb
-#          for i in `ls *.deb`; do
-#            sha256sum $i |awk '{print $1}' > $i.sha256
-#          done
-#          rm -f .passfile
-#
-#      - name: perist ${{env.target}} package
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: redisinsight-web-${{env.platform}}-${{env.arch}}.${{env.target}}
-#          path: |
-#            redisinsight-web*.${{env.target}}
-#
-#      - name: gather packages for s3 upload
-#        continue-on-error: true
-#        run: |
-#          mkdir -p s3uploads
-#          cp *.${{env.target}} *.sha256 s3uploads
-#      - uses: s3-actions/s3cmd@v1.1
-#        with:
-#          provider: aws
-#          region: us-east-1
-#          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#      - name: upload snapshots
-#        run: |
-#          s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/
-#
-#  focal:
-#    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-#    with:
-#      image_name: ubuntu:focal
-#      platform: focal
-#      osname: Linux
-#      osnick: ubuntu20.04
-#      arch: x86_64
-#      target: deb
-#      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-#      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-#      redisversion: 7.0.0
-#    secrets:
-#      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#      GPG_KEY: ${{ secrets.GPG_KEY }}
-#      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
-#
+  x86_64-focal:
+    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+    with:
+      image_name: ubuntu:focal
+      platform: focal
+      osname: Linux
+      osnick: ubuntu20.04
+      arch: x86_64
+      target: deb
+      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
+      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
+      redisversion: 7.0.0
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+
 #  bionic:
 #    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
 #    with:
@@ -181,7 +93,7 @@ jobs:
 #      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 #      GPG_KEY: ${{ secrets.GPG_KEY }}
 #      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
-#
+
 #  xenial:
 #    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
 #    with:

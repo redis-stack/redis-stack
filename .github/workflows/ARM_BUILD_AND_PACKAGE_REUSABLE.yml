@@ -55,67 +55,67 @@ on:
 
 jobs:
 
-  build-redis:
-    name: Build ${{inputs.platform}} (${{inputs.arch}})
+  # build-redis:
+  #   name: Build ${{inputs.platform}} (${{inputs.arch}})
 
-    env:
-      redisversion: ${{inputs.redisversion}}
-      pythonversion: ${{inputs.pythonversion}}
-      fpmversion: ${{inputs.fpmversion}}
-      rubyversion: ${{inputs.rubyversion}}
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        repository: redis/redis
-        path: redis
-        ref: ${{env.redisversion}}
-    - name: Cache dependencies
-      uses: actions/cache@v2
-      with:
-        path: |
-          /var/cache/apt
-          /var/cache/yum
-        key: cache-${{hashFiles('.github/workflows/redis.yml')}}-${{inputs.platform}}-${{inputs.arch}}-build
-    - name: make
-      uses: uraimo/run-on-arch-action@v2
-      with:
-        arch: aarch64
-        distro: ubuntu18.04
-        install: ${{inputs.build_deps}}
-        run: |
-          make -C redis/src all BUILD_TLS=yes
-    - name: package redis for s3
-      run: |
-        mkdir redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
-        cp redis/src/redis-server \
-           redis/src/redis-sentinel \
-           redis/src/redis-check-aof \
-           redis/src/redis-check-rdb \
-           redis/src/redis-benchmark \
-           redis/src/redis-cli \
-           redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
-        tar -czvf redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
-           redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
-    - name: install s3cmd
-      run: |
-        pip3 install s3cmd
-    - name: persist redis to s3
-      run: |
-        s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
-          s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
+  #   env:
+  #     redisversion: ${{inputs.redisversion}}
+  #     pythonversion: ${{inputs.pythonversion}}
+  #     fpmversion: ${{inputs.fpmversion}}
+  #     rubyversion: ${{inputs.rubyversion}}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #     with:
+  #       repository: redis/redis
+  #       path: redis
+  #       ref: ${{env.redisversion}}
+  #   - name: Cache dependencies
+  #     uses: actions/cache@v2
+  #     with:
+  #       path: |
+  #         /var/cache/apt
+  #         /var/cache/yum
+  #       key: cache-${{hashFiles('.github/workflows/redis.yml')}}-${{inputs.platform}}-${{inputs.arch}}-build
+  #   - name: make
+  #     uses: uraimo/run-on-arch-action@v2
+  #     with:
+  #       arch: aarch64
+  #       distro: ubuntu18.04
+  #       install: ${{inputs.build_deps}}
+  #       run: |
+  #         make -C redis/src all BUILD_TLS=yes
+  #   - name: package redis for s3
+  #     run: |
+  #       mkdir redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
+  #       cp redis/src/redis-server \
+  #          redis/src/redis-sentinel \
+  #          redis/src/redis-check-aof \
+  #          redis/src/redis-check-rdb \
+  #          redis/src/redis-benchmark \
+  #          redis/src/redis-cli \
+  #          redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
+  #       tar -czvf redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
+  #          redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
+  #   - name: install s3cmd
+  #     run: |
+  #       pip3 install s3cmd
+  #   - name: persist redis to s3
+  #     run: |
+  #       s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
+  #         s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
 
-    - name: perist redis
-      uses: actions/upload-artifact@v2
-      with:
-        name: redis-${{env.redisversion}}-${{inputs.platform}}-${{inputs.arch}}
-        path: |
-          redis/src/redis-server
-          redis/src/redis-sentinel
-          redis/src/redis-check-aof
-          redis/src/redis-check-rdb
-          redis/src/redis-benchmark
-          redis/src/redis-cli
+  #   - name: perist redis
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       name: redis-${{env.redisversion}}-${{inputs.platform}}-${{inputs.arch}}
+  #       path: |
+  #         redis/src/redis-server
+  #         redis/src/redis-sentinel
+  #         redis/src/redis-check-aof
+  #         redis/src/redis-check-rdb
+  #         redis/src/redis-benchmark
+  #         redis/src/redis-cli
 
   package:
     name: Package ${{inputs.platform}} (${{inputs.arch}}) ${{matrix.package}}
@@ -130,7 +130,7 @@ jobs:
       arch: ${{inputs.arch}}
       target: ${{inputs.target}}
     runs-on: ubuntu-latest
-    needs: [build-redis]
+    # needs: [build-redis]
     strategy:
       matrix:
         package: ['redis-stack-server']  # add the matrix back if multiple packages are a thing againt
