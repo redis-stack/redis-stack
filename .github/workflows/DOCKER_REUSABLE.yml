@@ -84,6 +84,7 @@ jobs:
           invoke dockergen -d ${{ matrix.package }}
       - name: build docker
         run: |
+          source .venv/bin/activate
           invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:testing -r .
 
       # - name: test docker build
