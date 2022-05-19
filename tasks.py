@@ -5,6 +5,27 @@ import sys
 import jinja2
 from stack.paths import Paths
 
+@task(
+    help={
+        "dockerfile": "path to docker file",
+        "tag": "docker tag name",
+        "arch": "architecture (eg: x86_64)",
+        "root": "root for docker build",
+    }
+)
+def dockerbuild(c, dockerfile="envs/dockers/Dockerfile.redis-stack-server", tag="redisfab/redis-stack-server:testing", arch="x86_64", root="."):
+    """build the docker"""
+    if arch == "x86_64":
+        cmd = f"docker build -f {dockerfile} -t {tag} {root}"
+    elif arch == "arm64":
+        cmd = f"docker buildx build --platform linux/arm/v8 -f {dockerfile} -t {tag} {root}"
+    else:
+        sys.stderr.write(f"{arch} is an unsupported platform.\n")
+        sys.exit(3)
+    sys.stderr.write("Building docker using the command: \n")
+    sys.stderr.write(cmd)
+    run(cmd)
+
 
 @task
 def build_redis(c, redis_repo_path="redis", build_args="all build_tls=yes"):

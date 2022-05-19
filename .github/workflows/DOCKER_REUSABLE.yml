@@ -82,15 +82,9 @@ jobs:
         run: |
           source .venv/bin/activate
           invoke dockergen -d ${{ matrix.package }}
-      - name: build docker (x86_64)
-        if: inputs.arch == x86_64
+      - name: build docker
         run: |
-          docker build -f envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{ matrix.package }}:testing .
-
-      - name: build docker (arm64)
-        if: inputs.arch == arm64
-        run: |
-          docker buildx build --platform linux/arm/v8 -f envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{ matrix.package }}:testing .
+          invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:testing -r .
 
       # - name: test docker build
       #   run: |
