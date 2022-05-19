@@ -101,5 +101,5 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: publish docker
         run: |
-          docker tag redisfab/${{ matrix.package }}:testing redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}-edge
-          docker push redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}-edge
+          docker tag redisfab/${{ matrix.package }}:testing redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
+          docker push redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
