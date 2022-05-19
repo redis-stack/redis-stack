@@ -18,7 +18,7 @@ def dockerbuild(c, dockerfile="envs/dockers/Dockerfile.redis-stack-server", tag=
     if arch == "x86_64":
         cmd = f"docker build -f {dockerfile} -t {tag} {root}"
     elif arch == "arm64":
-        cmd = f"docker buildx build --platform linux/arm/v8 -f {dockerfile} -t {tag} {root}"
+        cmd = f"docker buildx build --platform linux/arm64 -f {dockerfile} -t {tag} {root}"
     else:
         sys.stderr.write(f"{arch} is an unsupported platform.\n")
         sys.exit(3)
