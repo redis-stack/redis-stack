@@ -5,7 +5,7 @@ from urllib.request import urlopen
 import docker
 import pytest
 from mixins import RedisInsightTestMixin, RedisTestMixin
-from tests.smoketest.env import DockerTestEnv
+from env import DockerTestEnv
 
 
 @pytest.mark.dockers_redis_stack
