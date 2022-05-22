@@ -25,15 +25,17 @@ def dockerbuild(
 ):
     """build the docker"""
     if arch == "x86_64":
-        cmd = f"docker build -f {dockerfile} -t {tag} {root}"
+        platform = "linux/amd64"
     elif arch == "arm64":
-        if buildx_push:
-            cmd = f"docker buildx build --push --platform linux/arm64 -f {dockerfile} -t {tag} {root}"
-        else:
-            cmd = f"docker buildx build --platform linux/arm64 -f {dockerfile} -t {tag} {root}"
-    else:
+        platform = "linux/arm64"
+    else
         sys.stderr.write(f"{arch} is an unsupported platform.\n")
         sys.exit(3)
+    
+    if buildx_push:
+        cmd = f"docker buildx build --push --platform {platform} -f {dockerfile} -t {tag} {root}"
+    else:
+        cmd = f"docker buildx build --platform {platform} -f {dockerfile} -t {tag} {root}"
     sys.stderr.write("Building docker using the command: \n")
     sys.stderr.write(cmd)
     run(cmd)
