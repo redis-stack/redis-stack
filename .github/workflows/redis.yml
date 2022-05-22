@@ -13,6 +13,7 @@ on:
 
 jobs:
 
+###################### ARM JOBS #########################
   arm64-bionic:
     uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
     with:
@@ -56,7 +57,18 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
 
+  # arm64-snap:
+  #   uses: ./.github/workflows/SNAP_REUSABLE.yml
+  #   needs: [arm64-bionic]
+  #   with:
+  #     arch: x86_64
+  #     platform: bionic
+  #     osnick: ubuntu18.04
+  #   secrets:
+  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+###################### AMD64 JOBS #########################
   x86_64-focal-redisinsight-web:
     uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
     with:
@@ -98,6 +110,17 @@ jobs:
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
+
+  # x86_64-snap:
+  #   uses: ./.github/workflows/SNAP_REUSABLE.yml
+  #   needs: [x86_64-focal]
+  #   with:
+  #     arch: x86_64
+  #     platform: focal
+  #     osnick: ubuntu20.04
+  #   secrets:
+  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   docker-push:
     needs: [x86_64-docker, arm64-docker]
@@ -141,7 +164,7 @@ jobs:
             redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-arm64
       - name: push the manifest
         run: |
-          docker manifest push redisfab/${{matrix.package}}::${{steps.get_version.outputs.VERSION}}
+          docker manifest push redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}
 
 ##################### PLACEHOLDER CHAYIM ##########################
 
@@ -538,158 +561,3 @@ jobs:
 #      run: |
 #        s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
 #        s3cmd put -P *.sha256 s3://redismodules/redis-stack/snapshots/
-#
-#  snap:
-#    name: ${{matrix.package}} snap
-#    runs-on: ubuntu-latest
-#    needs: [focal]
-#    strategy:
-#      matrix:
-#        package: ['redis-stack-server']
-#    env:
-#      platform: focal
-#      arch: x86_64
-#      osnick: ubuntu20.04
-#      target: snap
-#      osname: Linux
-#      pythonversion: 3.9
-#      fpmversion: 1.14.1
-#      rubyversion: 2.7.2
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: install python
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: ${{env.pythonversion}}
-#      - uses: ruby/setup-ruby@v1
-#
-#      - uses: actions/cache@v2
-#        with:
-#          path: |
-#            /var/cache/apt
-#            /var/cache/yum
-#            ~/.cache/pip
-#            ~/.cache/pypoetry
-#            ~/.local/share/gem
-#          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
-#
-#      - name: install poetry
-#        uses: snok/install-poetry@v1
-#        with:
-#          version: latest
-#          virtualenvs-in-project: true
-#          virtualenvs-create: true
-#          installer-parallel: true
-#      - name: install packaging tools
-#        run: |
-#          gem install fpm -v ${{env.fpmversion}}
-#          poetry install
-#      - name: build snap
-#        run: |
-#          source .venv/bin/activate
-#          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p ${{ matrix.package }}
-#          for i in `ls *.snap`; do
-#            sha256 $i | awk '{print $1}' > $i.sha256
-#          done
-#
-#      - name: validate packages
-#        run: |
-#          mkdir redis-stack
-#          cp *.snap redis-stack/${{ matrix.package }}.${{ env.target }}
-#          sudo .venv/bin/pytest -m snaps
-#
-#      - uses: s3-actions/s3cmd@v1.1
-#        with:
-#          provider: aws
-#          region: us-east-1
-#          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#      - name: upload snapshots
-#        run: |
-#          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
-#          s3cmd put -P *.sha256 s3://redismodules/redis-stack/snapshots/
-#
-#  dockers:
-#    name: ${{matrix.package}} docker
-#    strategy:
-#      matrix:
-#        package: ['redis-stack-server', 'redis-stack']
-#    env:
-#      platform: focal
-#      arch: x86_64
-#
-#    runs-on: ubuntu-latest
-#    needs: [focal, x86_64-focal-redisinsight-web]
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: install python
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: 3.9
-#
-#      - uses: actions/cache@v2
-#        with:
-#          path: |
-#            /var/cache/apt
-#            /var/cache/yum
-#            ~/.cache/pip
-#            ~/.cache/pypoetry
-#            ~/.local/share/gem
-#          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
-#
-#      - name: install poetry
-#        uses: snok/install-poetry@v1
-#        with:
-#          version: latest
-#          virtualenvs-in-project: true
-#          virtualenvs-create: true
-#          installer-parallel: true
-#
-#      - uses: actions/download-artifact@v2
-#        with:
-#          name: redis-stack-server-${{env.platform}}-${{env.arch}}.deb
-#          path: redis-stack
-#      - uses: actions/download-artifact@v2
-#        with:
-#          name: redisinsight-web-${{env.platform}}-${{env.arch}}.deb
-#          path: redis-stack
-#      - name: display structure
-#        run: ls -R
-#
-#      - name: get package version
-#        id: get_version
-#        run: |
-#          poetry install
-#          source .venv/bin/activate
-#          realversion=`invoke version -p ${{ matrix.package }} -d true`
-#          echo "::set-output name=VERSION::$realversion"
-#      - name: generate docker file
-#        run: |
-#          source .venv/bin/activate
-#          invoke dockergen -d ${{ matrix.package }}
-#      - name: build docker
-#        run: |
-#          docker build -f envs/dockers/Dockerfile.${{ matrix.package }} -t redis/${{ matrix.package }}:testing .
-#
-#      - name: test docker build
-#        run: |
-#          matrixvar=`echo ${{matrix.package}}`
-#          matrixdocker="${matrixvar//-/_}"
-#          source .venv/bin/activate
-#          VERSION=testing pytest -m dockers_$matrixdocker
-#
-#      - name: Log in to DockerHub
-#        uses: docker/login-action@v1
-#        with:
-#          username: ${{ secrets.DOCKERHUB_USERNAME }}
-#          password: ${{ secrets.DOCKERHUB_TOKEN }}
-#      - name: publish docker
-#        if: github.ref != 'refs/heads/master'
-#        run: |
-#          docker tag redis/${{ matrix.package }}:testing redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-edge
-#          docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-edge
-#      - name: publish docker
-#        if: github.ref == 'refs/heads/master'
-#        run: |
-#          docker tag redis/${{ matrix.package }}:testing redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
-#          docker push redis/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}
