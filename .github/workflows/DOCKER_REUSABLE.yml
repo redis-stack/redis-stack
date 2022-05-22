@@ -91,6 +91,7 @@ jobs:
         run: |
           source .venv/bin/activate
           invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:testing -r .
+          docker images
           docker tag redisfab/${{ matrix.package }}:testing redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
           docker push redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
 
