@@ -54,7 +54,7 @@ version: "3.9"
 services:
   redis:
     container_name: {self.DOCKER_IMAGE}-dockercompose
-    image: "redis/{self.DOCKER_IMAGE}:{self.VERSION}"
+    image: "redisfab/{self.DOCKER_IMAGE}:{self.VERSION}"
     ports:
       - 6379:6379
 """
@@ -112,7 +112,7 @@ version: "3.9"
 services:
   redis:
     container_name: {self.DOCKER_IMAGE}-dockercompose
-    image: "redis/{self.DOCKER_IMAGE}:{self.VERSION}"
+    image: "redisfab/{self.DOCKER_IMAGE}:{self.VERSION}"
     ports:
       - 6379:6379
       - 8001:8001
