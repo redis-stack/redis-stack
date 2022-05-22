@@ -81,22 +81,25 @@ jobs:
         run: |
           source .venv/bin/activate
           invoke dockergen -d ${{ matrix.package }}
-      - name: build docker
-        run: |
-          source .venv/bin/activate
-          invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:testing -r .
-
-      # - name: test docker build
-      #   run: |
-      #     source .venv/bin/activate
-      #     invoke test-ci-dockers -d ${{matrix.package}} -a ${{inputs.arch}} -v testing
 
       - name: Log in to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: publish docker
+      - name: build docker
         run: |
+          source .venv/bin/activate
+          invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:testing -r .
           docker tag redisfab/${{ matrix.package }}:testing redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
           docker push redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
+
+      # - name: test docker build
+      #   run: |
+      #     source .venv/bin/activate
+      #     invoke test-ci-dockers -d ${{matrix.package}} -a ${{inputs.arch}} -v testing
+
+      # - name: publish docker
+      #   run: |
+      #     docker tag redisfab/${{ matrix.package }}:testing redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
+      #     docker push redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
