@@ -3,10 +3,6 @@ name: Snap
 on:
   workflow_call:
     inputs:
-      osname:
-        required: true
-        type: string
-        default: Linux
       arch:
         required: false
         type: string
@@ -17,6 +13,10 @@ on:
       platform:
         required: true
         type: string
+      osname:
+        required: false
+        type: string
+        default: Linux
       pythonversion:
         required: false
         type: string
