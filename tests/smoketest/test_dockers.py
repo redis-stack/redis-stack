@@ -36,6 +36,10 @@ class TestRedisStackServer(RedisTestMixin, DockerTestEnv):
 @pytest.mark.arm
 class TestARMRedisStack(TestRedisStack):
     PLATFORM = "linux/arm64"
+    
+    def test_basic_redisinsight(self):
+        """Override for arm only"""
+        return
 
 
 @pytest.mark.dockers_redis_stack_server
