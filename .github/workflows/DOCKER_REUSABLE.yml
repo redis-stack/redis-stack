@@ -74,6 +74,7 @@ jobs:
           realversion=`invoke version -p ${{ matrix.package }} -d true`
           echo "::set-output name=VERSION::$realversion"
 
+      - uses: docker/setup-qemu-action@v2
       - uses: docker/setup-buildx-action@v2
 
       - name: generate docker file
