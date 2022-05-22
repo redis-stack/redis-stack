@@ -28,7 +28,7 @@ def dockerbuild(
         platform = "linux/amd64"
     elif arch == "arm64":
         platform = "linux/arm64"
-    else
+    else:
         sys.stderr.write(f"{arch} is an unsupported platform.\n")
         sys.exit(3)
     
