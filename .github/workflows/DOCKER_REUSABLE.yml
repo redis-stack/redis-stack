@@ -59,10 +59,10 @@ jobs:
         with:
           name: redis-stack-server-${{inputs.platform}}-${{inputs.arch}}.deb
           path: redis-stack
-      - uses: actions/download-artifact@v2
-        with:
-          name: redisinsight-web-${{inputs.platform}}-${{inputs.arch}}.deb
-          path: redis-stack
+      # - uses: actions/download-artifact@v2
+      #   with:
+      #     name: redisinsight-web-${{inputs.platform}}-${{inputs.arch}}.deb
+      #     path: redis-stack
       - name: display structure
         run: ls -R
 
