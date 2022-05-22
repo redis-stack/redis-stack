@@ -12,6 +12,7 @@ from stack.paths import Paths
         "tag": "docker tag name",
         "arch": "architecture (eg: x86_64)",
         "root": "root for docker build",
+        "buildx_push": "Set, to push during a buildx build",
     }
 )
 def dockerbuild(
@@ -20,12 +21,16 @@ def dockerbuild(
     tag="redisfab/redis-stack-server:testing",
     arch="x86_64",
     root=".",
+    buildx_push=False,
 ):
     """build the docker"""
     if arch == "x86_64":
         cmd = f"docker build -f {dockerfile} -t {tag} {root}"
     elif arch == "arm64":
-        cmd = f"docker buildx build --platform linux/arm64 -f {dockerfile} -t {tag} {root}"
+        if buildx_push:
+            cmd = f"docker buildx build --push --platform linux/arm64 -f {dockerfile} -t {tag} {root}"
+        else:
+            cmd = f"docker buildx build --platform linux/arm64 -f {dockerfile} -t {tag} {root}"
     else:
         sys.stderr.write(f"{arch} is an unsupported platform.\n")
         sys.exit(3)
