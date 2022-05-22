@@ -102,7 +102,7 @@ services:
 
 
 @pytest.mark.dockers_redis_stack
-class TestDockerComposeRedisStack(RedisInsightTestMixin, DockerComposeBase):
+class TestDockerComposeRedisStack(DockerComposeBase):
 
     DOCKER_IMAGE = "redis-stack"
 
