@@ -27,7 +27,7 @@ jobs:
     name: ${{matrix.package}} docker
     strategy:
       matrix:
-        package: ['redis-stack-server'] #, 'redis-stack']
+        package: ['redis-stack-server', 'redis-stack']
 
     runs-on: ubuntu-latest
     steps:
@@ -59,10 +59,10 @@ jobs:
         with:
           name: redis-stack-server-${{inputs.platform}}-${{inputs.arch}}.deb
           path: redis-stack
-      # - uses: actions/download-artifact@v2
-      #   with:
-      #     name: redisinsight-web-${{inputs.platform}}-${{inputs.arch}}.deb
-      #     path: redis-stack
+      - uses: actions/download-artifact@v2
+        with:
+          name: redisinsight-web-${{inputs.platform}}-${{inputs.arch}}.deb
+          path: redis-stack
       - name: display structure
         run: ls -R
 
@@ -92,12 +92,7 @@ jobs:
           source .venv/bin/activate
           invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}} -r . -b
 
-      # - name: test docker build
-      #   run: |
-      #     source .venv/bin/activate
-      #     invoke test-ci-dockers -d ${{matrix.package}} -a ${{inputs.arch}} -v testing
-
-      # - name: publish docker
-      #   run: |
-      #     docker tag redisfab/${{ matrix.package }}:testing redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
-      #     docker push redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
+      - name: test docker build
+        run: |
+          source .venv/bin/activate
+          invoke test-ci-dockers -d ${{matrix.package}} -a ${{inputs.arch}} -v ${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
