@@ -178,6 +178,14 @@ class Recipe(object):
     def snap(self, fpmargs, distribution):
         snap_grade = "stable"
         snap_confinement = "classic"
+        
+        # this can change, once we build focal for arm
+        if self.ARCH == "arm64":
+            snap_arch = "arm64"
+            snap_base = "core18"
+        else:
+            snap_arch = "amd64"
+            snap_base = "core20"
 
         vars = {
             "PRODUCT": self.C.get_key(self.PACKAGE_NAME)["product"],
@@ -186,6 +194,8 @@ class Recipe(object):
             "DESCRIPTION": self.C.get_key(self.PACKAGE_NAME)["description"],
             "SNAP_GRADE": snap_grade,
             "SNAP_CONFINEMENT": snap_confinement,
+            "SNAP_BASE": snap_base,
+            "SNAP_ARCH": snap_arch,
             "basedir": self.__PATHS__.BASEDIR,
         }
 
