@@ -170,10 +170,6 @@ jobs:
          poetry install
 
      - run: gem install fpm -v ${{env.fpmversion}}
-    #  - uses: actions/download-artifact@v2
-    #    with:
-    #      name: redis-${{env.redisversion}}-${{env.platform}}-${{inputs.arch}}
-    #      path: deps/redis-${{env.redisversion}}-${{env.platform}}
      - name: display structure
        run: ls -R
      - name: build ${{matrix.package}}
@@ -225,14 +221,14 @@ jobs:
            rm key
          fi
 
-#      - name: run tests in dockers
-#        run: |
-#          source .venv/bin/activate
-#          mkdir redis-stack
-#          cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
-#          cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
-#          pytest -m "${{env.platform}} and not physical"
-#
+     - name: run tests
+       run: |
+         source .venv/bin/activate
+         mkdir redis-stack
+         cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
+         cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
+         invokce test -m ${{env.platform}} -m arm -n physical
+
      - name: perist ${{env.target}} package
        uses: actions/upload-artifact@v2
        with:
