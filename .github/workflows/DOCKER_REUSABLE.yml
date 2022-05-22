@@ -45,7 +45,7 @@ jobs:
             ~/.cache/pip
             ~/.cache/pypoetry
             ~/.local/share/gem
-          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{inputs.platform}}-${{inputs.arch}}-package
+          key: pypoetry-${{hashFiles('**/pyproject.toml', '.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.arch}}-package
 
       - name: install poetry
         uses: snok/install-poetry@v1

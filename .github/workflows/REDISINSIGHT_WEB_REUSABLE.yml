@@ -61,7 +61,7 @@ jobs:
            ~/.cache/pip
            ~/.cache/pypoetry
            ~/.local/share/gem
-         key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{inputs.platform}}-${{inputs.arch}}-package
+         key: pypoetry-${{hashFiles('**/pyproject.toml', '.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.arch}}-package
      - uses: ruby/setup-ruby@v1
      - name: install python
        uses: actions/setup-python@v2
