@@ -54,10 +54,6 @@ jobs:
           virtualenvs-in-project: true
           virtualenvs-create: true
           installer-parallel: true
-      - name: Set up Docker Buildx      
-        uses: crazy-max/ghaction-docker-buildx@v1      
-        with:        
-          version: latest 
 
       - uses: actions/download-artifact@v2
         with:
@@ -77,6 +73,8 @@ jobs:
           source .venv/bin/activate
           realversion=`invoke version -p ${{ matrix.package }} -d true`
           echo "::set-output name=VERSION::$realversion"
+
+      - uses: docker/setup-buildx-action@v2
 
       - name: generate docker file
         run: |
