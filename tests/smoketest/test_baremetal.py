@@ -81,6 +81,12 @@ class TestXenial(DebVagrant):
     OSNICK = "xenial"
 
 
+@pytest.mark.bullseye
+@pytest.mark.physical
+class TestBullseye(DebVagrant):
+
+    OSNICK = "bullseye"
+
 @pytest.mark.rhel7
 @pytest.mark.physical
 class TestCentos7(RPMVagrant):
