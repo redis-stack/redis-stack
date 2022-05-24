@@ -26,6 +26,7 @@ markers = [
     "xenial: ubuntu xenial tests",
     "bionic: ubuntu bionic tests",
     "focal: ubuntu focal tests",
+    "bullseye: bullseye tests",
     "rhel7: RedHat 7 (rhel7) tests",
     "rhel8: RedHat 8 (rhel8) tests",
     "physical: run tests within a vagrant image",

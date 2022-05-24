@@ -52,3 +52,9 @@ class TestFocal(DEBTestBase):
 
     DOCKER_NAME = "ubuntu:focal"
     CONTAINER_NAME = "redis-stack-focal"
+
+@pytest.mark.bullseye
+class TestBullseye(DEBTestBase):
+
+    DOCKER_NAME = "debian:bullseye-slim"
+    CONTAINER_NAME = "redis-stack-bullseye"
