@@ -6,6 +6,7 @@ from helpers import assert_path_exists, stack_dockloader
 from redis.commands.search.field import TextField
 from redis.commands.search.query import Query
 import time
+import requests
 
 
 class RedisInsightTestMixin:
@@ -15,8 +16,10 @@ class RedisInsightTestMixin:
         max_count = 30
         count = 0
         content = ""
-        c = urlopen("http://localhost:8001")
-        content = c.read().decode()
+        #c = urlopen("http://localhost:8001")
+        #content = c.read().decode()
+        c = requests.get("http://localhost:8001", timeout=30)
+        content = c.content.decode()
         assert content.lower().find("redisinsight") != -1
 
 
