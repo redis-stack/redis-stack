@@ -265,67 +265,66 @@ jobs:
         run: |
           s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/
 
-  #  physical_tests:
-  #   name: Test in VT-x
-  #   runs-on: macos-10.15
-  #   needs: [package]
-  #   env:
-  #     pythonversion: ${{inputs.pythonversion}}
-  #     platform: ${{inputs.platform}}
-  #     osname: ${{inputs.osname}}
-  #     osnick: ${{inputs.osnick}}
-  #     arch: ${{inputs.arch}}
-  #     target: ${{inputs.target}}
+   physical_tests:
+    name: Test in VT-x
+    runs-on: macos-10.15
+    needs: [package]
+    env:
+      pythonversion: ${{inputs.pythonversion}}
+      platform: ${{inputs.platform}}
+      osname: ${{inputs.osname}}
+      osnick: ${{inputs.osnick}}
+      arch: ${{inputs.arch}}
+      target: ${{inputs.target}}
 
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Cache
-  #       uses: actions/cache@v2
-  #       with:
-  #         path: ~/.vagrant.d/boxes
-  #         key: vagrant-${{inputs.platform}}-${{inputs.osname}}-${{inputs.osnick}}
-  #         restore-keys: vagrant-${{inputs.platform}}-${{inputs.osname}}-${{inputs.osnick}}
-  #     - run: vagrant --version
-  #     - name: install python
-  #       uses: actions/setup-python@v2
-  #       with:
-  #         python-version: ${{env.pythonversion}}
-  #     - name: install poetry
-  #       uses: snok/install-poetry@v1
-  #       with:
-  #         version: latest
-  #         virtualenvs-in-project: true
-  #         virtualenvs-create: true
-  #         installer-parallel: true
-  #     - uses: s3-actions/s3cmd@v1.1
-  #       with:
-  #         provider: aws
-  #         region: us-east-1
-  #         access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #     - name: install dependencies
-  #       run: |
-  #         source .venv/bin/activate
-  #         poetry install
-  #     - name: get package version
-  #       id: get_version
-  #       run: |
-  #         source .venv/bin/activate
-  #         realversion=`invoke version`
-  #         echo "::set-output name=VERSION::$realversion"
-  #     - uses: s3-actions/s3cmd@v1.1
-  #       with:
-  #         provider: aws
-  #         region: us-east-1
-  #         access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #     - name: fetch package
-  #       run: |
-  #         mkdir redis-stack
-  #         cd redis-stack
-  #         s3cmd get s3://redismodules/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}.${{inputs.platform}}.${{inputs.arch}}.${{inputs.target}} redis-stack-server.${{inputs.target}}
-  #     - name: run tests in vagrants
-  #       run: |
-  #         source .venv/bin/activate
-  #         invoke test -m ${{env.platform}} -m physical -n arm
-  #         pytest -m "${{env.platform}} and physical"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.vagrant.d/boxes
+          key: vagrant-${{inputs.platform}}-${{inputs.osname}}-${{inputs.osnick}}
+          restore-keys: vagrant-${{inputs.platform}}-${{inputs.osname}}-${{inputs.osnick}}
+      - run: vagrant --version
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{env.pythonversion}}
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+      - uses: s3-actions/s3cmd@v1.1
+        with:
+          provider: aws
+          region: us-east-1
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: install dependencies
+        run: |
+          source .venv/bin/activate
+          poetry install
+      - name: get package version
+        id: get_version
+        run: |
+          source .venv/bin/activate
+          realversion=`invoke version`
+          echo "::set-output name=VERSION::$realversion"
+      - uses: s3-actions/s3cmd@v1.1
+        with:
+          provider: aws
+          region: us-east-1
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: fetch package
+        run: |
+          mkdir redis-stack
+          cd redis-stack
+          s3cmd get s3://redismodules/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}.${{inputs.platform}}.${{inputs.arch}}.${{inputs.target}} redis-stack-server.${{inputs.target}}
+      - name: run tests in vagrants
+        run: |
+          source .venv/bin/activate
+          invoke test -m ${{env.platform}} -m physical -n arm
