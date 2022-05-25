@@ -305,6 +305,7 @@ jobs:
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: install dependencies
         run: |
+          python -m venv .venv
           source .venv/bin/activate
           poetry install
       - name: get package version
