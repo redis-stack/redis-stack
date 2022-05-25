@@ -4,7 +4,6 @@ from mixins import RedisPackagingMixin, RedisTestMixin
 
 
 class DEBTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
-
     def install(self, container):
         res, out = container.exec_run("apt update -q")
         assert res == 0
@@ -38,6 +37,7 @@ class TestXenial(DEBTestBase):
 
     DOCKER_NAME = "ubuntu:xenial"
     CONTAINER_NAME = "redis-stack-xenial"
+    PLATFORM = "linux/amd64"
 
 
 @pytest.mark.bionic
@@ -45,6 +45,13 @@ class TestBionic(DEBTestBase):
 
     DOCKER_NAME = "ubuntu:bionic"
     CONTAINER_NAME = "redis-stack-bionic"
+    PLATFORM = "linux/amd64"
+
+
+@pytest.mark.bionic
+@pytest.mark.arm
+class TestARMBionic(TestBionic):
+    PLATFORM = "linux/arm64"
 
 
 @pytest.mark.focal
@@ -52,9 +59,11 @@ class TestFocal(DEBTestBase):
 
     DOCKER_NAME = "ubuntu:focal"
     CONTAINER_NAME = "redis-stack-focal"
+    PLATFORM = "linux/amd64"
 
 @pytest.mark.bullseye
 class TestBullseye(DEBTestBase):
 
     DOCKER_NAME = "debian:bullseye-slim"
     CONTAINER_NAME = "redis-stack-bullseye"
+    PLATFORM = "linux/amd64"

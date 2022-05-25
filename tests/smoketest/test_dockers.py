@@ -5,57 +5,57 @@ from urllib.request import urlopen
 import docker
 import pytest
 from mixins import RedisInsightTestMixin, RedisTestMixin
+from env import DockerTestEnv
 
-
-class DockerTestBase(RedisTestMixin, object):
-    """Tests to support the dockers we build"""
-    
-    @classmethod
-    def setup_class(cls):
-
-        VERSION = os.getenv("VERSION", "edge")
-        cls.env = docker.from_env()
-        container = cls.env.containers.run(
-            image=f"{cls.DOCKER_NAME}:{VERSION}",
-            name=cls.CONTAINER_NAME,
-            detach=True,
-            publish_all_ports=True,
-            ports=cls.PORTMAP,
-        )
-        cls.__CONTAINER__ = container
-
-        # time for the docker to settle
-        time.sleep(3)
-
-    @classmethod
-    def teardown_class(cls):
-        container = cls.env.containers.get(cls.CONTAINER_NAME)
-        try:
-            container.kill()
-        except docker.errors.APIError:
-            pass
-        finally:
-            container.remove()
-            
-    @property
-    def container(self):
-        return self.__CONTAINER__
 
 @pytest.mark.dockers_redis_stack
-class TestRedisStack(RedisInsightTestMixin, DockerTestBase):
+class TestRedisStack(RedisInsightTestMixin, RedisTestMixin, DockerTestEnv):
 
-    DOCKER_NAME = "redis/redis-stack"
+    VERSION = os.getenv("VERSION", "edge")
     CONTAINER_NAME = "redis-stack"
+    DOCKER_NAME = f"redisfab/{CONTAINER_NAME}:{VERSION}"
     PORTMAP = {"6379/tcp": 6379, "8001/tcp": 8001}
+    PLATFORM = "linux/amd64"
 
 
 @pytest.mark.dockers_redis_stack_server
-class TestRedisStackServer(DockerTestBase):
+class TestRedisStackServer(RedisTestMixin, DockerTestEnv):
 
-    DOCKER_NAME = "redis/redis-stack-server"
+    VERSION = os.getenv("VERSION", "edge")
     CONTAINER_NAME = "redis-stack-server"
+    DOCKER_NAME = f"redisfab/{CONTAINER_NAME}:{VERSION}"
     PORTMAP = {"6379/tcp": 6379, "8001/tcp": 8001}
+    PLATFORM = "linux/amd64"
 
     def test_no_redisinsight(self):
         with pytest.raises(ConnectionError):
             urlopen("http://localhost:8001")
+
+
+@pytest.mark.dockers_redis_stack
+@pytest.mark.arm
+class TestARMRedisStack(TestRedisStack):
+    PLATFORM = "linux/arm64"
+
+    def test_basic_redisinsight(self):
+        # override redisinsight test due to limitations
+        # in github actions within qemu
+        try:
+            c = urlopen("http://localhost:8001")
+            content = c.read().decode()
+            assert content.lower().find("redisinsight") != -1
+        except ConnectionResetError:  # fine, qemu break case attempt
+            self.container.exec_run("apt install -y curl")
+            res, out = self.container.exec_run("curl http://localhost:8001")
+            try:
+                assert out.decode().strip().lower().find("redisinsight") != -1
+            except AssertionError:  # if in docker we can't, validate process runs, trust team tests
+                res, out = self.container.exec_run("ps -ef") # there are no pipes in exec_run contexts
+                assert out.decode().strip().lower().find("nodejs") != -1
+
+
+
+@pytest.mark.dockers_redis_stack_server
+@pytest.mark.arm
+class TestARMRedisStackServer(TestRedisStackServer):
+    PLATFORM = "linux/arm64"

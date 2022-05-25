@@ -53,6 +53,7 @@ class TestBionic(TARTestBase):
 
     DOCKER_NAME = "ubuntu:bionic"
     CONTAINER_NAME = "redis-stack-bionic"
+    PLATFORM = "linux/amd64"
 
     def __precommands__(self):
         return [
@@ -61,11 +62,18 @@ class TestBionic(TARTestBase):
         ]
 
 
+@pytest.mark.bionic
+@pytest.mark.arm
+class TestARMBionic(TestBionic):
+    PLATFORM = "linux/amd64"
+
+
 @pytest.mark.xenial
 class TestXenial(TARTestBase):
 
     DOCKER_NAME = "ubuntu:xenial"
     CONTAINER_NAME = "redis-stack-xenial"
+    PLATFORM = "linux/amd64"
 
     def __precommands__(self):
         return [
@@ -79,6 +87,7 @@ class TestFocal(TARTestBase):
 
     DOCKER_NAME = "ubuntu:focal"
     CONTAINER_NAME = "redis-stack-focal"
+    PLATFORM = "linux/amd64"
 
     def __precommands__(self):
         return [
@@ -92,6 +101,7 @@ class TestCentos7(TARTestBase):
 
     DOCKER_NAME = "centos:7"
     CONTAINER_NAME = "redis-stack-centos7"
+    PLATFORM = "linux/amd64"
 
     def __precommands__(self):
         return [
@@ -105,6 +115,7 @@ class TestCentos8(TARTestBase):
 
     DOCKER_NAME = "oraclelinux:8"
     CONTAINER_NAME = "redis-stack-centos8"
+    PLATFORM = "linux/amd64"
 
     def __precommands__(self):
         return [

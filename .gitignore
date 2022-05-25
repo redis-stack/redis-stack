@@ -8,6 +8,7 @@ out
 __pycache__
 .vscode
 dockers/Docker*
+Dockerfile.*
 
 # packages
 *.deb

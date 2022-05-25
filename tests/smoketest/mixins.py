@@ -9,17 +9,13 @@ import time
 
 
 class RedisInsightTestMixin:
+
     def test_basic_redisinsight(self):
         stack_dockloader(self)
-        count = 0
-        while count < 10:
-            count +=1
-            try:
-                c = urlopen("http://localhost:8001")
-                content = c.read().decode()
-            except:
-                time.sleep(5)
+        c = urlopen("http://localhost:8001")
+        content = c.read().decode()
         assert content.lower().find("redisinsight") != -1
+
 
 class RedisTestMixin:
     def test_basic_redis(self, r):

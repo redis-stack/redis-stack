@@ -79,7 +79,7 @@ jobs:
         path: |
           /var/cache/apt
           /var/cache/yum
-        key: cache-${{hashFiles('.github/workflows/redis.yml')}}-${{inputs.platform}}-${{inputs.arch}}-build
+        key: cache-${{hashFiles('.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.arch}}-build
     - name: make
       run: make -C redis/src all BUILD_TLS=yes
     - name: package redis for s3
@@ -144,7 +144,7 @@ jobs:
             ~/.cache/pip
             ~/.cache/pypoetry
             ~/.local/share/gem
-          key: pypoetry-${{hashFiles('pyproject.toml')}}-${{inputs.platform}}-${{inputs.arch}}-package
+          key: pypoetry-${{hashFiles('pyproject.toml', '.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.arch}}-package
 
       - uses: ruby/setup-ruby@v1
       - name: install python
@@ -168,21 +168,21 @@ jobs:
           poetry install
 
       - run: gem install fpm -v ${{env.fpmversion}}
-      - uses: actions/download-artifact@v2
-        with:
-          name: redis-${{env.redisversion}}-${{env.platform}}
-          path: deps/redis-${{env.redisversion}}-${{env.platform}}
+      # - uses: actions/download-artifact@v2
+      #   with:
+      #     name: redis-${{env.redisversion}}-${{env.platform}}
+      #     path: deps/redis-${{env.redisversion}}-${{env.platform}}
       - name: display structure
         run: ls -R
       - name: build ${{matrix.package}}
         run: |
           source .venv/bin/activate
-          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t ${{env.target}} -p ${{ matrix.package }}
+          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p ${{ matrix.package }}
 
       - name: build downloadable tarball
         run: |
           source .venv/bin/activate
-          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r deps/redis-${{env.redisversion}}-${{env.platform}} -t tar -p ${{ matrix.package }}
+          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t tar -p ${{ matrix.package }}
 
       - name: install gpg key
         run: |
@@ -229,7 +229,8 @@ jobs:
           mkdir redis-stack
           cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
           cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
-          pytest -m "${{env.platform}} and not physical"
+          # pytest -m "${{env.platform}} and not physical and not arm"
+          invoke test -m ${{env.platform}} -n physical -n arm
 
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
@@ -304,11 +305,12 @@ jobs:
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: install dependencies
         run: |
+          python -m venv .venv
+          source .venv/bin/activate
           poetry install
       - name: get package version
         id: get_version
         run: |
-          poetry install
           source .venv/bin/activate
           realversion=`invoke version`
           echo "::set-output name=VERSION::$realversion"
@@ -326,4 +328,4 @@ jobs:
       - name: run tests in vagrants
         run: |
           source .venv/bin/activate
-          pytest -m "${{env.platform}} and physical"
+          invoke test -m ${{env.platform}} -m physical -n arm

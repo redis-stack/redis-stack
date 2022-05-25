@@ -1,12 +1,23 @@
 import os
 import subprocess
 import time
+import sys
 
 import docker
 from helpers import ROOT
 
 
 class DockerTestEnv:
+    """An environment for use with docker. This version of the environment
+    creates a docker mount of the current directory in /build.
+
+    All instances must implement:
+    DOCKER_NAME - The docker image name
+    CONTAINER_NAME - The name to associate with the running container
+
+    Optionally classes can implement:
+    PORTMAP - A dictionary of docker port mappings eg: {"6379/tcp": 6379}
+    """
 
     HOST_TYPE = "docker"
 
@@ -20,23 +31,28 @@ class DockerTestEnv:
         except Exception:
             pass
 
+        portmap = getattr(cls, "PORTMAP", {"6379/tcp": 6379})
+
+        sys.stdout.write(f"Using image: {cls.DOCKER_NAME}\n")
         m = docker.types.Mount("/build", ROOT, read_only=True, type="bind")
         container = cls.env.containers.run(
             image=cls.DOCKER_NAME,
             name=cls.CONTAINER_NAME,
             detach=True,
             mounts=[m],
-            command="sleep 1200",
+            stdin_open=True,
             publish_all_ports=True,
-            ports={"6379/tcp": 6379},
+            ports=portmap,
         )
         cls.__CONTAINER__ = container
-        cls.install(cls, container)
+        if getattr(cls, "install", None) is not None:
+            cls.install(cls, container)
 
     @classmethod
     def teardown_class(cls):
         container = cls.env.containers.get(cls.CONTAINER_NAME)
-        cls.uninstall(cls, container)
+        if getattr(cls, "uninstall", None) is not None:
+            cls.uninstall(cls, container)
         try:
             container.kill()
         except docker.errors.APIError:
@@ -50,6 +66,7 @@ class DockerTestEnv:
 
 
 class VagrantTestEnv:
+    """Environments provisioned using Vagrant"""
 
     HOST_TYPE = "vagrant"
     VAGRANT_BASEDIR = os.path.join(ROOT, "envs", "vagrants")

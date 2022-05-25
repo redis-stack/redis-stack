@@ -8,7 +8,7 @@ import pytest
 
 class OSXTestBase(RedisPackagingMixin, RedisTestMixin, object):
     """Tests for OSX"""
-    
+
     @classmethod
     def setup_class(cls):
         for i in ["/opt/homebrew/redis-stack", "/usr/local/"]:

@@ -1,0 +1,127 @@
+name: Build RedisInsight Web package
+
+on:
+  workflow_call:
+    inputs:
+      arch:
+        required: false
+        type: string
+        default: x86_64
+      osnick:
+        required: true
+        type: string
+      target:
+        required: true
+        type: string
+      platform:
+        required: true
+        type: string
+      osname:
+        required: true
+        type: string
+      pythonversion:
+        required: false
+        type: string
+        default: 3.9
+      rubyversion:
+        required: false
+        type: string
+        default: 2.7.2
+      fpmversion:
+        required: false
+        type: string
+        default: 1.14.1
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      GPG_KEY:
+        required: true
+      GPG_PASSWORD:
+        required: true
+
+jobs:
+  build-redisinsight-web:
+    name: Build ${{inputs.platform}} (${{inputs.arch}})
+    env:
+      redisversion: ${{inputs.redisversion}}
+      pythonversion: ${{inputs.pythonversion}}
+      fpmversion: ${{inputs.fpmversion}}
+      rubyversion: ${{inputs.rubyversion}}
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v2
+     - name: Cache dependencies
+       uses: actions/cache@v2
+       with:
+         path: |
+           /var/cache/apt
+           /var/cache/yum
+           ~/.cache/pip
+           ~/.cache/pypoetry
+           ~/.local/share/gem
+         key: pypoetry-${{hashFiles('**/pyproject.toml', '.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.arch}}-package
+     - uses: ruby/setup-ruby@v1
+     - name: install python
+       uses: actions/setup-python@v2
+       with:
+         python-version: ${{env.pythonversion}}
+     - name: install poetry
+       uses: snok/install-poetry@v1
+       with:
+         version: latest
+         virtualenvs-in-project: true
+         virtualenvs-create: true
+         installer-parallel: true
+     - name: install packaging tools
+       run: |
+         sudo apt-get update
+         sudo apt-get install unzip libterm-readkey-perl dpkg-sig
+         poetry install
+     - run: gem install fpm -v ${{env.fpmversion}}
+     - name: build redisinsight-web
+       run: |
+         source .venv/bin/activate
+         invoke package -o ${{inputs.osname}} -s ${{inputs.osnick}} -d ${{inputs.platform}} -a ${{inputs.arch}} -t ${{inputs.target}} -p redisinsight-web
+
+     - name: install gpg key
+       run: |
+         cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
+
+     - name: get gpg id from key
+       id: get_gpg_id
+       run: |
+         gpg_id=`gpg --list-keys|sed -n 4p|awk '{print $1}'`
+         echo "::set-output name=GPG_ID::$gpg_id"
+
+     - name: gpg sign package
+       run: |
+         echo '${{secrets.GPG_PASSWORD}}' > .passfile
+         dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{steps.get_gpg_id.outputs.GPG_ID}} *.deb
+         for i in `ls *.deb`; do
+           sha256sum $i |awk '{print $1}' > $i.sha256
+         done
+         rm -f .passfile
+
+     - name: perist ${{inputs.target}} package
+       uses: actions/upload-artifact@v2
+       with:
+         name: redisinsight-web-${{inputs.platform}}-${{inputs.arch}}.${{inputs.target}}
+         path: |
+           redisinsight-web*.${{inputs.target}}
+
+     - name: gather packages for s3 upload
+       continue-on-error: true
+       run: |
+         mkdir -p s3uploads
+         cp *.${{inputs.target}} *.sha256 s3uploads
+     - uses: s3-actions/s3cmd@v1.1
+       with:
+         provider: aws
+         region: us-east-1
+         access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+     - name: upload snapshots
+       run: |
+         s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/
