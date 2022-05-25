@@ -12,7 +12,7 @@ from env import DockerTestEnv
 class TestRedisStack(RedisInsightTestMixin, RedisTestMixin, DockerTestEnv):
 
     VERSION = os.getenv("VERSION", "edge")
-    CONTAINER_NAME = "redis-stack-server"
+    CONTAINER_NAME = "redis-stack"
     DOCKER_NAME = f"redisfab/{CONTAINER_NAME}:{VERSION}"
     PORTMAP = {"6379/tcp": 6379, "8001/tcp": 8001}
     PLATFORM = "linux/amd64"
@@ -36,10 +36,6 @@ class TestRedisStackServer(RedisTestMixin, DockerTestEnv):
 @pytest.mark.arm
 class TestARMRedisStack(TestRedisStack):
     PLATFORM = "linux/arm64"
-    
-    def test_basic_redisinsight(self):
-        """Override for arm only"""
-        return
 
 
 @pytest.mark.dockers_redis_stack_server

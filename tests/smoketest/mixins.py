@@ -15,15 +15,8 @@ class RedisInsightTestMixin:
         max_count = 30
         count = 0
         content = ""
-        while count < max_count:
-            count += 1
-            try:
-                c = urlopen("http://localhost:8001")
-                content = c.read().decode()
-            except:
-                time.sleep(5)
-        if count == max_count:
-            raise AttributeError("RedisInsight failed to start")
+        c = urlopen("http://localhost:8001")
+        content = c.read().decode()
         assert content.lower().find("redisinsight") != -1
 
 

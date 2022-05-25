@@ -31,7 +31,7 @@ def dockerbuild(
     else:
         sys.stderr.write(f"{arch} is an unsupported platform.\n")
         sys.exit(3)
-    
+
     if buildx_push:
         cmd = f"docker buildx build --push --platform {platform} -f {dockerfile} -t {tag} {root}"
     else:
@@ -174,6 +174,7 @@ def dockergen(c, docker_type="redis-stack", arch="x86_64"):
     vars = {"docker_type": docker_type, "SHAREDIR": p.SHAREDIR, "arch": arch}
     with open(dest, "w+") as fp:
         fp.write(tmpl.render(vars))
+    sys.stdout.write(f"Docker file generated: {dest}\n")
 
 
 @task(
