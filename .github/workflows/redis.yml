@@ -520,10 +520,11 @@ jobs:
         path: |
           build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/*.zip
 
-    - name: notarize the custom zip
-      run: |
-        cd build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
-        sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
+    # TODO ADD BACK WHEN READY
+    # - name: notarize the custom zip
+    #   run: |
+    #     cd build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
+    #     sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
 
     - uses: s3-actions/s3cmd@v1.1
       with:
@@ -577,7 +578,7 @@ jobs:
           name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
       - name: write the ssh key to a file
         run: |
-          echo ${{secrets.OPERETO_KEY}} > ssh.key
+          echo "${{secrets.OPERETO_KEY}}" > ssh.key
           chmod 0400 ssh.key
       - name: display
         run: |
