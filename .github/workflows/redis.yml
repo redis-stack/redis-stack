@@ -589,10 +589,6 @@ jobs:
           source .venv/bin/activate
           realversion=`invoke version`
           echo "::set-output name=VERSION::$realversion"
-      - name: Get branch name
-        id: get_branch
-        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
-
       - name: run the tests
         run: |
           source .venv/bin/activate
@@ -604,7 +600,7 @@ jobs:
             -s ssh.key \
             -u ${{secrets.M1_SSH_USER}} \
             -v `echo $RANDOM` \
-            -g ${{ steps.get_branch.outputs.short_ref }}
+            -g HEAD
 
 # ###################### COLLATE DOCKERS ##################
 #   docker-push:
