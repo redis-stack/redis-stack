@@ -583,7 +583,7 @@ jobs:
       - name: display
         run: |
           ls -R
-          unzip redis-stack-server-${{env.platform}}-${env.arch}}.${{env.target}}
+          unzip redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
           ls -R
       - name: run the tests
         run: |
