@@ -588,7 +588,7 @@ jobs:
           source .venv/bin/activate
           realversion=`invoke version`
           echo "::set-output name=VERSION::$realversion"
-        run: |
+      - run: |
           ls -R
       - name: run the tests
         run: |
