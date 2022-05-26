@@ -603,7 +603,7 @@ jobs:
             -p redis-stack-server \
             -s ssh.key \
             -u ${{secrets.M1_SSH_USER}} \
-            -v ${{github.run_number}} \
+            -v `echo $RANDOM` \
             -g ${{ steps.get_branch.outputs.short_ref }}
 
 # ###################### COLLATE DOCKERS ##################
