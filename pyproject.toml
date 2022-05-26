@@ -9,6 +9,7 @@ license = "MIT"
 python = ">=3.6.2,<4.0"
 PyYAML = "^6.0"
 isort = "^5.10.1"
+Fabric = "^2.7.0"
 
 [tool.poetry.dev-dependencies]
 invoke = "^1.6.0"
