@@ -560,6 +560,7 @@ jobs:
             ~/.cache/pip
             ~/.cache/pypoetry
             ~/.local/share/gem
+            poetry.lock
           key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
       - name: install python
         uses: actions/setup-python@v2
@@ -587,16 +588,13 @@ jobs:
           source .venv/bin/activate
           realversion=`invoke version`
           echo "::set-output name=VERSION::$realversion"
-      - name: display
         run: |
-          ls -R
-          unzip redis-stack-server-${{steps.get_version.outputs.VERSION}}.${{env.platform}}.${{env.arch}}.${{env.target}}
           ls -R
       - name: run the tests
         run: |
           source .venv/bin/activate
           invoke test-over-ssh -b \
-            redis-stack-server-${{steps.get_version.outputs.VERISON}}.${{env.platform}}.${{env.arch}}.${{env.target}} \
+            redis-stack-server-${{steps.get_version.outputs.VERSION}}.${{env.platform}}.${{env.arch}}.${{env.target}} \
             -i ${{secrets.M1_IP}} \
             -m macos \
             -p redis-stack-server \
