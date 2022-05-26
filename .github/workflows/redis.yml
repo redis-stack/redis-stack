@@ -581,6 +581,7 @@ jobs:
         run: |
           echo "${{secrets.OPERETO_KEY}}" > ssh.key
           chmod 0400 ssh.key
+
       - name: get package version
         id: get_version
         run: |
@@ -588,8 +589,10 @@ jobs:
           source .venv/bin/activate
           realversion=`invoke version`
           echo "::set-output name=VERSION::$realversion"
-      - run: |
-          ls -R
+      - name: Get branch name
+        id: get_branch
+        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+
       - name: run the tests
         run: |
           source .venv/bin/activate
@@ -600,8 +603,8 @@ jobs:
             -p redis-stack-server \
             -s ssh.key \
             -u ${{secrets.M1_SSH_USER}} \
-            -v ${GITHUB_SHA} \
-            -g ${GITHUB_SHA}
+            -v ${github.run_id} \
+            -g ${{ steps.get_branch.outputs.short_ref }}
 
 # ###################### COLLATE DOCKERS ##################
 #   docker-push:

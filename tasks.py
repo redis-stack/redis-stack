@@ -106,13 +106,13 @@ def test_ci_dockers(c, docker="redis-stack-server", version=None, arch="x86_64")
         "version": "redis-stack version",
         "ssh_key_path": "path to ssh key",
         "binary": "path to binaries",
-        "githash": "git hash of the current branch/test",
+        "git_branch": "name of current git branch",
         "package": "name of the build package [redis-stack, redis-stack-server]",
         "marker": "pytest markers",
         "notmarker": "pytest markers to not run",
     }
 )
-def test_over_ssh(c, ip="", user="", ssh_key_path="", version="", binary="", githash="HEAD", package="redis-stack-server", marker=["macos"], notmarker=[]):
+def test_over_ssh(c, ip="", user="", ssh_key_path="", version="", binary="", git_branch="HEAD", package="redis-stack-server", marker=["macos"], notmarker=[]):
     markstr = markhandler(marker, notmarker)
     tests = f"/tmp/{package}-tests/{version}"
     c = Connection(host=ip, user=user, connect_kwargs={"key_filename": ssh_key_path})
@@ -125,7 +125,7 @@ def test_over_ssh(c, ip="", user="", ssh_key_path="", version="", binary="", git
     c.run(f"mkdir -p {tests}/redis-stack/redis-stack-server")
     c.run(f"unzip -d {tests}/redis-stack/redis-stack-server {dest}")
     c.run(f"python3 -m venv {tests}/.venv")
-    c.run(f"cd {tests} && git reset --hard {githash}")
+    c.run(f"cd {tests} && git checkout {git_branch}")
     c.run(f"cd {tests} && .venv/bin/python -m pip install --upgrade pip poetry")
     c.run(f"cd {tests} && .venv/bin/python -m poetry install")
     c.run(f"cd {tests} && .venv/bin/pytest -m macos")
