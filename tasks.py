@@ -4,6 +4,8 @@ import shutil
 import sys
 import jinja2
 from stack.paths import Paths
+from fabric import Connection
+from fabric.transfer import Transfer
 
 
 @task(
@@ -40,6 +42,17 @@ def dockerbuild(
     sys.stderr.write(cmd)
     run(cmd)
 
+def markhandler(marker=[], notmarker=[]):
+    markers = " and ".join(marker)
+    nots = " and not ".join(notmarker)
+    markstr = ""
+    if markers:
+        markstr += markers
+        if nots:
+            markstr += f" and not {nots}"
+    if nots and not markers:
+        markstr = f"not {nots}"
+    return markstr
 
 @task(
     help={
@@ -51,15 +64,7 @@ def dockerbuild(
 )
 def test(c, marker=[], notmarker=[], filter="", version=None):
     """Run unit tests"""
-    markers = " and ".join(marker)
-    nots = " and not ".join(notmarker)
-    markstr = ""
-    if markers:
-        markstr += markers
-        if nots:
-            markstr += f" and not {nots}"
-    if nots and not markers:
-        markstr = f"not {nots}"
+    markstr = markhandler(marker, notmarker)
     cmd = f"pytest -m '{markstr}' {filter} -s"
     if version is not None:
         cmd = f"VERSION={version} {cmd}"
@@ -75,6 +80,7 @@ def test(c, marker=[], notmarker=[], filter="", version=None):
     }
 )
 def test_ci_dockers(c, docker="redis-stack-server", version=None, arch="x86_64"):
+    """Helper wrapper for testing within github actions"""
     if arch == "arm64":
         test(
             c,
@@ -93,6 +99,36 @@ def test_ci_dockers(c, docker="redis-stack-server", version=None, arch="x86_64")
         sys.stderr.write(f"{arch} is an unsupported arch.\n")
         sys.exit(3)
 
+@task(
+    help={
+        "ip": "IP address of the server",
+        "user": "ssh user name",
+        "version": "redis-stack version",
+        "ssh_key_path": "path to ssh key",
+        "binary": "path to binaries",
+        "githash": "git hash of the current branch/test",
+        "package": "name of the build package [redis-stack, redis-stack-server]",
+        "marker": "pytest markers",
+        "notmarker": "pytest markers to not run",
+    }
+)
+def test_over_ssh(c, ip="", user="", ssh_key_path="", version="", binary="", githash="HEAD", package="redis-stack-server", marker=["macos"], notmarker=[]):
+    markstr = markhandler(marker, notmarker)
+    tests = f"/tmp/{package}-tests/{version}"
+    c = Connection(host=ip, user=user, connect_kwargs={"key_filename": ssh_key_path})
+    t = Transfer(c)
+    dest = f"/tmp/{package}-{version}.zip"
+    c.run(f"rm -rf {tests} {dest} /opt/homebrew/var/db/redis-stack/dump.rdb")
+    t.put(binary, dest)
+    c.run(f"mkdir -p {tests}")
+    c.run(f"git clone https://github.com/redis-stack/redis-stack {tests}")
+    c.run(f"mkdir -p {tests}/redis-stack/redis-stack-server")
+    c.run(f"unzip -d {tests}/redis-stack/redis-stack-server {dest}")
+    c.run(f"python3 -m venv {tests}/.venv")
+    c.run(f"cd {tests} && git reset --hard {githash}")
+    c.run(f"cd {tests} && .venv/bin/python -m pip install --upgrade pip poetry")
+    c.run(f"cd {tests} && .venv/bin/python -m poetry install")
+    c.run(f"cd {tests} && .venv/bin/pytest -m macos")
 
 @task
 def build_redis(c, redis_repo_path="redis", build_args="all build_tls=yes"):
