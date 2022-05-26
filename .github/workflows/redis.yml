@@ -536,8 +536,72 @@ jobs:
         s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
         s3cmd put -P *.sha256 s3://redismodules/redis-stack/snapshots/
 
+  test-osx-m1:
+    name: M1 tests
+    needs: [build-package-osx-m1]
+    env:
+      arch: arm64
+      osnick: monterey
+      target: zip
+      platform: monterey
+      osname: macos
+      redisversion: 7.0.0
+      pythonversion: 3.9
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout sources
+        uses: actions/checkout@v2
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            /var/cache/apt
+            ~/.cache/pip
+            ~/.cache/pypoetry
+            ~/.local/share/gem
+            poetry.lock
+          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "${{ env.pythonversion }}"
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+      - name: gather artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
+      - name: write the ssh key to a file
+        run: |
+          echo "${{secrets.OPERETO_KEY}}" > ssh.key
+          chmod 0400 ssh.key
 
-###################### COLLATE DOCKERS ##################
+      - name: get package version
+        id: get_version
+        run: |
+          poetry install
+          source .venv/bin/activate
+          realversion=`invoke version`
+          echo "::set-output name=VERSION::$realversion"
+      - name: run the tests
+        run: |
+          source .venv/bin/activate
+          invoke test-over-ssh -b \
+            redis-stack-server-${{steps.get_version.outputs.VERSION}}.${{env.platform}}.${{env.arch}}.${{env.target}} \
+            -i ${{secrets.M1_IP}} \
+            -m macos \
+            -p redis-stack-server \
+            -s ssh.key \
+            -u ${{secrets.M1_SSH_USER}} \
+            -v `echo $RANDOM` \
+            -g HEAD
+
+# ###################### COLLATE DOCKERS ##################
   docker-push:
     needs: [x86_64-docker, arm64-docker]
     name: Push ${{matrix.package}} manifest
