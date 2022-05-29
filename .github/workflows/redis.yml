@@ -25,7 +25,7 @@ jobs:
       target: deb
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-      redisversion: 7.0.0
+      redisversion: 6.2.7
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -93,7 +93,7 @@ jobs:
       target: deb
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-      redisversion: 7.0.0
+      redisversion: 6.2.7
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -133,7 +133,7 @@ jobs:
       target: deb
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-      redisversion: 7.0.0
+      redisversion: 6.2.7
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -151,7 +151,7 @@ jobs:
       target: deb
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-      redisversion: 7.0.0
+      redisversion: 6.2.7
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -169,7 +169,7 @@ jobs:
       target: deb
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-      redisversion: 7.0.0
+      redisversion: 6.2.7
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -187,7 +187,7 @@ jobs:
       target: rpm
       build_deps: yum install -y epel-release gcc make jemalloc-devel openssl-devel python3 python3-pip
       packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2 curl
-      redisversion: 7.0.0
+      redisversion: 6.2.7
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -207,7 +207,7 @@ jobs:
         dnf install -y oracle-epel-release-el8
         dnf install -y gcc make jemalloc-devel openssl-devel tar git python3 python3-pip
       packaging_deps: sudo apt-get install -y rpm unzip curl gnupg2
-      redisversion: 7.0.0
+      redisversion: 6.2.7
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -226,7 +226,7 @@ jobs:
       target: zip
       platform: catalina
       osname: macos
-      redisversion: 7.0.0
+      redisversion: 6.2.7
       pythonversion: 3.9
       fpmversion: 1.14.1
       rubyversion: 2.7.2
@@ -429,7 +429,7 @@ jobs:
       target: zip
       platform: monterey
       osname: macos
-      redisversion: 7.0.0
+      redisversion: 6.2.7
       pythonversion: 3.9
       fpmversion: 1.14.1
       rubyversion: 2.7.2
@@ -545,7 +545,7 @@ jobs:
       target: zip
       platform: monterey
       osname: macos
-      redisversion: 7.0.0
+      redisversion: 6.2.7
       pythonversion: 3.9
     runs-on: ubuntu-latest
     steps:
