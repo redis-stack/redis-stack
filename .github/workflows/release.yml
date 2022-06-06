@@ -61,7 +61,7 @@ jobs:
       - name: publish dockers
         run: |
           for i in redis-stack redis-stack-server; do
-            docker pull redisfab/${i}:${{ steps.get_version.outputs.VERSION}}-edge
-            docker tag redisfab/${i}:${{ steps.get_version.outputs.VERSION}}-edge redis/${i}:${{steps.get_version.outputs.VERSION}}
+            docker pull redisfab/${i}:${{ steps.get_version.outputs.VERSION}}
+            docker tag redisfab/${i}:${{ steps.get_version.outputs.VERSION}} redis/${i}:${{steps.get_version.outputs.VERSION}}
             docker push redis/${i}:${{ steps.get_version.outputs.VERSION}}
           done
