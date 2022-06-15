@@ -130,7 +130,7 @@ jobs:
       arch: ${{inputs.arch}}
       target: ${{inputs.target}}
     runs-on: ubuntu-latest
-    # needs: [build-redis]
+    needs: [build-redis]
     strategy:
       matrix:
         package: ['redis-stack-server']  # add the matrix back if multiple packages are a thing againt
