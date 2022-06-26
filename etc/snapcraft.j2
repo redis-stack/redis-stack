@@ -30,10 +30,11 @@ parts:
         stage-packages:
             - libssl-dev
             - libomp1
+            - bash
 
 plugs:
     {{PRODUCT}}-home:
         interface: home
-        stage-packages: [libssl-dev, libomp1]
+        stage-packages: [libssl-dev, libomp1, bash]
     {{PRODUCT}}-network:
         interface: network

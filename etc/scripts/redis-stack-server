@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 realpath() {
     [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
@@ -24,43 +24,24 @@ fi
 # default database location
 REDIS_DATA_DIR=`pwd`
 
-# linux base case
-sys=`uname -s`
-if [ ${sys} == "Linux" ]; then
+if [ -d /opt/redis-stack ]; then
     _datadir=/var/lib/redis-stack
-    mkdir -p ${_datadir}
-    touch ${_datadir}/.testfile 2>&1
-    if [ $? -eq 0 ]; then
-        REDIS_DATA_DIR=${_datadir}
-    fi
+elif [ -d /opt/homebrew/var ]; then
+    BREW_BASE=/opt/homebrew
+    _datadir=/opt/homebrew/var/db/redis-stack
+elif [ -d /usr/local/var ]; then
+    BREW_BASE=/usr/local
+    _datadir=/usr/local/var/db/redis-stack
 else
-    _platform=`uname -p`
-    if [ -d /usr/local/var ]; then
-        BREW_BASE=/usr/local
-        _datadir=/usr/local/var/db/redis-stack
-        mkdir -p ${_datadir}
-        touch ${_datadir}/.testfile 2>&1
-        if [ $? -eq 0 ]; then
-            REDIS_DATA_DIR=${_datadir}
-        fi
-    elif [ -d /opt/homebrew/var ]; then
-        BREW_BASE=/opt/homebrew
-        _datadir=/opt/homebrew/var/db/redis-stack
-        mkdir -p ${_datadir}
-        touch ${_datadir}/.testfile 2>&1
-        if [ $? -eq 0 ]; then
-            REDIS_DATA_DIR=${_datadir}
-        fi
-    else
-        BREW_BASE=${BASEDIR}
-        _datadir=${BASEDIR}/var/db/redis-stack
-        mkdir -p ${_datadir}
-        touch ${_datadir}/.testfile 2>&1
-        if [ $? -eq 0 ]; then
-            REDIS_DATA_DIR=${_datadir}
-        fi
-    fi
+   BREW_BASE=${BASEDIR}
+   _datadir=${BASEDIR}/var/db/redis-stack
 fi
+mkdir -p ${_datadir}
+touch ${_datadir}/.testfile 2>&1
+if [ $? -eq 0 ]; then
+    REDIS_DATA_DIR=${_datadir}
+fi
+
 
 CMD=${BASEDIR}/bin/redis-server
 if [ -f "${1}" ]; then
