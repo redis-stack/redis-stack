@@ -61,7 +61,7 @@ class RedisStackServer(Recipe):
         stackdest = os.path.join(self.__PATHS__.BINDIR, "redis-stack-server")
         shutil.copyfile(
             os.path.join(
-                self.__PATHS__.SCRIPTDIR, "scripts", f"redis-stack-server.{self.OSNAME}"
+                self.__PATHS__.SCRIPTDIR, "scripts", f"redis-stack-server"
             ),
             stackdest,
         )
