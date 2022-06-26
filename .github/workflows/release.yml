@@ -61,7 +61,8 @@ jobs:
       - name: publish dockers
         run: |
           for i in redis-stack redis-stack-server; do
-            docker pull redisfab/${i}:${{ steps.get_version.outputs.VERSION}}
-            docker tag redisfab/${i}:${{ steps.get_version.outputs.VERSION}} redis/${i}:${{steps.get_version.outputs.VERSION}}
-            docker push redis/${i}:${{ steps.get_version.outputs.VERSION}}
+            docker manifest create redis/${{i}}:${{steps.get_version.outputs.VERSION}} \
+              redisfab/${{i}}:${{steps.get_version.outputs.VERSION}}-x86_64 \
+              redisfab/${{i}}:${{steps.get_version.outputs.VERSION}}-arm64
+            docker manifest push redis/${i}:${{ steps.get_version.outputs.VERSION}}
           done

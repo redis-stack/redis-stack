@@ -22,7 +22,7 @@ REDISGRAPH_ARGS="MAX_QUEUED_QUERIES 25 TIMEOUT 1000 RESULTSET_SIZE 10000"
 fi
 
 ${CMD} \
-${CONFFILE} -- \
+${CONFFILE} \
 --dir ${REDIS_DATA_DIR} \
 --protected-mode no \
 --loadmodule /opt/redis-stack/lib/redisearch.so \
