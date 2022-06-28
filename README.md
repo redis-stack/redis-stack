@@ -1,6 +1,13 @@
+[![CI](https://github.com/redis-stack/redis-stack/actions/workflows/redis.yml/badge.svg)](https://github.com/redis-stack/redis-stack/actions/workflows/redis.yml)
+
 # redis-stack
 
 This repository builds redis, and downloads various components (modules, RedisInsight) in order to build redis-stack packages for it's CI process.
+
+[Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) | 
+[Helm Charts](https://github.com/redis-stack/helm-redis-stack) | 
+[Docker images](https://hub.docker.com/r/redis/redis-stack) |
+[Other downloads](https://redis.io/download/#redis-stack-downloads)
 
 ## Development Requirements
 
