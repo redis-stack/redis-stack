@@ -20,6 +20,7 @@ class RedisInsightTestMixin:
 class RedisTestMixin:
     def test_basic_redis(self, r):
         stack_dockloader(self)
+        r.flushdb()
         assert r.ping()
 
         r.set("some", "value")
@@ -35,17 +36,20 @@ class RedisTestMixin:
 
     def test_json(self, r):
         stack_dockloader(self)
+        r.flushdb()
         r.json().set("foo", ".", "bar")
         assert r.json().get("foo") == "bar"
 
     def test_bloom(self, r):
         stack_dockloader(self)
+        r.flushdb()
         assert r.bf().create("bloom", 0.01, 1000)
         assert 1 == r.bf().add("bloom", "foo")
         assert 0 == r.bf().add("bloom", "foo")
 
     def test_graph(self, r):
         stack_dockloader(self)
+        r.flushdb()
         params = [1, 2.3, "str", True, False, None, [0, 1, 2]]
         query = "RETURN $param"
         for param in params:
@@ -55,6 +59,7 @@ class RedisTestMixin:
 
     def test_timeseries(self, r):
         stack_dockloader(self)
+        r.flushdb()
         name = "test"
         r.ts().create(name)
         assert r.ts().get(name) is None
@@ -65,6 +70,7 @@ class RedisTestMixin:
 
     def test_search(self, r):
         stack_dockloader(self)
+        r.flushdb()
         r.ft().create_index((TextField("txt"),))
 
         r.ft().add_document("doc1", txt="foo baz")
