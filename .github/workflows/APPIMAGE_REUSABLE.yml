@@ -40,7 +40,7 @@ on:
         required: true
 
 jobs:
-  snap:
+  appimage:
     name: ${{matrix.package}} appimage
     runs-on: ubuntu-latest
     strategy:
@@ -80,7 +80,7 @@ jobs:
           wget https://github.com/AppImage/pkg2appimage/releases/download/continuous/pkg2appimage-${{inputs.pkg2appimageversion}}-${{inputs.arch}}.AppImage -O pkg2appimage.AppImage
           chmod a+x *.AppImage
       - name: fetch artifacts
-      - uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v2
         with:
           name: redis-stack-server-${{inputs.platform}}-${{inputs.arch}}.tar.gz
           path: .
