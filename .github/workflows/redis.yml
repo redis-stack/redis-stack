@@ -122,6 +122,17 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+  x86_64-appimage:
+    uses: ./.github/workflows/APPIMAGE_REUSABLE.yml
+    needs: [x86_64-focal]
+    with:
+      arch: x86_64
+      platform: focal
+      osnick: ubuntu20.04
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
   x86_64-bionic:
     uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
     with:

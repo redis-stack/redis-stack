@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=redis-stack-server
+Exec=/opt/bin/redis-stack-server
+StartupNotify=true
+Icon=redis-stack-server
+Categories=Network;
