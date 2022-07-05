@@ -77,7 +77,7 @@ jobs:
           poetry install
       - name: fetch dependencies
         run: |
-          wget https://github.com/AppImage/pkg2appimage/releases/download/continuous/pkg2appimage-${{inputs.pkg2appimageversion}}-${{inputs.arch}}.AppImage -O pkg2appimage.AppImage
+          wget -q https://github.com/AppImage/pkg2appimage/releases/download/continuous/pkg2appimage-${{inputs.pkg2appimageversion}}-${{inputs.arch}}.AppImage -O pkg2appimage.AppImage
           chmod a+x *.AppImage
       - name: fetch artifacts
         uses: actions/download-artifact@v2
@@ -90,12 +90,13 @@ jobs:
         run: |
           poetry install
           source .venv/bin/activate
-          realversion=`invoke version -p redis-stack-server -d true`
+          realversion=`invoke version -p redis-stack-server`
           echo "::set-output name=VERSION::$realversion"
+          echo ${realversion} > VERSION
+          cat VERSION
       - name: build appimage
         run: |
-          echo ${{steps.get_version.outputs.VERSION}} > VERSION
-          ./pkg2appimage.AppImage etc/redis-stack-server.appimage
+          ./pkg2appimage.AppImage `pwd`/etc/redis-stack-server.appimage
           mv out/redis-stack-server-*.AppImage out/${{matrix.package}}-${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}.AppImage
           for i in `ls out/*.AppImage`; do
             sha256 $i | awk '{print $1}' > $i.sha256
