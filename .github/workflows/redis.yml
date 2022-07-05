@@ -14,24 +14,24 @@ on:
 jobs:
 
 ###################### ARM JOBS #########################
-#  arm64-bionic:
-#    uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
-#    with:
-#      image_name: ubuntu:bionic
-#      platform: bionic
-#      osname: Linux
-#      osnick: ubuntu18.04
-#      arch: arm64
-#      target: deb
-#      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-#      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-#      redisversion: 7.0.2
-#    secrets:
-#      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#      GPG_KEY: ${{ secrets.GPG_KEY }}
-#      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
-#
+  arm64-bionic:
+    uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
+    with:
+      image_name: ubuntu:bionic
+      platform: bionic
+      osname: Linux
+      osnick: ubuntu18.04
+      arch: arm64
+      target: deb
+      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
+      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
+      redisversion: 7.0.2
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+
 #  arm64-bionic-redisinsight-web:
 #    uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
 #    with:
@@ -46,16 +46,16 @@ jobs:
 #      GPG_KEY: ${{ secrets.GPG_KEY }}
 #      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 #
-#  arm64-docker:
-#    uses: ./.github/workflows/DOCKER_REUSABLE.yml
-#    needs: [arm64-bionic, arm64-bionic-redisinsight-web]
-#    with:
-#      pythonversion: 3.9
-#      arch: arm64
-#      platform: bionic
-#    secrets:
-#      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
-#      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
+  arm64-docker:
+    uses: ./.github/workflows/DOCKER_REUSABLE.yml
+    needs: [arm64-bionic, arm64-bionic-redisinsight-web]
+    with:
+      pythonversion: 3.9
+      arch: arm64
+      platform: bionic
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
 
   # arm64-snap:
   #   uses: ./.github/workflows/SNAP_REUSABLE.yml
@@ -67,6 +67,17 @@ jobs:
   #   secrets:
   #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #
+  arm64-appimage:
+    uses: ./.github/workflows/APPIMAGE_REUSABLE.yml
+    needs: [arm64-bionic]
+    with:
+      arch: arm64
+      platform: bionic
+      osnick: ubuntu18.04
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 ##################### x86_64 JOBS #########################
 #  x86_64-focal-redisinsight-web:

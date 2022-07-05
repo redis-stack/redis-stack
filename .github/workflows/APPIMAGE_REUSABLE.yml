@@ -111,7 +111,7 @@ jobs:
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.package }}-${{steps.get_version.outputs.VERSION}}-${{env.arch}}.AppImage
+          name: ${{ matrix.package }}-${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}.AppImage
           path: |
             out/${{ matrix.package }}*.AppImage
 
