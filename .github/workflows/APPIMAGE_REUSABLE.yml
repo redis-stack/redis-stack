@@ -109,7 +109,7 @@ jobs:
 #          sudo .venv/bin/pytest -m snaps
 #
       - name: Build the AppImage
-        uses: AppImageCrafters/build-appimage@master
+        uses: AppImageCrafters/build-appimage@v1
         with:
           recipe: "./etc/redis-stack-server.appimage"
 
