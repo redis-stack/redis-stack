@@ -57,16 +57,16 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
 
-   arm64-snap:
-     uses: ./.github/workflows/SNAP_REUSABLE.yml
-     needs: [arm64-bionic]
-     with:
-       arch: arm64
-       platform: bionic
-       osnick: ubuntu18.04
-     secrets:
-       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  arm64-snap:
+    uses: ./.github/workflows/SNAP_REUSABLE.yml
+    needs: [arm64-bionic]
+    with:
+      arch: arm64
+      platform: bionic
+      osnick: ubuntu18.04
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 ##################### x86_64 JOBS #########################
   x86_64-focal-redisinsight-web:
