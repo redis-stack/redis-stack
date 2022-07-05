@@ -94,13 +94,13 @@ jobs:
           echo "::set-output name=VERSION::$realversion"
           echo ${realversion} > VERSION
           cat VERSION
-      - name: build appimage
-        run: |
-          ./pkg2appimage.AppImage `pwd`/etc/redis-stack-server.appimage
-          mv out/redis-stack-server-*.AppImage out/${{matrix.package}}-${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}.AppImage
-          for i in `ls out/*.AppImage`; do
-            sha256 $i | awk '{print $1}' > $i.sha256
-          done
+#      - name: build appimage
+#        run: |
+#          ./pkg2appimage.AppImage `pwd`/etc/redis-stack-server.appimage
+#          mv out/redis-stack-server-*.AppImage out/${{matrix.package}}-${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}.AppImage
+#          for i in `ls out/*.AppImage`; do
+#            sha256 $i | awk '{print $1}' > $i.sha256
+#          done
 
 #      - name: validate packages
 #        run: |
@@ -108,6 +108,10 @@ jobs:
 #          cp *.snap redis-stack/${{ matrix.package }}.${{ env.target }}
 #          sudo .venv/bin/pytest -m snaps
 #
+      - uses: AppImageCrafters/build-appimage@master
+        with:
+          recipe: ./etc/redis-stack-server.appimage
+
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
         with:
