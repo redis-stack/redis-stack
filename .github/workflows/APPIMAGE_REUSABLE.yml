@@ -75,10 +75,10 @@ jobs:
         run: |
           gem install fpm -v ${{inputs.fpmversion}}
           poetry install
-      - name: fetch dependencies
-        run: |
-          wget -q https://github.com/AppImage/pkg2appimage/releases/download/continuous/pkg2appimage-${{inputs.pkg2appimageversion}}-${{inputs.arch}}.AppImage -O pkg2appimage.AppImage
-          chmod a+x *.AppImage
+#      - name: fetch dependencies
+#        run: |
+#          wget -q https://github.com/AppImage/pkg2appimage/releases/download/continuous/pkg2appimage-${{inputs.pkg2appimageversion}}-${{inputs.arch}}.AppImage -O pkg2appimage.AppImage
+#          chmod a+x *.AppImage
       - name: fetch artifacts
         uses: actions/download-artifact@v2
         with:
@@ -101,7 +101,7 @@ jobs:
 #          for i in `ls out/*.AppImage`; do
 #            sha256 $i | awk '{print $1}' > $i.sha256
 #          done
-
+#
 #      - name: validate packages
 #        run: |
 #          mkdir redis-stack
@@ -111,7 +111,7 @@ jobs:
       - name: Build the AppImage
         uses: AppImageCrafters/build-appimage@v1
         with:
-          recipe: "${GITHUB_WORKSPACE}/etc/redis-stack-server.appimage"
+          recipe: "./etc/redis-stack-server.appimage"
 
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
