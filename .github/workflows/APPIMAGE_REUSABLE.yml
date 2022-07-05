@@ -75,10 +75,10 @@ jobs:
         run: |
           gem install fpm -v ${{inputs.fpmversion}}
           poetry install
-#      - name: fetch dependencies
-#        run: |
-#          wget -q https://github.com/AppImage/pkg2appimage/releases/download/continuous/pkg2appimage-${{inputs.pkg2appimageversion}}-${{inputs.arch}}.AppImage -O pkg2appimage.AppImage
-#          chmod a+x *.AppImage
+      - name: fetch dependencies
+        run: |
+          wget -q https://github.com/AppImage/pkg2appimage/releases/download/continuous/pkg2appimage-${{inputs.pkg2appimageversion}}-${{inputs.arch}}.AppImage -O pkg2appimage.AppImage
+          chmod a+x *.AppImage
       - name: fetch artifacts
         uses: actions/download-artifact@v2
         with:
@@ -94,25 +94,20 @@ jobs:
           echo "::set-output name=VERSION::$realversion"
           echo ${realversion} > VERSION
           cat VERSION
-#      - name: build appimage
-#        run: |
-#          ./pkg2appimage.AppImage `pwd`/etc/redis-stack-server.appimage
-#          mv out/redis-stack-server-*.AppImage out/${{matrix.package}}-${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}.AppImage
-#          for i in `ls out/*.AppImage`; do
-#            sha256 $i | awk '{print $1}' > $i.sha256
-#          done
-#
+      - name: build appimage
+        run: |
+          ./pkg2appimage.AppImage `pwd`/etc/redis-stack-server.appimage
+          mv out/redis-stack-server-*.AppImage out/${{matrix.package}}-${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}.AppImage
+          for i in `ls out/*.AppImage`; do
+            sha256 $i | awk '{print $1}' > $i.sha256
+          done
+
 #      - name: validate packages
 #        run: |
 #          mkdir redis-stack
 #          cp *.snap redis-stack/${{ matrix.package }}.${{ env.target }}
 #          sudo .venv/bin/pytest -m snaps
 #
-      - name: Build the AppImage
-        uses: AppImageCrafters/build-appimage@v1
-        with:
-          recipe: "./etc/redis-stack-server.appimage"
-
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
         with:
