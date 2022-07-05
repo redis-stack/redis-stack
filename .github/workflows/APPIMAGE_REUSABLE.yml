@@ -111,7 +111,7 @@ jobs:
       - name: Build the AppImage
         uses: AppImageCrafters/build-appimage@v1
         with:
-          recipe: "./etc/redis-stack-server.appimage"
+          recipe: "${GITHUB_WORKSPACE}/etc/redis-stack-server.appimage"
 
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
