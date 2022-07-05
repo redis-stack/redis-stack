@@ -108,9 +108,10 @@ jobs:
 #          cp *.snap redis-stack/${{ matrix.package }}.${{ env.target }}
 #          sudo .venv/bin/pytest -m snaps
 #
-      - uses: AppImageCrafters/build-appimage@master
+      - name: Build the AppImage
+        uses: AppImageCrafters/build-appimage@master
         with:
-          recipe: ./etc/redis-stack-server.appimage
+          recipe: "./etc/redis-stack-server.appimage"
 
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
