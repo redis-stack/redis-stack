@@ -249,7 +249,7 @@ jobs:
       with:
         ruby-version: ${{env.rubyversion}}
     - name: install python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: "${{ env.pythonversion }}"
     - name: install poetry
@@ -383,7 +383,7 @@ jobs:
 
     steps:
     - name: install python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: "${{ env.pythonversion }}"
     - name: install poetry
@@ -453,7 +453,7 @@ jobs:
       with:
         ruby-version: ${{env.rubyversion}}
     - name: install python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: "${{ env.pythonversion }}"
     - name: install poetry
@@ -574,7 +574,7 @@ jobs:
             poetry.lock
           key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
       - name: install python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: "${{ env.pythonversion }}"
       - name: install poetry
@@ -626,7 +626,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: install python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: "${{inputs.pythonversion}}"
       - name: install poetry

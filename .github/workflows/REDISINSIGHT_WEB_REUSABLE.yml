@@ -64,7 +64,7 @@ jobs:
          key: pypoetry-${{hashFiles('**/pyproject.toml', '.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.arch}}-package
      - uses: ruby/setup-ruby@v1
      - name: install python
-       uses: actions/setup-python@v2
+       uses: actions/setup-python@v3
        with:
          python-version: "${{env.pythonversion}}"
      - name: install poetry
