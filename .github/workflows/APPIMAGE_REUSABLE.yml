@@ -20,7 +20,7 @@ on:
       pythonversion:
         required: false
         type: string
-        default: 3.10
+        default: "3.10"
       rubyversion:
         required: false
         type: string
