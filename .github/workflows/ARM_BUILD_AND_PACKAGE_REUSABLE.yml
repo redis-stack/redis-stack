@@ -34,7 +34,7 @@ on:
       pythonversion:
         required: false
         type: string
-        default: 3.9
+        default: "3.10"
       rubyversion:
         required: false
         type: string
@@ -121,7 +121,7 @@ jobs:
     name: Package ${{inputs.platform}} (${{inputs.arch}}) ${{matrix.package}}
     env:
       redisversion: ${{inputs.redisversion}}
-      pythonversion: ${{inputs.pythonversion}}
+      pythonversion: "${{inputs.pythonversion}}"
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
       platform: ${{inputs.platform}}
@@ -150,9 +150,9 @@ jobs:
 
      - uses: ruby/setup-ruby@v1
      - name: install python
-       uses: actions/setup-python@v2
+       uses: actions/setup-python@v3
        with:
-         python-version: ${{env.pythonversion}}
+         python-version: "${{env.pythonversion}}"
      - name: install poetry
        uses: snok/install-poetry@v1
        with:

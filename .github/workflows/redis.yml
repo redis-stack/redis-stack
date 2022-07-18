@@ -28,6 +28,7 @@ jobs:
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
       redisversion: 7.0.2
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -42,6 +43,7 @@ jobs:
       osnick: ubuntu20.04
       arch: arm64
       target: deb
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -52,7 +54,7 @@ jobs:
     uses: ./.github/workflows/DOCKER_REUSABLE.yml
     needs: [arm64-bionic, arm64-bionic-redisinsight-web]
     with:
-      pythonversion: 3.9
+      pythonversion: "3.10"
       arch: arm64
       platform: bionic
     secrets:
@@ -66,6 +68,7 @@ jobs:
       arch: arm64
       platform: bionic
       osnick: ubuntu18.04
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -79,6 +82,7 @@ jobs:
       osname: Linux
       osnick: ubuntu20.04
       target: deb
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -97,6 +101,7 @@ jobs:
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
       redisversion: 7.0.2
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -107,7 +112,7 @@ jobs:
     uses: ./.github/workflows/DOCKER_REUSABLE.yml
     needs: [x86_64-focal, x86_64-focal-redisinsight-web]
     with:
-      pythonversion: 3.9
+      pythonversion: "3.10"
       arch: x86_64
       platform: focal
     secrets:
@@ -121,6 +126,7 @@ jobs:
       arch: x86_64
       platform: focal
       osnick: ubuntu20.04
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -132,6 +138,7 @@ jobs:
       arch: x86_64
       platform: focal
       osnick: ubuntu20.04
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -148,6 +155,7 @@ jobs:
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
       redisversion: 7.0.2
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -166,6 +174,7 @@ jobs:
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
       redisversion: 7.0.2
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -184,6 +193,7 @@ jobs:
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
       redisversion: 7.0.2
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -202,6 +212,7 @@ jobs:
       build_deps: yum install -y epel-release gcc make jemalloc-devel openssl-devel python3 python3-pip
       packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2 curl
       redisversion: 7.0.2
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -217,6 +228,7 @@ jobs:
       osnick: rhel8
       arch: x86_64
       target: rpm
+      pythonversion: "3.10"
       build_deps: |
         dnf install -y oracle-epel-release-el8
         dnf install -y gcc make jemalloc-devel openssl-devel tar git python3 python3-pip
@@ -241,7 +253,7 @@ jobs:
       platform: catalina
       osname: macos
       redisversion: 7.0.2
-      pythonversion: 3.9
+      pythonversion: "3.10"
       fpmversion: 1.14.1
       rubyversion: 2.7.2
 
@@ -251,7 +263,7 @@ jobs:
       with:
         ruby-version: ${{env.rubyversion}}
     - name: install python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: "${{ env.pythonversion }}"
     - name: install poetry
@@ -381,11 +393,11 @@ jobs:
       target: zip
       platform: catalina
       osname: macos
-      pythonversion: 3.9
+      pythonversion: "3.10"
 
     steps:
     - name: install python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: "${{ env.pythonversion }}"
     - name: install poetry
@@ -444,7 +456,7 @@ jobs:
       platform: monterey
       osname: macos
       redisversion: 7.0.2
-      pythonversion: 3.9
+      pythonversion: "3.10"
       fpmversion: 1.14.1
       rubyversion: 2.7.2
     runs-on: macos-latest
@@ -455,7 +467,7 @@ jobs:
       with:
         ruby-version: ${{env.rubyversion}}
     - name: install python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: "${{ env.pythonversion }}"
     - name: install poetry
@@ -560,7 +572,7 @@ jobs:
       platform: monterey
       osname: macos
       redisversion: 7.0.2
-      pythonversion: 3.9
+      pythonversion: "3.10"
     runs-on: ubuntu-latest
     steps:
       - name: checkout sources
@@ -576,7 +588,7 @@ jobs:
             poetry.lock
           key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
       - name: install python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: "${{ env.pythonversion }}"
       - name: install poetry
@@ -623,14 +635,14 @@ jobs:
       matrix:
         package: ['redis-stack-server', 'redis-stack']
     env:
-      pythonversion: 3.9
+      pythonversion: "3.10"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: install python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
-          python-version: ${{inputs.pythonversion}}
+          python-version: "${{inputs.pythonversion}}"
       - name: install poetry
         uses: snok/install-poetry@v1
         with:
