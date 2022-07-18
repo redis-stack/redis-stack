@@ -26,6 +26,7 @@ jobs:
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
       redisversion: 7.0.2
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -40,6 +41,7 @@ jobs:
       osnick: ubuntu20.04
       arch: arm64
       target: deb
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
