@@ -51,7 +51,7 @@ jobs:
       - name: install python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{inputs.pythonversion}}
+          python-version: "${{inputs.pythonversion}}"
       - uses: ruby/setup-ruby@v1
 
       - uses: actions/cache@v2

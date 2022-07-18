@@ -24,7 +24,7 @@ jobs:
       - name: install python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{env.pythonversion}}
+          python-version: "${{env.pythonversion}}"
       - name: install poetry
         uses: snok/install-poetry@v1
         with:
