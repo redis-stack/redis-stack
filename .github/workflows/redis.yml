@@ -50,7 +50,7 @@ jobs:
     uses: ./.github/workflows/DOCKER_REUSABLE.yml
     needs: [arm64-bionic, arm64-bionic-redisinsight-web]
     with:
-      pythonversion: 3.9
+      pythonversion: 3.10
       arch: arm64
       platform: bionic
     secrets:
@@ -105,7 +105,7 @@ jobs:
     uses: ./.github/workflows/DOCKER_REUSABLE.yml
     needs: [x86_64-focal, x86_64-focal-redisinsight-web]
     with:
-      pythonversion: 3.9
+      pythonversion: 3.10
       arch: x86_64
       platform: focal
     secrets:
@@ -239,7 +239,7 @@ jobs:
       platform: catalina
       osname: macos
       redisversion: 7.0.2
-      pythonversion: 3.9
+      pythonversion: 3.10
       fpmversion: 1.14.1
       rubyversion: 2.7.2
 
@@ -379,7 +379,7 @@ jobs:
       target: zip
       platform: catalina
       osname: macos
-      pythonversion: 3.9
+      pythonversion: 3.10
 
     steps:
     - name: install python
@@ -442,7 +442,7 @@ jobs:
       platform: monterey
       osname: macos
       redisversion: 7.0.2
-      pythonversion: 3.9
+      pythonversion: 3.10
       fpmversion: 1.14.1
       rubyversion: 2.7.2
     runs-on: macos-latest
@@ -558,7 +558,7 @@ jobs:
       platform: monterey
       osname: macos
       redisversion: 7.0.2
-      pythonversion: 3.9
+      pythonversion: 3.10
     runs-on: ubuntu-latest
     steps:
       - name: checkout sources
@@ -621,7 +621,7 @@ jobs:
       matrix:
         package: ['redis-stack-server', 'redis-stack']
     env:
-      pythonversion: 3.9
+      pythonversion: 3.10
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
