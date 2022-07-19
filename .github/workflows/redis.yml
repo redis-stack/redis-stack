@@ -258,6 +258,7 @@ jobs:
       rubyversion: 2.7.2
 
     runs-on: macos-latest
+
     steps:
     - name: check if already built
       id: redis-already-built
