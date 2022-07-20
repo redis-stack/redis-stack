@@ -178,7 +178,7 @@ class Recipe(object):
     def snap(self, fpmargs, distribution):
         snap_grade = "stable"
         snap_confinement = "classic"
-        
+
         # this can change, once we build focal for arm
         if self.ARCH == "arm64":
             snap_arch = "arm64"
@@ -210,9 +210,7 @@ class Recipe(object):
         with open(dest, "w+") as fp:
             fp.write(generated)
 
-        fpmargs.append(
-            f"-p {self.PACKAGE_NAME}-{self.version}.{self.ARCH}.snap"
-        )
+        fpmargs.append(f"-p {self.PACKAGE_NAME}-{self.version}.{self.ARCH}.snap")
         fpmargs.append(f"--snap-confinement {snap_confinement}")
         fpmargs.append(f"--snap-grade {snap_grade}")
         fpmargs.append(f"--snap-yaml {dest}")
