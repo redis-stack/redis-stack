@@ -7,12 +7,12 @@ versions:
   redisearch: 2.4.9
   redisgraph: 2.8.15
   redisbloom: 2.2.17
-  nodejs: v14.19.0
+  nodejs: v16.15.1
   redis: 7.0.2
   redis-stack: 99.99.99
   redis-stack-server: 99.99.99
-  redisinsight: 2.4.0
-  redisinsight-web: 2.4.0
+  redisinsight: 2.6.0
+  redisinsight-web: 2.6.0
 
 # common package variables
 email: Redis OSS <oss@redislabs.com>
