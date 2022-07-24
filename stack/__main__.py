@@ -29,6 +29,7 @@ if __name__ == "__main__":
         "--redis-binaries",
         dest="REDISBIN",
         help="[Optional] Path to redis binaries",
+        default=None,
         metavar="DIR",
     )
     p.add_option(
@@ -105,8 +106,7 @@ if __name__ == "__main__":
 
     # a = Package(opts.OSNICK, opts.ARCH, opts.OSNAME)
     if opts.PACKAGE == "redis-stack-server":
-        from stack.recipes.redis_stack_server import \
-            RedisStackServer as pkgklass
+        from stack.recipes.redis_stack_server import RedisStackServer as pkgklass
     elif opts.PACKAGE == "redis-stack":
         from stack.recipes.redis_stack import RedisStack as pkgklass
     elif opts.PACKAGE == "redisinsight":

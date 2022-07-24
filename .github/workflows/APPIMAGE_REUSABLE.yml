@@ -25,6 +25,10 @@ on:
         required: false
         type: string
         default: 2.7.2
+      pkg2appimageversioN:
+        required: false
+        type: string
+        default: 1807
       fpmversion:
         required: false
         type: string
@@ -36,14 +40,12 @@ on:
         required: true
 
 jobs:
-  snap:
-    name: ${{matrix.package}} snap
+  appimage:
+    name: ${{matrix.package}} appimage
     runs-on: ubuntu-latest
     strategy:
       matrix:
         package: ['redis-stack-server']
-    env:
-      target: snap
     steps:
       - uses: actions/checkout@v2
       - name: install python
@@ -73,11 +75,30 @@ jobs:
         run: |
           gem install fpm -v ${{inputs.fpmversion}}
           poetry install
-      - name: build snap
+      - name: fetch dependencies
         run: |
+          wget -q https://github.com/AppImage/pkg2appimage/releases/download/continuous/pkg2appimage-${{inputs.pkg2appimageversion}}-${{inputs.arch}}.AppImage -O pkg2appimage.AppImage
+          chmod a+x *.AppImage
+      - name: fetch artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: redis-stack-server-${{inputs.platform}}-${{inputs.arch}}.tar.gz
+          path: .
+
+      - name: get package version
+        id: get_version
+        run: |
+          poetry install
           source .venv/bin/activate
-          invoke package -o ${{inputs.osname}} -s ${{inputs.osnick}} -d ${{inputs.platform}} -a ${{inputs.arch}} -t ${{env.target}} -p ${{ matrix.package }}
-          for i in `ls *.snap`; do
+          realversion=`invoke version -p redis-stack-server`
+          echo "::set-output name=VERSION::$realversion"
+          echo ${realversion} > VERSION
+          cat VERSION
+      - name: build appimage
+        run: |
+          ./pkg2appimage.AppImage `pwd`/etc/redis-stack-server.appimage
+          mv out/redis-stack-server-*.AppImage out/${{matrix.package}}-${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}.AppImage
+          for i in `ls out/*.AppImage`; do
             sha256 $i | awk '{print $1}' > $i.sha256
           done
 
@@ -86,6 +107,13 @@ jobs:
 #          mkdir redis-stack
 #          cp *.snap redis-stack/${{ matrix.package }}.${{ env.target }}
 #          sudo .venv/bin/pytest -m snaps
+#
+      - name: perist ${{env.target}} package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.package }}-${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}.AppImage
+          path: |
+            out/${{ matrix.package }}*.AppImage
 
       - uses: s3-actions/s3cmd@v1.1
         with:
@@ -95,5 +123,4 @@ jobs:
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: upload snapshots
         run: |
-          s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
-          s3cmd put -P *.sha256 s3://redismodules/redis-stack/snapshots/
+          s3cmd put -P out/* s3://redismodules/redis-stack/snapshots/

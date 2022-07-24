@@ -34,7 +34,7 @@ on:
       pythonversion:
         required: false
         type: string
-        default: 3.9
+        default: "3.10"
       rubyversion:
         required: false
         type: string
@@ -60,7 +60,7 @@ jobs:
 
     env:
       redisversion: ${{inputs.redisversion}}
-      pythonversion: ${{inputs.pythonversion}}
+      pythonversion: "${{inputs.pythonversion}}"
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
     runs-on: ubuntu-latest
@@ -68,7 +68,13 @@ jobs:
     steps:
     - name: install dependencies
       run: ${{inputs.build_deps}}
+    - name: check if already built
+      id: redis-already-built
+      continue-on-error: true
+      run: |
+        wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.redisversion}}-${{inputs.osname}}-$${{inputs.osnick}}-${{inputs.arch}}.tgz
     - uses: actions/checkout@v2
+      if: steps.redis-already-built.outcome != 'success'
       with:
         repository: redis/redis
         path: redis
@@ -81,8 +87,10 @@ jobs:
           /var/cache/yum
         key: cache-${{hashFiles('.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.arch}}-build
     - name: make
+      if: steps.redis-already-built.outcome != 'success'
       run: make -C redis/src all BUILD_TLS=yes
     - name: package redis for s3
+      if: steps.redis-already-built.outcome != 'success'
       run: |
         mkdir redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
         cp redis/src/redis-server \
@@ -95,14 +103,17 @@ jobs:
         tar -czvf redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
            redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
     - name: install s3cmd
+      if: steps.redis-already-built.outcome != 'success'
       run: |
         pip3 install s3cmd
     - name: persist redis to s3
+      if: steps.redis-already-built.outcome != 'success'
       run: |
         s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
           s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
 
     - name: perist redis
+      if: steps.redis-already-built.outcome != 'success'
       uses: actions/upload-artifact@v2
       with:
         name: redis-${{env.redisversion}}-${{inputs.platform}}
@@ -118,7 +129,7 @@ jobs:
     name: Package ${{inputs.platform}} (${{inputs.arch}}) ${{matrix.package}}
     env:
       redisversion: ${{inputs.redisversion}}
-      pythonversion: ${{inputs.pythonversion}}
+      pythonversion: "${{inputs.pythonversion}}"
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
       platform: ${{inputs.platform}}
@@ -148,9 +159,9 @@ jobs:
 
       - uses: ruby/setup-ruby@v1
       - name: install python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
-          python-version: ${{env.pythonversion}}
+          python-version: "${{env.pythonversion}}"
       - name: install poetry
         uses: snok/install-poetry@v1
         with:
@@ -287,7 +298,7 @@ jobs:
 #          restore-keys: vagrant-${{inputs.platform}}-${{inputs.osname}}-${{inputs.osnick}}
 #      - run: vagrant --version
 #      - name: install python
-#        uses: actions/setup-python@v2
+#        uses: actions/setup-python@v3
 #        with:
 #          python-version: ${{env.pythonversion}}
 #      - name: install poetry
