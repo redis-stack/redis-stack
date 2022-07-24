@@ -10,6 +10,8 @@ on:
       - master
       - '[0-9].[0-9]'
   pull_request:
+  schedule:
+    - cron: "0 1 * * *"
 
 jobs:
 
@@ -26,6 +28,7 @@ jobs:
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
       redisversion: 6.2.7
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -40,6 +43,7 @@ jobs:
       osnick: ubuntu20.04
       arch: arm64
       target: deb
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -50,23 +54,24 @@ jobs:
     uses: ./.github/workflows/DOCKER_REUSABLE.yml
     needs: [arm64-bionic, arm64-bionic-redisinsight-web]
     with:
-      pythonversion: 3.9
+      pythonversion: "3.10"
       arch: arm64
       platform: bionic
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
 
-  # arm64-snap:
-  #   uses: ./.github/workflows/SNAP_REUSABLE.yml
-  #   needs: [arm64-bionic]
-  #   with:
-  #     arch: arm64
-  #     platform: bionic
-  #     osnick: ubuntu18.04
-  #   secrets:
-  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  arm64-snap:
+    uses: ./.github/workflows/SNAP_REUSABLE.yml
+    needs: [arm64-bionic]
+    with:
+      arch: arm64
+      platform: bionic
+      osnick: ubuntu18.04
+      pythonversion: "3.10"
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 ##################### x86_64 JOBS #########################
   x86_64-focal-redisinsight-web:
@@ -76,6 +81,7 @@ jobs:
       osname: Linux
       osnick: ubuntu20.04
       target: deb
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -94,6 +100,7 @@ jobs:
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
       redisversion: 6.2.7
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -104,7 +111,7 @@ jobs:
     uses: ./.github/workflows/DOCKER_REUSABLE.yml
     needs: [x86_64-focal, x86_64-focal-redisinsight-web]
     with:
-      pythonversion: 3.9
+      pythonversion: "3.10"
       arch: x86_64
       platform: focal
     secrets:
@@ -118,6 +125,19 @@ jobs:
       arch: x86_64
       platform: focal
       osnick: ubuntu20.04
+      pythonversion: "3.10"
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  x86_64-appimage:
+    uses: ./.github/workflows/APPIMAGE_REUSABLE.yml
+    needs: [x86_64-focal]
+    with:
+      arch: x86_64
+      platform: focal
+      osnick: ubuntu20.04
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -134,6 +154,7 @@ jobs:
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
       redisversion: 6.2.7
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -152,6 +173,7 @@ jobs:
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
       redisversion: 6.2.7
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -170,6 +192,7 @@ jobs:
       build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
       packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
       redisversion: 6.2.7
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -188,6 +211,7 @@ jobs:
       build_deps: yum install -y epel-release gcc make jemalloc-devel openssl-devel python3 python3-pip
       packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2 curl
       redisversion: 6.2.7
+      pythonversion: "3.10"
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -203,6 +227,7 @@ jobs:
       osnick: rhel8
       arch: x86_64
       target: rpm
+      pythonversion: "3.10"
       build_deps: |
         dnf install -y oracle-epel-release-el8
         dnf install -y gcc make jemalloc-devel openssl-devel tar git python3 python3-pip
@@ -227,17 +252,23 @@ jobs:
       platform: catalina
       osname: macos
       redisversion: 6.2.7
-      pythonversion: 3.9
+      pythonversion: "3.10"
       fpmversion: 1.14.1
       rubyversion: 2.7.2
 
     runs-on: macos-latest
+
     steps:
+    - name: check if already built
+      id: redis-already-built
+      continue-on-error: true
+      run: |
+        wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.redisversion}}-${{inputs.osname}}-$${{inputs.osnick}}-${{inputs.arch}}.tgz
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{env.rubyversion}}
     - name: install python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: "${{ env.pythonversion }}"
     - name: install poetry
@@ -253,6 +284,7 @@ jobs:
       with:
         path: redis-stack
     - name: clone redis
+      if: steps.redis-already-built.outcome != 'success'
       uses: actions/checkout@v2
       with:
         repository: redis/redis
@@ -266,11 +298,13 @@ jobs:
         cd redis-stack
         poetry install
     - name: build redis from source
+      if: steps.redis-already-built.outcome != 'success'
       run: |
         cd redis
         make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a"
 
     - name: package redis for s3
+      if: steps.redis-already-built.outcome != 'success'
       run: |
         mkdir redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
         cp redis/src/redis-server \
@@ -290,11 +324,13 @@ jobs:
         access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     - name: persist redis to s3
+      if: steps.redis-already-built.outcome != 'success'
       run: |
         s3cmd put -P redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
         s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
 
     - name: perist redis
+      if: steps.redis-already-built.outcome != 'success'
       uses: actions/upload-artifact@v2
       with:
         name: redis-${{env.redisversion}}-osx
@@ -310,7 +346,7 @@ jobs:
       run: |
         cd redis-stack
         source .venv/bin/activate
-        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server -k package
+        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t zip -p redis-stack-server -k package
 
     - name: codesign all binaries
       run: |
@@ -367,11 +403,11 @@ jobs:
       target: zip
       platform: catalina
       osname: macos
-      pythonversion: 3.9
+      pythonversion: "3.10"
 
     steps:
     - name: install python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: "${{ env.pythonversion }}"
     - name: install poetry
@@ -430,7 +466,7 @@ jobs:
       platform: monterey
       osname: macos
       redisversion: 6.2.7
-      pythonversion: 3.9
+      pythonversion: "3.10"
       fpmversion: 1.14.1
       rubyversion: 2.7.2
     runs-on: macos-latest
@@ -441,7 +477,7 @@ jobs:
       with:
         ruby-version: ${{env.rubyversion}}
     - name: install python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: "${{ env.pythonversion }}"
     - name: install poetry
@@ -546,7 +582,7 @@ jobs:
       platform: monterey
       osname: macos
       redisversion: 6.2.7
-      pythonversion: 3.9
+      pythonversion: "3.10"
     runs-on: ubuntu-latest
     steps:
       - name: checkout sources
@@ -562,7 +598,7 @@ jobs:
             poetry.lock
           key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
       - name: install python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: "${{ env.pythonversion }}"
       - name: install poetry
@@ -601,7 +637,7 @@ jobs:
             -v `echo $RANDOM` \
             -g HEAD
 
-# ###################### COLLATE DOCKERS ##################
+ ###################### COLLATE DOCKERS ##################
   docker-push:
     needs: [x86_64-docker, arm64-docker]
     name: Push ${{matrix.package}} manifest
@@ -609,14 +645,14 @@ jobs:
       matrix:
         package: ['redis-stack-server', 'redis-stack']
     env:
-      pythonversion: 3.9
+      pythonversion: "3.10"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: install python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
-          python-version: ${{inputs.pythonversion}}
+          python-version: "${{inputs.pythonversion}}"
       - name: install poetry
         uses: snok/install-poetry@v1
         with:

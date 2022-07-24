@@ -3,6 +3,7 @@ import shutil
 
 import requests
 from loguru import logger
+from typing import Union
 
 from ..components.modules import Modules
 from ..components.redis import Redis
@@ -24,7 +25,10 @@ class RedisStackServer(Recipe):
         self.C = Config()
 
     def prepackage(
-        self, binary_dir: str, ignore: bool = False, version_override: str = None
+        self,
+        binary_dir: Union[str, None],
+        ignore: bool = False,
+        version_override: str = None,
     ):
         for i in [
             self.__PATHS__.EXTERNAL,
@@ -60,14 +64,12 @@ class RedisStackServer(Recipe):
         logger.debug("Copying redis-stack-server script")
         stackdest = os.path.join(self.__PATHS__.BINDIR, "redis-stack-server")
         shutil.copyfile(
-            os.path.join(
-                self.__PATHS__.SCRIPTDIR, "scripts", f"redis-stack-server"
-            ),
+            os.path.join(self.__PATHS__.SCRIPTDIR, "scripts", f"redis-stack-server"),
             stackdest,
         )
         os.chmod(stackdest, mode=0o755)
 
-        if binary_dir is not None and not os.path.isdir(binary_dir):
+        if binary_dir is not None:
             r = Redis(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
             r.prepare()
         else:

@@ -1,0 +1,17 @@
+app: redis-stack-server
+union: true
+ingredients:
+  dist: focal
+  packages:
+    - libssl-dev
+    - libgomp1
+  sources:
+    - deb http://us.archive.ubuntu.com/ubuntu/ focal main universe
+script:
+  - cp ../../etc/appimage/redis-stack-server.desktop redis-stack-server.desktop
+  - cp ../../etc/appimage/redis-stack.png redis-stack-server.png
+  - tar xpf ../../redis-stack-server*.tar.gz
+  - cp ../../VERSION ..
+  - mv redis-stack-server-* opt
+  - mv opt/bin/* usr/bin
+  - mv opt/lib/* usr/lib
