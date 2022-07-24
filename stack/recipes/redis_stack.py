@@ -8,6 +8,7 @@ from ..components.modules import Modules
 from ..config import Config
 from ..paths import Paths
 from . import Recipe
+from typing import Union
 
 # FUTURE this is a placeholder for the package depending on packages, in Linux
 # This is not a real package
@@ -26,7 +27,10 @@ class RedisStack(Recipe):
         self.C = Config()
 
     def prepackage(
-        self, binary_dir: str, ignore: bool = False, version_override: str = None
+        self,
+        binary_dir: Union[str, None],
+        ignore: bool = False,
+        version_override: str = None,
     ):
 
         raise NotImplementedError("DISABLED FOR NOW, INTENTIONALLY")

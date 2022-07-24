@@ -11,7 +11,7 @@ This repository builds redis, and downloads various components (modules, RedisIn
 
 ## Development Requirements
 
-* Python > 3.9 (for this toolkit) and [poetry](https://python-poetry.org)
+* Python > 3.10 (for this toolkit) and [poetry](https://python-poetry.org)
 * Ruby > 2.7 (for [fpm](https://github.com/jordansissel/fpm))
 * Docker (to build a docker)
 * zip/apt/deb/tar depending on your target outputs.
@@ -81,6 +81,7 @@ The following steps only apply to non-prerelease, releases. As of this writing o
 2. Tag the [rpm repository](https://github.com/redis-stack/redis-stack-rpm) and wait for the [publish action to complete](https://github.com/redis-stack/redis-stack-rpm/actions/workflows/release.yml).
 3. Tag the [debian repository](https://github.com/redis-stack/redis-stack-deb)
 4. Update [homebrew](https://github.com/redis-stack/homebrew-redis-stack) with the latest version
+5. Update the [helm charts](https://github.com/redis-stack/helm-redis-stack) with the latest version
 
 ------------------------
 
@@ -97,4 +98,3 @@ Today, to modify the way a service starts, the following files all need editing:
 Versions for all packages are defined in the config.yaml file, and within a function named *generate_url* for each source type. In the case where you need to test a package that has been built to a custom location, set a variable named <module>-url-override in the config file at the top level.  For example, to override the rejson package location create a variable named *rejson-url-override*.  In the case of RedisInsight, all packages would derive from *redisinsight-url-override*.
 
 Do not commit this change to a mainline branch.
-
