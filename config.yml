@@ -3,7 +3,7 @@
 # module versions
 versions:
   rejson: 2.0.9
-  redistimeseries: 1.6.16
+  redistimeseries: 1.6.17
   redisearch: 2.4.9
   redisgraph: 2.8.15
   redisbloom: 2.2.17
