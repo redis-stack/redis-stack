@@ -6,7 +6,7 @@ versions:
   redistimeseries: 1.6.16
   redisearch: 2.4.9
   redisgraph: 2.8.15
-  redisbloom: 2.2.17
+  redisbloom: 2.2.18
   nodejs: v14.19.0
   redis: 7.0.4
   redis-stack: 99.99.99
