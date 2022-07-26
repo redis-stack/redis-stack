@@ -1,4 +1,4 @@
-name: Build Redis
+name: CI
 
 on:
   push:
