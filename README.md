@@ -1,11 +1,15 @@
 [![CI](https://github.com/redis-stack/redis-stack/actions/workflows/redis.yml/badge.svg)](https://github.com/redis-stack/redis-stack/actions/workflows/redis.yml)
+[![Homebrew](https://github.com/redis-stack/homebrew-redis-stack/actions/workflows/integration.yml/badge.svg)](https://github.com/redis-stack/homebrew-redis-stack/actions/workflows/integration.yml)
+[![Helm Chart](https://github.com/redis-stack/helm-redis-stack/actions/workflows/release.yml/badge.svg)](https://github.com/redis-stack/helm-redis-stack/actions/workflows/release.yml)
+[![redis-stack docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack)](https://img.shields.io/docker/pulls/redis/redis-stack)
+[![redis-stack-server docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack-server)](https://img.shields.io/docker/pulls/redis/redis-stack-server)
 
 # redis-stack
 
 This repository builds redis, and downloads various components (modules, RedisInsight) in order to build redis-stack packages for it's CI process.
 
-[Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) | 
-[Helm Charts](https://github.com/redis-stack/helm-redis-stack) | 
+[Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
+[Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
 [Docker images](https://hub.docker.com/r/redis/redis-stack) |
 [Other downloads](https://redis.io/download/#redis-stack-downloads)
 
