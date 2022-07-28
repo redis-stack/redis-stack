@@ -111,7 +111,7 @@ jobs:
       run: |
         pip3 install s3cmd
     - name: persist redis to s3
-      if: steps.redis-already-built.outcome != 'success'
+      if: steps.redis-already-built.outcome != 'success' && github.repository == 'redis-stack/redis-stack'
       run: |
         s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
           s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
@@ -201,29 +201,33 @@ jobs:
          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t tar -p ${{ matrix.package }}
 
      - name: install gpg key
+       if: github.repository == 'redis-stack/redis-stack'
        run: |
          cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
 
      - name: get gpg id from key
+       if: github.repository == 'redis-stack/redis-stack'
        id: get_gpg_id
        run: |
          gpg_id=`gpg --list-keys|sed -n 4p|awk '{print $1}'`
          echo "::set-output name=GPG_ID::$gpg_id"
 
      - name: get gpg email address
+       if: github.repository == 'redis-stack/redis-stack'
        id: get_gpg_email
        run: |
          gpg_email=`gpg -k|grep uid|cut -d '<' -f 2-2|cut -d '>' -f 1-1`
          echo "::set-output name=GPG_EMAIL::$gpg_email"
 
      - name: get gpg_keygrip
+       if: github.repository == 'redis-stack/redis-stack'
        id: get_gpg_keygrip
        run: |
          keygrip=`gpg -k --with-keygrip |sed -n 5p|cut -d '=' -f 2-2`
          echo "::set-output name=GPG_KEYGRIP::$keygrip"
 
      - name: gpg sign package
-       if: ${{ env.target }} = 'deb'
+       if: ${{ env.target }} = 'deb' && github.repository == 'redis-stack/redis-stack'
        run: |
          if [ -f /usr/bin/dpkg-sig ]; then
            echo '${{secrets.GPG_PASSWORD}}' > .passfile
@@ -261,6 +265,7 @@ jobs:
            ${{ matrix.package }}*.tar.gz
 
      - name: gather packages for s3 upload
+       if: github.repository == 'redis-stack/redis-stack'
        continue-on-error: true
        run: |
          mkdir -p s3uploads
@@ -276,6 +281,6 @@ jobs:
          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
      - name: upload snapshots
-       if: startsWith(github.ref, 'refs/tags/') != true
+       if: startsWith(github.ref, 'refs/tags/') != true && github.repository == 'redis-stack/redis-stack'
        run: |
          s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/

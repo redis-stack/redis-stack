@@ -84,15 +84,25 @@ jobs:
 
       - name: Log in to DockerHub
         uses: docker/login-action@v1
+        if: github.repository == 'redis-stack/redis-stack'
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: build docker
+        if: github.repository == 'redis-stack/redis-stack'
         run: |
           source .venv/bin/activate
           invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}} -r . -b
 
+      - name: build docker
+        if: github.repository != 'redis-stack/redis-stack'
+        run: |
+          source .venv/bin/activate
+          invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}} -r .
+
       - name: test docker build
+        if: github.repository == 'redis-stack/redis-stack'
         run: |
           source .venv/bin/activate
           invoke test-ci-dockers -d ${{matrix.package}} -a ${{inputs.arch}} -v ${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
