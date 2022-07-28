@@ -12,7 +12,7 @@ env:
   s3root: s3://redismodules/redis-stack
 
   # Distination bucket for releases
-  s3publicreponame: s3://packages.redis.io/redis-stack/
+  s3publicreponame: s3://packages.redis.io/redis-stack
 
 jobs:
 
@@ -53,6 +53,7 @@ jobs:
       - name: publish all files to s3  # maintain a copy with redis-stack itself so that rpms (etc) can be signed
         run: |
           s3cmd put -P s3uploads/* ${{ env.s3root}}/
+
       # copy to the distribution bucket
       - uses: s3-actions/s3cmd@v1.2.0
         with:
@@ -62,7 +63,7 @@ jobs:
           secret_key: ${{ secrets.PUBLICREPO_AWS_SECRET_ACCESS_KEY }}
       - name: publish all files to s3
         run: |
-          s3cmd put -P s3uploads/* ${{ env.s3publicreponame }}
+          s3cmd put -P s3uploads/* ${{ env.s3publicreponame }}/
 
       - name: Log in to DockerHub
         uses: docker/login-action@v1
