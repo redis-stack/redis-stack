@@ -34,6 +34,7 @@ redis-stack:
 
     Manage your Redis server and view your data with the RedisInsight graphical tool, which is also included in this package.
 
+
 redis-stack-server:
   product: redis-stack-server
   summary: Redis Stack Server installs a Redis server with additional database capabilities.
