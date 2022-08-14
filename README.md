@@ -2,7 +2,7 @@
 
 # redis-stack
 
-This repository builds redis, and downloads various components (modules, RedisInsight) in order to build redis-stack packages for it's CI process.
+This repository builds redis, and downloads various components (modules, RedisInsight) in order to build redis-stack packages for it's CI process. 
 
 [Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) | 
 [Helm Charts](https://github.com/redis-stack/helm-redis-stack) | 
@@ -80,8 +80,9 @@ The following steps only apply to non-prerelease, releases. As of this writing o
 
 2. Tag the [rpm repository](https://github.com/redis-stack/redis-stack-rpm) and wait for the [publish action to complete](https://github.com/redis-stack/redis-stack-rpm/actions/workflows/release.yml).
 3. Tag the [debian repository](https://github.com/redis-stack/redis-stack-deb)
-4. Update [homebrew](https://github.com/redis-stack/homebrew-redis-stack) with the latest version
-5. Update the [helm charts](https://github.com/redis-stack/helm-redis-stack) with the latest version
+4. Update [homebrew](https://github.com/redis-stack/homebrew-redis-stack) with the latest version of redis-stack
+    1. Note that if RedisInsight is being upgraded, it too needs to be edited in that pull request,
+5. Update the [helm charts](https://github.com/redis-stack/helm-redis-stack) with the latest version of redis-stack
 
 ------------------------
 
