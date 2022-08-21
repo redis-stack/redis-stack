@@ -17,6 +17,7 @@ env:
 jobs:
 
   promote_releases:
+    if: github.repository == 'redis-stack/redis-stack'
     name: Promote Releases
     runs-on: ubuntu-latest
     steps:
