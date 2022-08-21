@@ -27,7 +27,8 @@ jobs:
           echo "::set-output name=IAMFORK::$amfork"
       - name: amitrue
         run: |
-          [[ "true" == "${amfork}" ]]
+          echo "${steps.iam.outputs.IAMFORK}"
+          [[ "true" == "${steps.iam.outputs.IAMFORK}" ]]
 
 
 ####################### ARM JOBS #########################
