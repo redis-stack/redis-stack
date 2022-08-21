@@ -72,6 +72,9 @@ jobs:
         env
         set
 
+    - name: install dependencies
+      run: ${{inputs.build_deps}}
+
     - name: determine if in fork
       id: iamafork
       run: |
@@ -79,8 +82,6 @@ jobs:
         echo "am I fork: ${amfork}"
         echo "::set-output name=IAMAFORK::$amfork"
 
-    - name: install dependencies
-      run: ${{inputs.build_deps}}
     - name: check if already built
       id: redis-already-built
       continue-on-error: true
