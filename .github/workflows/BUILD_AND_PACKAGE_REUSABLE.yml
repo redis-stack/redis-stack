@@ -244,7 +244,7 @@ jobs:
           echo "::set-output name=GPG_KEYGRIP::$keygrip"
 
       - name: gpg sign package
-        if: ${{ env.target }} = 'deb' && steps.iamaform.outputs.IAMAFORK == 'false'
+        if: steps.iamaform.outputs.IAMAFORK == 'false'
         run: |
           if [ -f /usr/bin/dpkg-sig ]; then
             echo '${{secrets.GPG_PASSWORD}}' > .passfile

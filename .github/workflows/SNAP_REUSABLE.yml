@@ -101,6 +101,7 @@ jobs:
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: upload snapshots
+        if: steps.iamaform.outputs.IAMAFORK == 'false'
         run: |
           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
           s3cmd put -P *.sha256 s3://redismodules/redis-stack/snapshots/
