@@ -18,10 +18,12 @@ jobs:
   skiptest:
     runs-on: ubuntu-latest
     steps:
+      - using: actions/checkout@v3
       - name: tell me if I am
         run: |
           echo "I am the --${{github.repository}}--"
-          set
+          git remote
+          git remote get-url origin
 
 
 
