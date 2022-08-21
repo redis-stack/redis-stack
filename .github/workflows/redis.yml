@@ -24,7 +24,7 @@ jobs:
           echo "I am the --${{github.repository}}--"
           git remote
           git remote get-url origin
-          cat /home/runner/work/_temp/_github_workflow/event.json
+          cat /home/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'
           set
 
 ####################### ARM JOBS #########################
