@@ -718,6 +718,7 @@ jobs:
          echo "::set-output name=IAMAFORK::$amfork"
 
      - name: Log in to DockerHub
+       if: steps.iamaform.outputs.IAMAFORK == 'false'
        uses: docker/login-action@v1
        with:
          username: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
