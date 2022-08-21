@@ -16,6 +16,7 @@ on:
 jobs:
 
   skiptest:
+    runs-on: ubuntu-latest
     steps:
       - name: tell me if I am
         run: |
