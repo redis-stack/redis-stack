@@ -209,7 +209,7 @@ jobs:
      osnick: rhel7
      arch: x86_64
      target: rpm
-     build_deps: yum install -y epel-release gcc make jemalloc-devel openssl-devel python3 python3-pip jq wget
+     build_deps: yum install -y epel-release gcc make jemalloc-devel openssl-devel python3 python3-pip && yum install -y jq wget
      packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2 curl
      redisversion: 7.0.4
      pythonversion: "3.10"
