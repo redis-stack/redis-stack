@@ -66,8 +66,22 @@ jobs:
     runs-on: ubuntu-latest
     container: ${{inputs.image_name}}
     steps:
+
+    - name: vars for here
+      run: |
+        env
+        set
+
     - name: install dependencies
       run: ${{inputs.build_deps}}
+
+    - name: determine if in fork
+      id: iamafork
+      run: |
+        amfork=`cat /github/workflow/event.json | jq '.pull_request.head.repo.fork'`
+        echo "am I fork: ${amfork}"
+        echo "::set-output name=IAMAFORK::$amfork"
+
     - name: check if already built
       id: redis-already-built
       continue-on-error: true
@@ -107,7 +121,7 @@ jobs:
       run: |
         pip3 install s3cmd
     - name: persist redis to s3
-      if: steps.redis-already-built.outcome != 'success'
+      if: steps.redis-already-built.outcome != 'success' && steps.iamaform.outputs.IAMAFORK == 'false'
       run: |
         s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
           s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
@@ -145,6 +159,14 @@ jobs:
         package: ['redis-stack-server']  # add the matrix back if multiple packages are a thing againt
 
     steps:
+
+      - name: determine if in fork
+        id: iamafork
+        run: |
+          amfork=`cat /home/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
+          echo "am I fork: ${amfork}"
+          echo "::set-output name=IAMAFORK::$amfork"
+
       - uses: actions/checkout@v2
       - name: Cache dependencies
         uses: actions/cache@v2
@@ -196,29 +218,33 @@ jobs:
           invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t tar -p ${{ matrix.package }}
 
       - name: install gpg key
+        if: steps.iamaform.outputs.IAMAFORK == 'false'
         run: |
           cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
 
       - name: get gpg id from key
+        if: steps.iamaform.outputs.IAMAFORK == 'false'
         id: get_gpg_id
         run: |
           gpg_id=`gpg --list-keys|sed -n 4p|awk '{print $1}'`
           echo "::set-output name=GPG_ID::$gpg_id"
 
       - name: get gpg email address
+        if: steps.iamaform.outputs.IAMAFORK == 'false'
         id: get_gpg_email
         run: |
           gpg_email=`gpg -k|grep uid|cut -d '<' -f 2-2|cut -d '>' -f 1-1`
           echo "::set-output name=GPG_EMAIL::$gpg_email"
 
       - name: get gpg_keygrip
+        if: steps.iamaform.outputs.IAMAFORK == 'false'
         id: get_gpg_keygrip
         run: |
           keygrip=`gpg -k --with-keygrip |sed -n 5p|cut -d '=' -f 2-2`
           echo "::set-output name=GPG_KEYGRIP::$keygrip"
 
       - name: gpg sign package
-        if: ${{ env.target }} = 'deb'
+        if: steps.iamaform.outputs.IAMAFORK == 'false'
         run: |
           if [ -f /usr/bin/dpkg-sig ]; then
             echo '${{secrets.GPG_PASSWORD}}' > .passfile
@@ -266,13 +292,14 @@ jobs:
             sha256sum $i |awk '{print $1}' > $i.sha256
           done
       - uses: s3-actions/s3cmd@v1.1
+        if: steps.iamaform.outputs.IAMAFORK == 'false'
         with:
           provider: aws
           region: us-east-1
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: upload snapshots
-        if: startsWith(github.ref, 'refs/tags/') != true
+        if: startsWith(github.ref, 'refs/tags/') != true && steps.iamaform.outputs.IAMAFORK == 'false'
         run: |
           s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/
 
