@@ -12,7 +12,7 @@ env:
   s3root: s3://redismodules/redis-stack
 
   # Distination bucket for releases
-  s3publicreponame: s3://packages.redis.io/redis-stack/
+  s3publicreponame: s3://packages.redis.io/redis-stack
 
 jobs:
 
@@ -39,6 +39,7 @@ jobs:
           source .venv/bin/activate
           realversion=`invoke version -p redis-stack-server -d true`
           echo "::set-output name=VERSION::$realversion"
+
       - uses: s3-actions/s3cmd@v1.2.0
         with:
           provider: aws
@@ -51,7 +52,7 @@ jobs:
           s3cmd get ${{env.s3root}}/snapshots/*${{ steps.get_version.outputs.VERSION }}* s3uploads/
       - name: publish all files to s3  # maintain a copy with redis-stack itself so that rpms (etc) can be signed
         run: |
-          s3cmd put -P s3uploads/* ${{ env.s3publicreponame }}/
+          s3cmd put -P s3uploads/* ${{ env.s3root}}/
 
       # copy to the distribution bucket
       - uses: s3-actions/s3cmd@v1.2.0
