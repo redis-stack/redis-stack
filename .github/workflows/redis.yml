@@ -20,12 +20,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: tell me if I am
+        id: iam
         run: |
-          echo "I am the --${{github.repository}}--"
-          git remote
-          git remote get-url origin
-          cat /home/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'
-          set
+          amfork=`cat /home/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
+          echo "am I fork: ${amfork}"
+          echo "::set-output name=IAMFORK::$amfork"
+      - name: amitrue
+        run: |
+          [[ "true" == "${amfork}" ]]
+
 
 ####################### ARM JOBS #########################
 #  arm64-bionic:
