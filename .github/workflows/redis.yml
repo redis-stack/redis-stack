@@ -18,12 +18,14 @@ jobs:
   skiptest:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: tell me if I am
         run: |
           echo "I am the --${{github.repository}}--"
+          git remote
+          git remote get-url origin
+          cat /home/runner/work/_temp/_github_workflow/event.json
           set
-
-
 
 ####################### ARM JOBS #########################
 #  arm64-bionic:
