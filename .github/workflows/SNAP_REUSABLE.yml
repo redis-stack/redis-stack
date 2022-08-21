@@ -45,6 +45,12 @@ jobs:
     env:
       target: snap
     steps:
+      - name: determine if in fork
+        id: iamafork
+        run: |
+          amfork=`cat /home/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
+          echo "am I fork: ${amfork}"
+          echo "::set-output name=IAMAFORK::$amfork"
       - uses: actions/checkout@v2
       - name: install python
         uses: actions/setup-python@v3
@@ -88,7 +94,7 @@ jobs:
 #          sudo .venv/bin/pytest -m snaps
 
       - uses: s3-actions/s3cmd@v1.1
-        if: github.repository == 'redis-stack/redis-stack'
+        if: steps.iamaform.outputs.IAMAFORK == 'false'
         with:
           provider: aws
           region: us-east-1

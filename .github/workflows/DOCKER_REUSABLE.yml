@@ -31,6 +31,14 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
+
+      - name: determine if in fork
+        id: iamafork
+        run: |
+          amfork=`cat /home/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
+          echo "am I fork: ${amfork}"
+          echo "::set-output name=IAMAFORK::$amfork"
+
       - uses: actions/checkout@v2
       - name: install python
         uses: actions/setup-python@v3
@@ -84,25 +92,25 @@ jobs:
 
       - name: Log in to DockerHub
         uses: docker/login-action@v1
-        if: github.repository == 'redis-stack/redis-stack'
+        if: steps.iamaform.outputs.IAMAFORK == 'false'
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: build docker
-        if: github.repository == 'redis-stack/redis-stack'
+        if: steps.iamaform.outputs.IAMAFORK == 'false'
         run: |
           source .venv/bin/activate
           invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}} -r . -b
 
       - name: build docker
-        if: github.repository != 'redis-stack/redis-stack'
+        if: steps.iamaform.outputs.IAMAFORK == 'false'
         run: |
           source .venv/bin/activate
           invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}} -r .
 
       - name: test docker build
-        if: github.repository == 'redis-stack/redis-stack'
+        if: steps.iamaform.outputs.IAMAFORK == 'false'
         run: |
           source .venv/bin/activate
           invoke test-ci-dockers -d ${{matrix.package}} -a ${{inputs.arch}} -v ${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
