@@ -67,6 +67,11 @@ jobs:
     container: ${{inputs.image_name}}
     steps:
 
+    - name: vars for here
+      run: |
+        env
+        set
+
     - name: determine if in fork
       id: iamafork
       run: |
