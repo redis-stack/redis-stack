@@ -45,7 +45,6 @@ jobs:
   build-redisinsight-web:
     name: Build ${{inputs.platform}} (${{inputs.arch}})
     env:
-      redisversion: ${{inputs.redisversion}}
       pythonversion: "${{inputs.pythonversion}}"
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}

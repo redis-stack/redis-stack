@@ -31,6 +31,9 @@ on:
       redisversion:
         required: false
         type: string
+      packagedredisversion:
+        required: false
+        type: string
       pythonversion:
         required: false
         type: string
@@ -60,6 +63,7 @@ jobs:
 
     env:
       redisversion: ${{inputs.redisversion}}
+      packagedredisversion: ${{inputs.packagedredisversion}}
       pythonversion: "${{inputs.pythonversion}}"
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
@@ -86,7 +90,7 @@ jobs:
       id: redis-already-built
       continue-on-error: true
       run: |
-        wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.redisversion}}-${{inputs.osname}}-$${{inputs.osnick}}-${{inputs.arch}}.tgz
+        wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.packagedredisversion}}-${{inputs.osname}}-$${{inputs.osnick}}-${{inputs.arch}}.tgz
     - uses: actions/checkout@v2
       if: steps.redis-already-built.outcome != 'success'
       with:

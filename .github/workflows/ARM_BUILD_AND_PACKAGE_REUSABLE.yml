@@ -31,6 +31,9 @@ on:
       redisversion:
         required: false
         type: string
+      packagedredisversion:
+        required: false
+        type: string
       pythonversion:
         required: false
         type: string
@@ -60,6 +63,7 @@ jobs:
 
     env:
       redisversion: ${{inputs.redisversion}}
+      packagedredisversion: ${{inputs.packagedredisversion}}
       pythonversion: ${{inputs.pythonversion}}
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
@@ -75,7 +79,7 @@ jobs:
       id: redis-already-built
       continue-on-error: true
       run: |
-        wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
+        wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
     - uses: actions/checkout@v2
       if: steps.redis-already-built.outcome != 'success'
       with:
@@ -98,20 +102,20 @@ jobs:
         distro: ubuntu18.04
         install: ${{inputs.build_deps}}
         run: |
-          make -C redis/src all BUILD_TLS=yes
+          make -C redis/src all BUILD_TLS=yes MALLOC=libc
     - name: package redis for s3
       if: steps.redis-already-built.outcome != 'success'
       run: |
-        mkdir redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
+        mkdir redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
         cp redis/src/redis-server \
            redis/src/redis-sentinel \
            redis/src/redis-check-aof \
            redis/src/redis-check-rdb \
            redis/src/redis-benchmark \
            redis/src/redis-cli \
-           redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
-        tar -czvf redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
-           redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
+           redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
+        tar -czvf redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
+           redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
     - name: install s3cmd
       if: steps.redis-already-built.outcome != 'success'
       run: |
@@ -119,14 +123,14 @@ jobs:
     - name: persist redis to s3
       if: steps.redis-already-built.outcome != 'success' && steps.iamaform.outputs.IAMAFORK == 'false'
       run: |
-        s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
-          s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
+        s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
+          s3://redismodules/redis-stack/dependencies/redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
 
     - name: perist redis
       uses: actions/upload-artifact@v2
       if: steps.redis-already-built.outcome != 'success'
       with:
-        name: redis-${{env.redisversion}}-${{inputs.platform}}-${{inputs.arch}}
+        name: redis-${{env.packagedredisversion}}-${{inputs.platform}}-${{inputs.arch}}
         path: |
           redis/src/redis-server
           redis/src/redis-sentinel
@@ -139,6 +143,7 @@ jobs:
     name: Package ${{inputs.platform}} (${{inputs.arch}}) ${{matrix.package}}
     env:
       redisversion: ${{inputs.redisversion}}
+      packagedredisversion: ${{inputs.packagedredisversion}}
       pythonversion: "${{inputs.pythonversion}}"
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
