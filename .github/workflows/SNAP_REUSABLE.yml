@@ -94,14 +94,14 @@ jobs:
 #          sudo .venv/bin/pytest -m snaps
 
       - uses: s3-actions/s3cmd@v1.1
-        if: steps.iamaform.outputs.IAMAFORK == 'false'
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         with:
           provider: aws
           region: us-east-1
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: upload snapshots
-        if: steps.iamaform.outputs.IAMAFORK == 'false'
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         run: |
           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
           s3cmd put -P *.sha256 s3://redismodules/redis-stack/snapshots/

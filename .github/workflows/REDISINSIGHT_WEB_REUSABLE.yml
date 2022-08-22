@@ -92,19 +92,19 @@ jobs:
          invoke package -o ${{inputs.osname}} -s ${{inputs.osnick}} -d ${{inputs.platform}} -a ${{inputs.arch}} -t ${{inputs.target}} -p redisinsight-web
 
      - name: install gpg key
-       if: steps.iamaform.outputs.IAMAFORK == 'false'
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
          cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
 
      - name: get gpg id from key
-       if: steps.iamaform.outputs.IAMAFORK == 'false'
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
        id: get_gpg_id
        run: |
          gpg_id=`gpg --list-keys|sed -n 4p|awk '{print $1}'`
          echo "::set-output name=GPG_ID::$gpg_id"
 
      - name: gpg sign package
-       if: steps.iamaform.outputs.IAMAFORK == 'false'
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
          echo '${{secrets.GPG_PASSWORD}}' > .passfile
          dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{steps.get_gpg_id.outputs.GPG_ID}} *.deb
@@ -126,13 +126,13 @@ jobs:
          mkdir -p s3uploads
          cp *.${{inputs.target}} *.sha256 s3uploads
      - uses: s3-actions/s3cmd@v1.1
-       if: steps.iamaform.outputs.IAMAFORK == 'false'
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
        with:
          provider: aws
          region: us-east-1
          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
      - name: upload snapshots
-       if: steps.iamaform.outputs.IAMAFORK == 'false'
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
          s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/
