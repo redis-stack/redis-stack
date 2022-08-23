@@ -128,13 +128,13 @@ jobs:
       if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
       run: |
         s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
-          s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
+          s3://redismodules/redis-stack/dependencies/redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
 
     - name: perist redis
       if: steps.redis-already-built.outcome != 'success'
       uses: actions/upload-artifact@v2
       with:
-        name: redis-${{env.redisversion}}-${{inputs.platform}}
+        name: redis-${{env.packagedredisversion}}-${{inputs.platform}}
         path: |
           redis/src/redis-server
           redis/src/redis-sentinel
