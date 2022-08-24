@@ -1,6 +1,7 @@
 [![CI](https://github.com/redis-stack/redis-stack/actions/workflows/redis.yml/badge.svg)](https://github.com/redis-stack/redis-stack/actions/workflows/redis.yml)
+[![Latest Release](https://img.shields.io/github/v/release/redis-stack/redis-stack.svg)](https://github.com/redis-stack/redis-stack/releases/latest)
 [![Homebrew](https://github.com/redis-stack/homebrew-redis-stack/actions/workflows/integration.yml/badge.svg)](https://github.com/redis-stack/homebrew-redis-stack/actions/workflows/integration.yml)
-[![Helm Chart](https://github.com/redis-stack/helm-redis-stack/actions/workflows/release.yml/badge.svg)](https://github.com/redis-stack/helm-redis-stack/actions/workflows/release.yml)
+[![Helm Chart](https://img.shields.io/github/v/release/redis-stack/helm-redis-stack.svg)](https://github.com/redis-stack/helm-redis-stack/releases/latest)
 [![redis-stack docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack)](https://img.shields.io/docker/pulls/redis/redis-stack)
 [![redis-stack-server docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack-server)](https://img.shields.io/docker/pulls/redis/redis-stack-server)
 
