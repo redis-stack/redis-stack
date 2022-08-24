@@ -13,6 +13,25 @@ This repository builds redis, and downloads various components (modules, RedisIn
 [Docker images](https://hub.docker.com/r/redis/redis-stack) |
 [Other downloads](https://redis.io/download/#redis-stack-downloads)
 
+---
+
+## Quick start
+
+*Start a docker*
+ ```docker run redis/redis-stack:latest```
+
+*Start a docker with the custom password foo*
+ ```docker run -e REDIS_ARGS="--requirepass foo" redis/redis-stack:latest```
+
+*Start a docker with both custom redis arguments, and search configuration*
+```docker run -e REDIS_ARGS="--requirepass foo" -e REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis/redis-stack:latest```
+
+*Start a redis stack, with custom search results and passwords, from a locally installed package*
+
+```REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis-stack-server --requirepass foo```
+
+----
+
 ## Development Requirements
 
 * Python > 3.10 (for this toolkit) and [poetry](https://python-poetry.org)
