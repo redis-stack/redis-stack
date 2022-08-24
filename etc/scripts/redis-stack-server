@@ -69,16 +69,9 @@ ${CONFFILE} \
 --dir ${REDIS_DATA_DIR} \
 --protected-mode no \
 --daemonize no \
---loadmodule ${MODULEDIR}/redisearch.so \
-MAXSEARCHRESULTS 10000 MAXAGGREGATERESULTS 10000 \
-${REDISEARCH_ARGS} \
---loadmodule ${MODULEDIR}/redisgraph.so \
-MAX_QUEUED_QUERIES 25 TIMEOUT 1000 RESULTSET_SIZE 10000 \
-${REDISGRAPH_ARGS} \
---loadmodule ${MODULEDIR}/redistimeseries.so \
-${REDISTIMESERIES_ARGS} \
---loadmodule ${MODULEDIR}/rejson.so \
-${REDISJSON_ARGS} \
---loadmodule ${MODULEDIR}/redisbloom.so \
-${REDISBLOOM_ARGS} \
+--loadmodule ${MODULEDIR}/redisearch.so ${REDISEARCH_ARGS} \
+--loadmodule ${MODULEDIR}/redisgraph.so ${REDISGRAPH_ARGS} \
+--loadmodule ${MODULEDIR}/redistimeseries.so ${REDISTIMESERIES_ARGS} \
+--loadmodule ${MODULEDIR}/rejson.so ${REDISJSON_ARGS} \
+--loadmodule ${MODULEDIR}/redisbloom.so ${REDISBLOOM_ARGS} \
 $*
