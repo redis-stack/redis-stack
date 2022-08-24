@@ -28,6 +28,7 @@ jobs:
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
      redisversion: 7.0.4
+     packagedredisversion: 7.0.4-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -101,6 +102,7 @@ jobs:
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
      redisversion: 7.0.4
+     packagedredisversion: 7.0.4-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -155,6 +157,7 @@ jobs:
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
      redisversion: 7.0.4
+     packagedredisversion: 7.0.4-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -174,6 +177,7 @@ jobs:
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
      redisversion: 7.0.4
+     packagedredisversion: 7.0.4-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -193,6 +197,7 @@ jobs:
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
      redisversion: 7.0.4
+     packagedredisversion: 7.0.4-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -210,10 +215,11 @@ jobs:
      arch: x86_64
      target: rpm
      build_deps: |
-      yum install -y epel-release 
+      yum install -y epel-release
       yum install -y gcc make jemalloc-devel openssl-devel python3 python3-pip jq wget
      packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2 curl
      redisversion: 7.0.4
+     packagedredisversion: 7.0.4-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -236,6 +242,7 @@ jobs:
        dnf install -y gcc make jemalloc-devel openssl-devel tar git python3 python3-pip jq wget
      packaging_deps: sudo apt-get install -y rpm unzip curl gnupg2
      redisversion: 7.0.4
+     packagedredisversion: 7.0.4-1
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -255,6 +262,7 @@ jobs:
      platform: catalina
      osname: macos
      redisversion: 7.0.4
+     packagedredisversion: 7.0.4-1
      pythonversion: "3.10"
      fpmversion: 1.14.1
      rubyversion: 2.7.2
@@ -273,7 +281,7 @@ jobs:
      id: redis-already-built
      continue-on-error: true
      run: |
-       wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.redisversion}}-${{inputs.osname}}-$${{inputs.osnick}}-${{inputs.arch}}.tgz
+       wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.packagedredisversion}}-${{inputs.osname}}-$${{inputs.osnick}}-${{inputs.arch}}.tgz
    - uses: ruby/setup-ruby@v1
      with:
        ruby-version: ${{env.rubyversion}}
@@ -316,16 +324,16 @@ jobs:
    - name: package redis for s3
      if: steps.redis-already-built.outcome != 'success'
      run: |
-       mkdir redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
+       mkdir redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
        cp redis/src/redis-server \
            redis/src/redis-sentinel \
            redis/src/redis-check-aof \
            redis/src/redis-check-rdb \
            redis/src/redis-benchmark \
            redis/src/redis-cli \
-           redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
-       tar -czvf redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
-           redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
+           redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
+       tar -czvf redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
+           redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
 
    - uses: s3-actions/s3cmd@v1.1
      with:
@@ -334,16 +342,16 @@ jobs:
        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
    - name: persist redis to s3
-     if: steps.redis-already-built.outcome != 'success' && steps.iamaform.outputs.IAMAFORK == 'false'
+     if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
-       s3cmd put -P redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
-       s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
+       s3cmd put -P redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
+       s3://redismodules/redis-stack/dependencies/redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
 
    - name: perist redis
      if: steps.redis-already-built.outcome != 'success'
      uses: actions/upload-artifact@v2
      with:
-       name: redis-${{env.redisversion}}-osx
+       name: redis-${{env.packagedredisversion}}-osx
        path: |
          redis/src/redis-server
          redis/src/redis-sentinel
@@ -359,7 +367,7 @@ jobs:
        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t zip -p redis-stack-server -k package
 
    - name: codesign all binaries
-     if: steps.iamaform.outputs.IAMAFORK == 'false'
+     if: steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
        cd redis-stack
        echo ${{secrets.MACOS_CERTIFICATE}} | base64 --decode > certificate.p12
@@ -400,7 +408,7 @@ jobs:
        zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
 
    - name: notarize the custom zip
-     if: steps.iamaform.outputs.IAMAFORK == 'false'
+     if: steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
        cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
        sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
@@ -464,7 +472,7 @@ jobs:
        echo "::set-output name=VERSION::$realversion"
 
    - uses: s3-actions/s3cmd@v1.1
-     if: steps.iamaform.outputs.IAMAFORK == 'false'
+     if: steps.iamafork.outputs.IAMAFORK == 'false'
      with:
        provider: aws
        region: us-east-1
@@ -472,7 +480,7 @@ jobs:
        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
    - name: persist redis to s3
-     if: steps.iamaform.outputs.IAMAFORK == 'false'
+     if: steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
        s3cmd put -P redis-stack/redis-stack-server*.${{env.target}} \
        s3://redismodules/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}.${{env.osnick}}.${{env.arch}}.${{env.target}}
@@ -487,6 +495,7 @@ jobs:
      platform: monterey
      osname: macos
      redisversion: 7.0.4
+     packagedredisversion: 7.0.4-1
      pythonversion: "3.10"
      fpmversion: 1.14.1
      rubyversion: 2.7.2
@@ -542,7 +551,7 @@ jobs:
        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p redis-stack-server -k package
 
    - name: codesign all binaries
-     if: steps.iamaform.outputs.IAMAFORK == 'false'
+     if: steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
        echo ${{secrets.MACOS_CERTIFICATE}} | base64 --decode > certificate.p12
        security create-keychain -p ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
@@ -586,20 +595,20 @@ jobs:
          build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/*.zip
 
    - name: notarize the custom zip
-     if: steps.iamaform.outputs.IAMAFORK == 'false'
+     if: steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
        cd build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
        sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
 
    - uses: s3-actions/s3cmd@v1.1
-     if: steps.iamaform.outputs.IAMAFORK == 'false'
+     if: steps.iamafork.outputs.IAMAFORK == 'false'
      with:
        provider: aws
        region: us-east-1
        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
    - name: upload snapshots
-     if: steps.iamaform.outputs.IAMAFORK == 'false'
+     if: steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
        s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
        s3cmd put -P *.sha256 s3://redismodules/redis-stack/snapshots/
@@ -614,6 +623,7 @@ jobs:
      platform: monterey
      osname: macos
      redisversion: 7.0.4
+     packagedredisversion: 7.0.4-1
      pythonversion: "3.10"
    runs-on: ubuntu-latest
    steps:
@@ -653,7 +663,7 @@ jobs:
          name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
 
      - name: write the ssh key to a file
-       if: steps.iamaform.outputs.IAMAFORK == 'false'
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
          echo "${{secrets.OPERETO_KEY}}" > ssh.key
          chmod 0400 ssh.key
@@ -666,7 +676,7 @@ jobs:
          realversion=`invoke version`
          echo "::set-output name=VERSION::$realversion"
      - name: run the tests
-       if: steps.iamaform.outputs.IAMAFORK == 'false'
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
          source .venv/bin/activate
          invoke test-over-ssh -b \
@@ -718,7 +728,7 @@ jobs:
          echo "::set-output name=IAMAFORK::$amfork"
 
      - name: Log in to DockerHub
-       if: steps.iamaform.outputs.IAMAFORK == 'false'
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
        uses: docker/login-action@v1
        with:
          username: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
@@ -729,6 +739,6 @@ jobs:
            redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-x86_64 \
            redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-arm64
      - name: push the manifest
-       if: steps.iamaform.outputs.IAMAFORK == 'false'
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
          docker manifest push redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}
