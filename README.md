@@ -1,9 +1,10 @@
 [![CI](https://github.com/redis-stack/redis-stack/actions/workflows/redis.yml/badge.svg)](https://github.com/redis-stack/redis-stack/actions/workflows/redis.yml)
-[![Latest Release](https://img.shields.io/github/v/release/redis-stack/redis-stack.svg)](https://github.com/redis-stack/redis-stack/releases/latest)
+[![Latest Release](https://img.shields.io/github/v/release/redis-stack/redis-stack?label=latest)](https://github.com/redis-stack/redis-stack/releases/latest)
+[![Pre-release](https://img.shields.io/github/v/release/redis-stack/redis-stack?include_prereleases&label=prerelease)](https://github.com/redis-stack/redis-stack/releases)
 [![Homebrew](https://github.com/redis-stack/homebrew-redis-stack/actions/workflows/integration.yml/badge.svg)](https://github.com/redis-stack/homebrew-redis-stack/actions/workflows/integration.yml)
-[![Helm Chart](https://img.shields.io/github/v/release/redis-stack/helm-redis-stack.svg)](https://github.com/redis-stack/helm-redis-stack/releases/latest)
-[![redis-stack docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack)](https://img.shields.io/docker/pulls/redis/redis-stack)
-[![redis-stack-server docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack-server)](https://img.shields.io/docker/pulls/redis/redis-stack-server)
+[![Helm Chart](https://img.shields.io/github/v/release/redis-stack/helm-redis-stack?label=latest&20helm%20chart)](https://github.com/redis-stack/helm-redis-stack/releases/latest)
+[![redis-stack docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack?label=redis-stack)](https://img.shields.io/docker/pulls/redis/redis-stack)
+[![redis-stack-server docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack-server?label=redis-stack-server)](https://img.shields.io/docker/pulls/redis/redis-stack-server)
 
 # redis-stack
 
@@ -106,6 +107,7 @@ The following steps only apply to non-prerelease, releases. As of this writing o
 3. Tag the [debian repository](https://github.com/redis-stack/redis-stack-deb)
 4. Update [homebrew](https://github.com/redis-stack/homebrew-redis-stack) with the latest version of redis-stack
     1. Note that if RedisInsight is being upgraded, it too needs to be edited in that pull request,
+    1. Tag the repository, after the merge to master.
 5. Update the [helm charts](https://github.com/redis-stack/helm-redis-stack) with the latest version of redis-stack
 
 ------------------------
