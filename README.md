@@ -6,7 +6,7 @@
 
 # redis-stack
 
-This repository builds redis, and downloads various components (modules, RedisInsight) in order to build redis-stack packages for it's CI process. 
+This repository builds redis, and downloads various components (modules, RedisInsight) in order to build redis-stack packages for it's CI process.
 
 [Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
 [Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
@@ -23,10 +23,10 @@ This repository builds redis, and downloads various components (modules, RedisIn
 *Start a docker with the custom password foo*
  ```docker run -e REDIS_ARGS="--requirepass foo" redis/redis-stack:latest```
 
-*Start a docker with both custom redis arguments, and search configuration*
+*Start a docker with both custom redis arguments and a search configuration*
 ```docker run -e REDIS_ARGS="--requirepass foo" -e REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis/redis-stack:latest```
 
-*Start a redis stack, with custom search results and passwords, from a locally installed package*
+*From a locally installed package: start a redis stack with custom search results and passwords*
 
 ```REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis-stack-server --requirepass foo```
 
