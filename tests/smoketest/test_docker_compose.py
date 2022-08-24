@@ -76,7 +76,7 @@ services:
     ports:
       - 6379:6379
     environment:
-        REDIS_ARGS: "--maxmemory 100mb"
+        REDIS_ARGS: "maxmemory 100mb"
 """
         return content
 
@@ -96,7 +96,7 @@ services:
     ports:
       - 6379:6379
     environment:
-        REDIS_ARGS: "--maxmemory 100mb"
+        REDIS_ARGS: "maxmemory 100mb"
 """
         return content
 
