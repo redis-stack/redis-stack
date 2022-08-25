@@ -2,7 +2,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/redis-stack/redis-stack?label=latest)](https://github.com/redis-stack/redis-stack/releases/latest)
 [![Pre-release](https://img.shields.io/github/v/release/redis-stack/redis-stack?include_prereleases&label=prerelease)](https://github.com/redis-stack/redis-stack/releases)
 [![Homebrew](https://github.com/redis-stack/homebrew-redis-stack/actions/workflows/integration.yml/badge.svg)](https://github.com/redis-stack/homebrew-redis-stack/actions/workflows/integration.yml)
-[![Helm Chart](https://img.shields.io/github/v/release/redis-stack/helm-redis-stack?label=latest&20helm%20chart)](https://github.com/redis-stack/helm-redis-stack/releases/latest)
+[![Helm Chart](https://img.shields.io/github/v/release/redis-stack/helm-redis-stack?label=helm%20chart)](https://github.com/redis-stack/helm-redis-stack/releases/latest)
 [![redis-stack docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack?label=redis-stack)](https://img.shields.io/docker/pulls/redis/redis-stack)
 [![redis-stack-server docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack-server?label=redis-stack-server)](https://img.shields.io/docker/pulls/redis/redis-stack-server)
 
@@ -14,6 +14,30 @@ This repository builds redis, and downloads various components (modules, RedisIn
 [Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
 [Docker images](https://hub.docker.com/r/redis/redis-stack) |
 [Other downloads](https://redis.io/download/#redis-stack-downloads)
+
+[Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
+[Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
+[Docker images](https://hub.docker.com/r/redis/redis-stack) |
+[Other downloads](https://redis.io/download/#redis-stack-downloads)
+
+---
+
+## Quick start
+
+*Start a docker*
+ ```docker run redis/redis-stack:latest```
+
+*Start a docker with the custom password foo*
+ ```docker run -e REDIS_ARGS="--requirepass foo" redis/redis-stack:latest```
+
+*Start a docker with both custom redis arguments and a search configuration*
+```docker run -e REDIS_ARGS="--requirepass foo" -e REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis/redis-stack:latest```
+
+*From a locally installed package: start a redis stack with custom search results and passwords*
+
+```REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis-stack-server --requirepass foo```
+
+----
 
 [Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
 [Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
