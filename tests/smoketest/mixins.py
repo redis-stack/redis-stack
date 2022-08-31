@@ -1,15 +1,15 @@
 import os
+import yaml
 import subprocess
 from urllib.request import urlopen
 
-from helpers import assert_path_exists, stack_dockloader
+from helpers import assert_path_exists, stack_dockloader, CONFIGYAML
 from redis.commands.search.field import TextField
 from redis.commands.search.query import Query
 import time
 
 
 class RedisInsightTestMixin:
-
     def test_basic_redisinsight(self):
         stack_dockloader(self)
         c = urlopen("http://localhost:8001")
@@ -82,6 +82,35 @@ class RedisTestMixin:
         docs = [i.id for i in res.docs]
         assert "doc2" in docs
         assert "doc1" in docs
+
+    def test_versions_match(self, r):
+        stack_dockloader(r)
+        modmap = {
+            "redisearch": "search",
+            "redisgraph": "graph",
+            "redistimeseries": "timeseries",
+            "redisbloom": "bf",
+            "rejson": "rejson",
+        }
+
+        with open(CONFIGYAML, "r") as fp:
+            data = yaml.load(fp, yaml.SafeLoader)
+            versions = data.get("versions")
+
+        modlist = r.module_list()
+        modules = {m.get("name").lower(): m.get("ver") for m in modlist}
+        for k, v in modmap.items():
+            yamlversion = versions.get(k)
+
+            # remap
+            parts = yamlversion.split(".")
+            last = parts[2]
+            if len(parts[2]) == 1:
+                last = f"{parts[2]}0"
+            version = f"{parts[0]}0{parts[1]}{last}"
+
+            remoteversion = modules.get(v)
+            assert str(version) == str(remoteversion)
 
 
 class RedisPackagingMixin:
