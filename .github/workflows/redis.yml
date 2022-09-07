@@ -189,8 +189,8 @@ jobs:
    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
    with:
      image_name: archlinux:latest
-     platform: xenial
-     osnick: ubuntu16.04
+     platform: focal
+     osnick: ubuntu20.04
      arch: x86_64
      osname: Linux
      target: pkg
