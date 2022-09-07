@@ -194,7 +194,7 @@ jobs:
      arch: x86_64
      osname: Linux
      target: pkg
-     build_deps: pacman -Syyu --noconfirm gcc gcc-libs git openssl jq wget python
+     build_deps: pacman -Syyu --noconfirm gcc gcc-libs git openssl jq wget python openssh make
      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
      redisversion: 7.0.4
      packagedredisversion: 7.0.4-1
