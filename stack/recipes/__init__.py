@@ -119,7 +119,7 @@ class Recipe(object):
 
     def pacman(self, fpmargs, distribution):
         fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.{self.ARCH}.pacman"
+            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{self.ARCH}.pkg"
         )
         fpmargs.append(
             f"--after-install {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'postinstall')}"
@@ -130,9 +130,11 @@ class Recipe(object):
         fpmargs.append(
             f"--before-remove {os.path.join(self.__PATHS__.SCRIPTDIR, 'package', 'preremove')}"
         )
+        fpmargs.append("--depends openssl")
+        fpmargs.append("--depends gcc-libs")
         fpmargs.append(f"--pacman-user {self.C.get_key('product_user')}")
         fpmargs.append(f"--pacman-group {self.C.get_key('product_group')}")
-        fpmargs.append("--pacman-compression gz")
+        fpmargs.append("--pacman-compression xz")
         fpmargs.append("-t pacman")
         return fpmargs
 
