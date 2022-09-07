@@ -247,14 +247,16 @@ jobs:
           keygrip=`gpg -k --with-keygrip |sed -n 5p|cut -d '=' -f 2-2`
           echo "::set-output name=GPG_KEYGRIP::$keygrip"
 
-      - name: gpg sign package
-        if: steps.iamafork.outputs.IAMAFORK == 'false'
+      - name: gpg sign deb package
+        if: steps.iamafork.outputs.IAMAFORK == 'false' && inputs.target == 'deb'
         run: |
-          if [ -f /usr/bin/dpkg-sig ]; then
-            echo '${{secrets.GPG_PASSWORD}}' > .passfile
-            dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{steps.get_gpg_id.outputs.GPG_ID}} *.deb
-            rm -f .passfile
-          elif [ -f /usr/bin/rpm ]; then
+          echo '${{secrets.GPG_PASSWORD}}' > .passfile
+          dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{steps.get_gpg_id.outputs.GPG_ID}} *.deb
+          rm -f .passfile
+
+      - name: gpg sign rpm package
+        if: steps.iamafork.outputs.IAMAFORK == 'false' && inputs.target == 'rpm'
+        run: |
             gpg --export -a '${{ steps.get_gpg_email.outputs.GPG_EMAIL }}' > key
             rpm --import key
             echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
@@ -262,7 +264,6 @@ jobs:
             /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ steps.get_gpg_keygrip.outputs.GPG_KEYGRIP }}
             rpmsign --addsign --key-id ${{ steps.get_gpg_id.outputs.GPG_ID}} *.rpm
             rm key
-          fi
 
       - name: run tests in dockers
         run: |
