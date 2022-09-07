@@ -236,7 +236,7 @@ class Recipe(object):
         elif package_type == "osxpkg":
             fpmargs = self.osxpkg(fpmargs, distribution)
 
-        elif package_type == "pacman":
+        elif package_type == "pkg":
             fpmargs = self.pacman(fpmargs, distribution)
         elif package_type == "zip":
             fpmargs = self.zip(fpmargs, distribution)
