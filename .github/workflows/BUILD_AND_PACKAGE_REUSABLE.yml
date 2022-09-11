@@ -31,10 +31,13 @@ on:
       redisversion:
         required: false
         type: string
+      packagedredisversion:
+        required: false
+        type: string
       pythonversion:
         required: false
         type: string
-        default: 3.9
+        default: "3.10"
       rubyversion:
         required: false
         type: string
@@ -42,7 +45,7 @@ on:
       fpmversion:
         required: false
         type: string
-        default: 1.14.1
+        default: 1.14.2
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -60,15 +63,36 @@ jobs:
 
     env:
       redisversion: ${{inputs.redisversion}}
-      pythonversion: ${{inputs.pythonversion}}
+      packagedredisversion: ${{inputs.packagedredisversion}}
+      pythonversion: "${{inputs.pythonversion}}"
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
     runs-on: ubuntu-latest
     container: ${{inputs.image_name}}
     steps:
+
+    - name: vars for here
+      run: |
+        env
+        set
+
     - name: install dependencies
       run: ${{inputs.build_deps}}
+
+    - name: determine if in fork
+      id: iamafork
+      run: |
+        amfork=`cat /github/workflow/event.json | jq '.pull_request.head.repo.fork'`
+        echo "am I fork: ${amfork}"
+        echo "::set-output name=IAMAFORK::$amfork"
+
+    - name: check if already built
+      id: redis-already-built
+      continue-on-error: true
+      run: |
+        wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.packagedredisversion}}-${{inputs.osname}}-$${{inputs.osnick}}-${{inputs.arch}}.tgz
     - uses: actions/checkout@v2
+      if: steps.redis-already-built.outcome != 'success'
       with:
         repository: redis/redis
         path: redis
@@ -81,31 +105,36 @@ jobs:
           /var/cache/yum
         key: cache-${{hashFiles('.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.arch}}-build
     - name: make
+      if: steps.redis-already-built.outcome != 'success'
       run: make -C redis/src all BUILD_TLS=yes
     - name: package redis for s3
+      if: steps.redis-already-built.outcome != 'success'
       run: |
-        mkdir redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
+        mkdir redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
         cp redis/src/redis-server \
            redis/src/redis-sentinel \
            redis/src/redis-check-aof \
            redis/src/redis-check-rdb \
            redis/src/redis-benchmark \
            redis/src/redis-cli \
-           redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
-        tar -czvf redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
-           redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
+           redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
+        tar -czvf redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
+           redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
     - name: install s3cmd
+      if: steps.redis-already-built.outcome != 'success'
       run: |
         pip3 install s3cmd
     - name: persist redis to s3
+      if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
       run: |
-        s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
-          s3://redismodules/redis-stack/dependencies/redis-${{env.redisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
+        s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
+          s3://redismodules/redis-stack/dependencies/redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
 
     - name: perist redis
+      if: steps.redis-already-built.outcome != 'success'
       uses: actions/upload-artifact@v2
       with:
-        name: redis-${{env.redisversion}}-${{inputs.platform}}
+        name: redis-${{env.packagedredisversion}}-${{inputs.platform}}
         path: |
           redis/src/redis-server
           redis/src/redis-sentinel
@@ -118,7 +147,7 @@ jobs:
     name: Package ${{inputs.platform}} (${{inputs.arch}}) ${{matrix.package}}
     env:
       redisversion: ${{inputs.redisversion}}
-      pythonversion: ${{inputs.pythonversion}}
+      pythonversion: "${{inputs.pythonversion}}"
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
       platform: ${{inputs.platform}}
@@ -134,6 +163,14 @@ jobs:
         package: ['redis-stack-server']  # add the matrix back if multiple packages are a thing againt
 
     steps:
+
+      - name: determine if in fork
+        id: iamafork
+        run: |
+          amfork=`cat /home/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
+          echo "am I fork: ${amfork}"
+          echo "::set-output name=IAMAFORK::$amfork"
+
       - uses: actions/checkout@v2
       - name: Cache dependencies
         uses: actions/cache@v2
@@ -148,9 +185,9 @@ jobs:
 
       - uses: ruby/setup-ruby@v1
       - name: install python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
-          python-version: ${{env.pythonversion}}
+          python-version: "${{env.pythonversion}}"
       - name: install poetry
         uses: snok/install-poetry@v1
         with:
@@ -185,29 +222,33 @@ jobs:
           invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t tar -p ${{ matrix.package }}
 
       - name: install gpg key
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         run: |
           cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
 
       - name: get gpg id from key
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         id: get_gpg_id
         run: |
           gpg_id=`gpg --list-keys|sed -n 4p|awk '{print $1}'`
           echo "::set-output name=GPG_ID::$gpg_id"
 
       - name: get gpg email address
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         id: get_gpg_email
         run: |
           gpg_email=`gpg -k|grep uid|cut -d '<' -f 2-2|cut -d '>' -f 1-1`
           echo "::set-output name=GPG_EMAIL::$gpg_email"
 
       - name: get gpg_keygrip
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         id: get_gpg_keygrip
         run: |
           keygrip=`gpg -k --with-keygrip |sed -n 5p|cut -d '=' -f 2-2`
           echo "::set-output name=GPG_KEYGRIP::$keygrip"
 
       - name: gpg sign package
-        if: ${{ env.target }} = 'deb'
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         run: |
           if [ -f /usr/bin/dpkg-sig ]; then
             echo '${{secrets.GPG_PASSWORD}}' > .passfile
@@ -255,13 +296,14 @@ jobs:
             sha256sum $i |awk '{print $1}' > $i.sha256
           done
       - uses: s3-actions/s3cmd@v1.1
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         with:
           provider: aws
           region: us-east-1
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: upload snapshots
-        if: startsWith(github.ref, 'refs/tags/') != true
+        if: startsWith(github.ref, 'refs/tags/') != true && steps.iamafork.outputs.IAMAFORK == 'false'
         run: |
           s3cmd put -P s3uploads/* s3://redismodules/redis-stack/snapshots/
 
@@ -287,7 +329,7 @@ jobs:
 #          restore-keys: vagrant-${{inputs.platform}}-${{inputs.osname}}-${{inputs.osnick}}
 #      - run: vagrant --version
 #      - name: install python
-#        uses: actions/setup-python@v2
+#        uses: actions/setup-python@v3
 #        with:
 #          python-version: ${{env.pythonversion}}
 #      - name: install poetry

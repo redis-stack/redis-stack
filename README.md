@@ -1,17 +1,42 @@
 [![CI](https://github.com/redis-stack/redis-stack/actions/workflows/redis.yml/badge.svg)](https://github.com/redis-stack/redis-stack/actions/workflows/redis.yml)
+[![Latest Release](https://img.shields.io/github/v/release/redis-stack/redis-stack?label=latest)](https://github.com/redis-stack/redis-stack/releases/latest)
+[![Pre-release](https://img.shields.io/github/v/release/redis-stack/redis-stack?include_prereleases&label=prerelease)](https://github.com/redis-stack/redis-stack/releases)
+[![Homebrew](https://github.com/redis-stack/homebrew-redis-stack/actions/workflows/integration.yml/badge.svg)](https://github.com/redis-stack/homebrew-redis-stack/actions/workflows/integration.yml)
+[![Helm Chart](https://img.shields.io/github/v/release/redis-stack/helm-redis-stack?label=helm%20chart)](https://github.com/redis-stack/helm-redis-stack/releases/latest)
+[![redis-stack docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack?label=redis-stack)](https://img.shields.io/docker/pulls/redis/redis-stack)
+[![redis-stack-server docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack-server?label=redis-stack-server)](https://img.shields.io/docker/pulls/redis/redis-stack-server)
 
 # redis-stack
 
 This repository builds redis, and downloads various components (modules, RedisInsight) in order to build redis-stack packages for it's CI process.
 
-[Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) | 
-[Helm Charts](https://github.com/redis-stack/helm-redis-stack) | 
+[Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
+[Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
 [Docker images](https://hub.docker.com/r/redis/redis-stack) |
 [Other downloads](https://redis.io/download/#redis-stack-downloads)
 
+---
+
+## Quick start
+
+*Start a docker*
+ ```docker run redis/redis-stack:latest```
+
+*Start a docker with the custom password foo*
+ ```docker run -e REDIS_ARGS="--requirepass foo" redis/redis-stack:latest```
+
+*Start a docker with both custom redis arguments and a search configuration*
+```docker run -e REDIS_ARGS="--requirepass foo" -e REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis/redis-stack:latest```
+
+*From a locally installed package: start a redis stack with custom search results and passwords*
+
+```REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis-stack-server --requirepass foo```
+
+----
+
 ## Development Requirements
 
-* Python > 3.9 (for this toolkit) and [poetry](https://python-poetry.org)
+* Python > 3.10 (for this toolkit) and [poetry](https://python-poetry.org)
 * Ruby > 2.7 (for [fpm](https://github.com/jordansissel/fpm))
 * Docker (to build a docker)
 * zip/apt/deb/tar depending on your target outputs.
@@ -80,8 +105,10 @@ The following steps only apply to non-prerelease, releases. As of this writing o
 
 2. Tag the [rpm repository](https://github.com/redis-stack/redis-stack-rpm) and wait for the [publish action to complete](https://github.com/redis-stack/redis-stack-rpm/actions/workflows/release.yml).
 3. Tag the [debian repository](https://github.com/redis-stack/redis-stack-deb)
-4. Update [homebrew](https://github.com/redis-stack/homebrew-redis-stack) with the latest version
-5. Update the [helm charts](https://github.com/redis-stack/helm-redis-stack) with the latest version
+4. Update [homebrew](https://github.com/redis-stack/homebrew-redis-stack) with the latest version of redis-stack
+    1. Note that if RedisInsight is being upgraded, it too needs to be edited in that pull request,
+    1. Tag the repository, after the merge to master.
+5. Update the [helm charts](https://github.com/redis-stack/helm-redis-stack) with the latest version of redis-stack
 
 ------------------------
 
@@ -98,4 +125,3 @@ Today, to modify the way a service starts, the following files all need editing:
 Versions for all packages are defined in the config.yaml file, and within a function named *generate_url* for each source type. In the case where you need to test a package that has been built to a custom location, set a variable named <module>-url-override in the config file at the top level.  For example, to override the rejson package location create a variable named *rejson-url-override*.  In the case of RedisInsight, all packages would derive from *redisinsight-url-override*.
 
 Do not commit this change to a mainline branch.
-

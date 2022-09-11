@@ -6,7 +6,7 @@ on:
       pythonversion:
         required: false
         type: string
-        default: 3.9
+        default: "3.10"
       arch:
         required: false
         type: string
@@ -31,11 +31,19 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
+
+      - name: determine if in fork
+        id: iamafork
+        run: |
+          amfork=`cat /home/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
+          echo "am I fork: ${amfork}"
+          echo "::set-output name=IAMAFORK::$amfork"
+
       - uses: actions/checkout@v2
       - name: install python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
-          python-version: ${{inputs.pythonversion}}
+          python-version: "${{inputs.pythonversion}}"
 
       - uses: actions/cache@v2
         with:
@@ -84,13 +92,22 @@ jobs:
 
       - name: Log in to DockerHub
         uses: docker/login-action@v1
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: build docker
+
+      - name: build and publish docker
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         run: |
           source .venv/bin/activate
           invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}} -r . -b
+
+      - name: build docker
+        if: steps.iamafork.outputs.IAMAFORK == 'true'
+        run: |
+          source .venv/bin/activate
+          invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}} -r .
 
       - name: test docker build
         run: |

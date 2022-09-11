@@ -20,7 +20,7 @@ on:
       pythonversion:
         required: false
         type: string
-        default: 3.9
+        default: "3.10"
       rubyversion:
         required: false
         type: string
@@ -28,7 +28,7 @@ on:
       fpmversion:
         required: false
         type: string
-        default: 1.14.1
+        default: 1.14.2
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -45,11 +45,17 @@ jobs:
     env:
       target: snap
     steps:
+      - name: determine if in fork
+        id: iamafork
+        run: |
+          amfork=`cat /home/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
+          echo "am I fork: ${amfork}"
+          echo "::set-output name=IAMAFORK::$amfork"
       - uses: actions/checkout@v2
       - name: install python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
-          python-version: ${{inputs.pythonversion}}
+          python-version: "${{inputs.pythonversion}}"
       - uses: ruby/setup-ruby@v1
 
       - uses: actions/cache@v2
@@ -88,12 +94,14 @@ jobs:
 #          sudo .venv/bin/pytest -m snaps
 
       - uses: s3-actions/s3cmd@v1.1
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         with:
           provider: aws
           region: us-east-1
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: upload snapshots
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         run: |
           s3cmd put -P *.${{env.target}} s3://redismodules/redis-stack/snapshots/
           s3cmd put -P *.sha256 s3://redismodules/redis-stack/snapshots/
