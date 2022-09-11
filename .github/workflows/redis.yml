@@ -185,11 +185,13 @@ jobs:
 #      GPG_KEY: ${{ secrets.GPG_KEY }}
 #      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
+  # uses precompiled ubuntu binaries, hence the testplatform override
   x86_64-archlinux:
    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
    with:
      image_name: archlinux:latest
      platform: focal
+     testplatform: archlinux
      osnick: ubuntu20.04
      arch: x86_64
      osname: Linux

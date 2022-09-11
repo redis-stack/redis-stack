@@ -3,37 +3,64 @@ name: Build and Publish
 on:
   workflow_call:
     inputs:
+
+      # docker image for compiling redis
       image_name:
         required: true
         type: string
+
+      # architecture
       arch:
         required: false
         type: string
         default: x86_64
+
+      # short version of the OS (ubuntu20.04, rhel7, etc)
       osnick:
         required: true
         type: string
+
+      # target package type (deb, rpm, etc)
       target:
         required: true
         type: string
+
+      # a different type of OS shortname (focal, rhel7, etc)
       platform:
         required: true
         type: string
+
+      # an override - if set, use only as the target in testing
+      testplatform:
+        required: false
+        type: string
+
+      # operating system name (i.e Linux)
       osname:
         required: true
         type: string
+
+      # build depenedncies with the package install statement
       build_deps:
         required: true
         type: string
+
+      # a string to apt packaging dependencies
       packaging_deps:
         required: true
         type: string
+
+      # redis version to compile
       redisversion:
         required: false
         type: string
+
+      # prcompiled redis package version to try downloading
       packagedredisversion:
         required: false
         type: string
+
+      # self explanatory
       pythonversion:
         required: false
         type: string
@@ -46,6 +73,8 @@ on:
         required: false
         type: string
         default: 1.14.2
+
+    # for AWS and code signing
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -151,6 +180,7 @@ jobs:
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
       platform: ${{inputs.platform}}
+      testplatform: ${{inputs.testplatform}}
       osname: ${{inputs.osname}}
       osnick: ${{inputs.osnick}}
       arch: ${{inputs.arch}}
@@ -272,7 +302,11 @@ jobs:
           cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
           cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
           # pytest -m "${{env.platform}} and not physical and not arm"
-          invoke test -m ${{env.platform}} -n physical -n arm
+          if [ -z ${{env.testplatform }} ]; then
+            invoke test -m ${{env.platform}} -n physical -n arm
+          else
+            invoke test -m ${{env.testplatform}} -n physical -n arm
+          fi
 
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
