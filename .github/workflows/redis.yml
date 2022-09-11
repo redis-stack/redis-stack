@@ -284,7 +284,7 @@ jobs:
 #      redisversion: 7.0.4
 #      packagedredisversion: 7.0.4-1
 #      pythonversion: "3.10"
-#      fpmversion: 1.14.1
+#      fpmversion: 1.14.2
 #      rubyversion: 2.7.2
 
 #    runs-on: macos-latest
@@ -517,7 +517,7 @@ jobs:
 #      redisversion: 7.0.4
 #      packagedredisversion: 7.0.4-1
 #      pythonversion: "3.10"
-#      fpmversion: 1.14.1
+#      fpmversion: 1.14.2
 #      rubyversion: 2.7.2
 #    runs-on: macos-latest
 #    steps:
