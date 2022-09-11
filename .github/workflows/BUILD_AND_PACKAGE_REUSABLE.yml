@@ -308,14 +308,25 @@ jobs:
             invoke test -m ${{env.testplatform}} -n physical -n arm
           fi
 
-      - name: perist ${{env.target}} package
+      - name: persist ${{env.target}} package
         uses: actions/upload-artifact@v2
+        if: env.testplatform == ""
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
           path: |
             ${{ matrix.package }}*.${{env.target}}
-      - name: perist tarball
+
+      - name: persist ${{env.target}} package
         uses: actions/upload-artifact@v2
+        if: env.testplatform != ""
+        with:
+          name: ${{ matrix.package }}-${{env.testplatform}}-${{env.arch}}.${{env.target}}
+          path: |
+            ${{ matrix.package }}*.${{env.target}}
+
+      - name: persist tarball
+        uses: actions/upload-artifact@v2
+        if: env.testplatform == ""
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.tar.gz
           path: |
@@ -325,7 +336,11 @@ jobs:
         continue-on-error: true
         run: |
           mkdir -p s3uploads
-          cp *.${{env.target}} *.tar.gz s3uploads
+          if [ -z ${{env.testplatform }} ]; then
+            cp *.${{env.target}} *.tar.gz s3uploads
+          else 
+            cp *.${{env.target}} s3uploads
+          fi
           cd s3uploads
           for i in `ls`; do
             sha256sum $i |awk '{print $1}' > $i.sha256
