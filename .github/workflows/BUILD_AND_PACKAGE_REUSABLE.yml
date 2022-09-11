@@ -310,7 +310,7 @@ jobs:
 
       - name: persist ${{env.target}} package
         uses: actions/upload-artifact@v2
-        if: env.testplatform == ""
+        if: env.testplatform == ''
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
           path: |
@@ -318,7 +318,7 @@ jobs:
 
       - name: persist ${{env.target}} package
         uses: actions/upload-artifact@v2
-        if: env.testplatform != ""
+        if: env.testplatform != ''
         with:
           name: ${{ matrix.package }}-${{env.testplatform}}-${{env.arch}}.${{env.target}}
           path: |
@@ -326,7 +326,7 @@ jobs:
 
       - name: persist tarball
         uses: actions/upload-artifact@v2
-        if: env.testplatform == ""
+        if: env.testplatform == ''
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.tar.gz
           path: |
