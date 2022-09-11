@@ -21,6 +21,8 @@ Dockerfile.*
 *.tgz
 *.appimage
 *.AppImage
+*.tar.xz
+*.pkg
 
 *.rdb
 *.lock
