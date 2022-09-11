@@ -195,7 +195,7 @@ jobs:
      osname: Linux
      target: pkg
      build_deps: pacman -Syyu --noconfirm gcc gcc-libs git openssl jq wget python python-pip openssh make
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 bsdtar
+     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 libarchive-tools
      redisversion: 7.0.4
      packagedredisversion: 7.0.4-1
      pythonversion: "3.10"
