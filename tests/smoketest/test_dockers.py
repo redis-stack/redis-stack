@@ -50,9 +50,10 @@ class TestARMRedisStack(TestRedisStack):
             try:
                 assert out.decode().strip().lower().find("redisinsight") != -1
             except AssertionError:  # if in docker we can't, validate process runs, trust team tests
-                res, out = self.container.exec_run("ps -ef") # there are no pipes in exec_run contexts
+                res, out = self.container.exec_run(
+                    "ps -ef"
+                )  # there are no pipes in exec_run contexts
                 assert out.decode().strip().lower().find("nodejs") != -1
-
 
 
 @pytest.mark.dockers_redis_stack_server
