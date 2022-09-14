@@ -484,7 +484,7 @@ jobs:
        unzip redis-stack/redis-stack*.${{env.target}} -d redis-stack/redis-stack-server
    - name: run osx tests
      run: |
-       .venv/bin/pytest -m macos
+       .venv/bin/invoke test -m macos
    - name: get package version
      id: get_version
      run: |
