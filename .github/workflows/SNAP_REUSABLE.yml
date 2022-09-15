@@ -84,7 +84,7 @@ jobs:
           source .venv/bin/activate
           invoke package -o ${{inputs.osname}} -s ${{inputs.osnick}} -d ${{inputs.platform}} -a ${{inputs.arch}} -t ${{env.target}} -p ${{ matrix.package }}
           for i in `ls *.snap`; do
-            sha256 $i | awk '{print $1}' > $i.sha256
+            sha256sum $i | awk '{print $1}' > $i.sha256
           done
 
 #      - name: validate packages
