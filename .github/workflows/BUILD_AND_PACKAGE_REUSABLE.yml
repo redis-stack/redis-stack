@@ -308,6 +308,16 @@ jobs:
             invoke test -m ${{env.testplatform}} -n physical -n arm
           fi
 
+      - uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Test Results ${{env.platform}} ${{env.osnick}} ${{env.arch}}
+          path: '*.xml'
+          reporter: java-junit
+          list-suites: all
+          list-tests: all
+          max-annotations: 10
+
       - name: persist ${{env.target}} package
         uses: actions/upload-artifact@v2
         if: env.testplatform == ''
@@ -338,7 +348,7 @@ jobs:
           mkdir -p s3uploads
           if [ -z ${{env.testplatform }} ]; then
             cp *.${{env.target}} *.tar.gz s3uploads
-          else 
+          else
             cp *.${{env.target}} s3uploads
           fi
           cd s3uploads

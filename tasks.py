@@ -65,7 +65,7 @@ def markhandler(marker=[], notmarker=[]):
 def test(c, marker=[], notmarker=[], filter="", version=None):
     """Run unit tests"""
     markstr = markhandler(marker, notmarker)
-    cmd = f"pytest -m '{markstr}' {filter} -s"
+    cmd = f"pytest -m '{markstr}' {filter} --junit-xml=results.xml -s"
     if version is not None:
         cmd = f"VERSION={version} {cmd}"
     sys.stderr.write(f"Running: {cmd}\n")

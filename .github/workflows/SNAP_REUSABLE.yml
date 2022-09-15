@@ -91,7 +91,7 @@ jobs:
 #        run: |
 #          mkdir redis-stack
 #          cp *.snap redis-stack/${{ matrix.package }}.${{ env.target }}
-#          sudo .venv/bin/pytest -m snaps
+#          sudo invoke test -m snaps
 
       - uses: s3-actions/s3cmd@v1.1
         if: steps.iamafork.outputs.IAMAFORK == 'false'

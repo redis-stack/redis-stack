@@ -28,3 +28,4 @@ Dockerfile.*
 *.lock
 .vagrant
 *.log
+*.xml
