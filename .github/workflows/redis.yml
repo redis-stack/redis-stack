@@ -500,7 +500,7 @@ jobs:
      if: steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
       mkdir s3dist
-      cp redis-stack/redis-stack*.${{env.target}}
+      cp redis-stack/redis-stack*.${{env.target}} s3dist
       for i in `ls s3dist`; do
         sha256sum $i | awk '{print $1'} > s3dist/$i.sha256
       done
@@ -638,7 +638,7 @@ jobs:
        s3cmd put -P *.sha256 s3://redismodules/redis-stack/snapshots/
 
  test-osx-m1:
-   name: M1 tests
+   name: Mac (M1) tests
    needs: [build-package-osx-m1]
    env:
      arch: arm64
@@ -654,7 +654,7 @@ jobs:
      - name: determine if in fork
        id: iamafork
        run: |
-         amfork=`cat /Users/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
+         amfork=`cat /github/workflow/event.json | jq '.pull_request.head.repo.fork'`
          echo "am I fork: ${amfork}"
          echo "::set-output name=IAMAFORK::$amfork"
 
