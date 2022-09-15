@@ -482,9 +482,20 @@ jobs:
        ls -R
        mkdir -p redis-stack
        unzip redis-stack/redis-stack*.${{env.target}} -d redis-stack/redis-stack-server
+
    - name: run osx tests
      run: |
-       .venv/bin/invoke test -m macos
+       .venv/bin/pytest test -m macos --junit-xml=results.xml
+   - uses: dorny/test-reporter@v1
+     if: success() || failure()
+     with:
+       name: Test Results: ${{env.platform}} ${{env.osnick}} ${{env.arch}}
+       path: '*.xml'
+       reporter: java-junit
+       list-suites: all
+       list-tests: all
+       max-annotations: 10
+
    - name: get package version
      id: get_version
      run: |
