@@ -303,7 +303,7 @@ jobs:
      id: redis-already-built
      continue-on-error: true
      run: |
-       wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.packagedredisversion}}-${{inputs.osname}}-$${{inputs.osnick}}-${{inputs.arch}}.tgz
+       wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{env.packagedredisversion}}-${{env.osname}}-$${{env.osnick}}-${{env.arch}}.tgz
    - uses: ruby/setup-ruby@v1
      with:
        ruby-version: ${{env.rubyversion}}
