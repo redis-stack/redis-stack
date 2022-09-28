@@ -49,7 +49,7 @@ if __name__ == "__main__":
         help="Target package type (eg dpkg)",
         default="deb",
         type="choice",
-        choices=["rpm", "deb", "osxpkg", "pacman", "zip", "tar", "snap"],
+        choices=["rpm", "deb", "osxpkg", "pkg", "zip", "tar", "snap"],
     )
     p.add_option(
         "-p",

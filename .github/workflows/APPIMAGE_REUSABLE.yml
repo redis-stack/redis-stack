@@ -32,7 +32,11 @@ on:
       fpmversion:
         required: false
         type: string
+<<<<<<< HEAD
         default: 1.14.1
+=======
+        default: 1.14.2
+>>>>>>> origin/master
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -107,7 +111,7 @@ jobs:
           ./pkg2appimage.AppImage `pwd`/etc/redis-stack-server.appimage
           mv out/redis-stack-server-*.AppImage out/${{matrix.package}}-${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}.AppImage
           for i in `ls out/*.AppImage`; do
-            sha256 $i | awk '{print $1}' > $i.sha256
+            sha256sum $i | awk '{print $1}' > $i.sha256
           done
 
 #      - name: validate packages

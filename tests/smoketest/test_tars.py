@@ -122,3 +122,15 @@ class TestCentos8(TARTestBase):
             "yum install -y epel-release tar",
             "yum install -y openssl-devel jemalloc-devel libgomp",
         ]
+        
+@pytest.mark.archlinux
+class TestArchLinux(TARTestBase):
+
+    DOCKER_NAME = "archlinux:latest"
+    CONTAINER_NAME = "redis-stack-centos8"
+    PLATFORM = "linux/amd64"
+    
+    def __precommands__(self):
+        return [
+            "pacman -Fy"
+        ]
