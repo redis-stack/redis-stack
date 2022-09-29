@@ -65,7 +65,7 @@ def markhandler(marker=[], notmarker=[]):
 def test(c, marker=[], notmarker=[], filter="", version=None):
     """Run unit tests"""
     markstr = markhandler(marker, notmarker)
-    cmd = f"pytest -m '{markstr}' {filter} -s"
+    cmd = f"pytest -m '{markstr}' {filter} --junit-xml=results.xml -s"
     if version is not None:
         cmd = f"VERSION={version} {cmd}"
     sys.stderr.write(f"Running: {cmd}\n")
@@ -193,21 +193,21 @@ def package_redis(
 
 @task(
     help={
-        "docker_type": "docker type [redis-stack, redis-stack-server]",
+        "product": "docker type [redis-stack, redis-stack-server]",
         "arch": "architectures [x86_64, arm64]",
     }
 )
-def dockergen(c, docker_type="redis-stack", arch="x86_64"):
+def dockergen(c, product="redis-stack", arch="x86_64"):
     """Generate docker compile files"""
     here = os.path.abspath(os.path.dirname(__file__))
     src = os.path.join("envs", "dockers", "dockerfile.tmpl")
-    dest = os.path.join(here, "envs", "dockers", f"Dockerfile.{docker_type}")
+    dest = os.path.join(here, "envs", "dockers", f"Dockerfile.{product}")
     loader = jinja2.FileSystemLoader(here)
     env = jinja2.Environment(loader=loader)
     tmpl = loader.load(name=src, environment=env)
 
     p = Paths(None, None)
-    vars = {"docker_type": docker_type, "SHAREDIR": p.SHAREDIR, "arch": arch}
+    vars = {"docker_type": product, "SHAREDIR": p.SHAREDIR, "arch": arch}
     with open(dest, "w+") as fp:
         fp.write(tmpl.render(vars))
     sys.stdout.write(f"Docker file generated: {dest}\n")

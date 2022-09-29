@@ -88,7 +88,7 @@ jobs:
       - name: generate docker file
         run: |
           source .venv/bin/activate
-          invoke dockergen -d ${{ matrix.package }}
+          invoke dockergen -p ${{ matrix.package }}
 
       - name: Log in to DockerHub
         uses: docker/login-action@v1

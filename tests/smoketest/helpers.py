@@ -21,6 +21,7 @@ BINARIES = [
 ]
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+CONFIGYAML = os.path.join(ROOT, "config.yml")
 
 
 def stack_dockloader(cls):
