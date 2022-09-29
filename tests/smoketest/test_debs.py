@@ -61,6 +61,7 @@ class TestFocal(DEBTestBase):
     CONTAINER_NAME = "redis-stack-focal"
     PLATFORM = "linux/amd64"
 
+
 @pytest.mark.bullseye
 class TestBullseye(DEBTestBase):
 
