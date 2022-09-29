@@ -3,37 +3,64 @@ name: Build and Publish
 on:
   workflow_call:
     inputs:
+
+      # docker image for compiling redis
       image_name:
         required: true
         type: string
+
+      # architecture
       arch:
         required: false
         type: string
         default: x86_64
+
+      # short version of the OS (ubuntu20.04, rhel7, etc)
       osnick:
         required: true
         type: string
+
+      # target package type (deb, rpm, etc)
       target:
         required: true
         type: string
+
+      # a different type of OS shortname (focal, rhel7, etc)
       platform:
         required: true
         type: string
+
+      # an override - if set, use only as the target in testing
+      testplatform:
+        required: false
+        type: string
+
+      # operating system name (i.e Linux)
       osname:
         required: true
         type: string
+
+      # build depenedncies with the package install statement
       build_deps:
         required: true
         type: string
+
+      # a string to apt packaging dependencies
       packaging_deps:
         required: true
         type: string
+
+      # redis version to compile
       redisversion:
         required: false
         type: string
+
+      # prcompiled redis package version to try downloading
       packagedredisversion:
         required: false
         type: string
+
+      # self explanatory
       pythonversion:
         required: false
         type: string
@@ -45,7 +72,9 @@ on:
       fpmversion:
         required: false
         type: string
-        default: 1.14.1
+        default: 1.14.2
+
+    # for AWS and code signing
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -90,7 +119,7 @@ jobs:
       id: redis-already-built
       continue-on-error: true
       run: |
-        wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.packagedredisversion}}-${{inputs.osname}}-$${{inputs.osnick}}-${{inputs.arch}}.tgz
+        wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
     - uses: actions/checkout@v2
       if: steps.redis-already-built.outcome != 'success'
       with:
@@ -151,6 +180,7 @@ jobs:
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
       platform: ${{inputs.platform}}
+      testplatform: ${{inputs.testplatform}}
       osname: ${{inputs.osname}}
       osnick: ${{inputs.osnick}}
       arch: ${{inputs.arch}}
@@ -247,14 +277,16 @@ jobs:
           keygrip=`gpg -k --with-keygrip |sed -n 5p|cut -d '=' -f 2-2`
           echo "::set-output name=GPG_KEYGRIP::$keygrip"
 
-      - name: gpg sign package
-        if: steps.iamafork.outputs.IAMAFORK == 'false'
+      - name: gpg sign deb package
+        if: steps.iamafork.outputs.IAMAFORK == 'false' && inputs.target == 'deb'
         run: |
-          if [ -f /usr/bin/dpkg-sig ]; then
-            echo '${{secrets.GPG_PASSWORD}}' > .passfile
-            dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{steps.get_gpg_id.outputs.GPG_ID}} *.deb
-            rm -f .passfile
-          elif [ -f /usr/bin/rpm ]; then
+          echo '${{secrets.GPG_PASSWORD}}' > .passfile
+          dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{steps.get_gpg_id.outputs.GPG_ID}} *.deb
+          rm -f .passfile
+
+      - name: gpg sign rpm package
+        if: steps.iamafork.outputs.IAMAFORK == 'false' && inputs.target == 'rpm'
+        run: |
             gpg --export -a '${{ steps.get_gpg_email.outputs.GPG_EMAIL }}' > key
             rpm --import key
             echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
@@ -262,7 +294,6 @@ jobs:
             /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ steps.get_gpg_keygrip.outputs.GPG_KEYGRIP }}
             rpmsign --addsign --key-id ${{ steps.get_gpg_id.outputs.GPG_ID}} *.rpm
             rm key
-          fi
 
       - name: run tests in dockers
         run: |
@@ -271,16 +302,41 @@ jobs:
           cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
           cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
           # pytest -m "${{env.platform}} and not physical and not arm"
-          invoke test -m ${{env.platform}} -n physical -n arm
+          if [ -z ${{env.testplatform }} ]; then
+            invoke test -m ${{env.platform}} -n physical -n arm
+          else
+            invoke test -m ${{env.testplatform}} -n physical -n arm
+          fi
 
-      - name: perist ${{env.target}} package
+      - uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Test Results ${{env.platform}} ${{env.osnick}} ${{env.arch}}
+          path: '*.xml'
+          reporter: java-junit
+          list-suites: all
+          list-tests: all
+          max-annotations: 10
+
+      - name: persist ${{env.target}} package
         uses: actions/upload-artifact@v2
+        if: env.testplatform == ''
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
           path: |
             ${{ matrix.package }}*.${{env.target}}
-      - name: perist tarball
+
+      - name: persist ${{env.target}} package
         uses: actions/upload-artifact@v2
+        if: env.testplatform != ''
+        with:
+          name: ${{ matrix.package }}-${{env.testplatform}}-${{env.arch}}.${{env.target}}
+          path: |
+            ${{ matrix.package }}*.${{env.target}}
+
+      - name: persist tarball
+        uses: actions/upload-artifact@v2
+        if: env.testplatform == ''
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.tar.gz
           path: |
@@ -290,7 +346,11 @@ jobs:
         continue-on-error: true
         run: |
           mkdir -p s3uploads
-          cp *.${{env.target}} *.tar.gz s3uploads
+          if [ -z ${{env.testplatform }} ]; then
+            cp *.${{env.target}} *.tar.gz s3uploads
+          else
+            cp *.${{env.target}} s3uploads
+          fi
           cd s3uploads
           for i in `ls`; do
             sha256sum $i |awk '{print $1}' > $i.sha256

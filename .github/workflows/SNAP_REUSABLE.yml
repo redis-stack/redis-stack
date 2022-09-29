@@ -28,7 +28,7 @@ on:
       fpmversion:
         required: false
         type: string
-        default: 1.14.1
+        default: 1.14.2
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -84,14 +84,14 @@ jobs:
           source .venv/bin/activate
           invoke package -o ${{inputs.osname}} -s ${{inputs.osnick}} -d ${{inputs.platform}} -a ${{inputs.arch}} -t ${{env.target}} -p ${{ matrix.package }}
           for i in `ls *.snap`; do
-            sha256 $i | awk '{print $1}' > $i.sha256
+            sha256sum $i | awk '{print $1}' > $i.sha256
           done
 
 #      - name: validate packages
 #        run: |
 #          mkdir redis-stack
 #          cp *.snap redis-stack/${{ matrix.package }}.${{ env.target }}
-#          sudo .venv/bin/pytest -m snaps
+#          sudo invoke test -m snaps
 
       - uses: s3-actions/s3cmd@v1.1
         if: steps.iamafork.outputs.IAMAFORK == 'false'

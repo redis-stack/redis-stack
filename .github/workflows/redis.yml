@@ -185,6 +185,28 @@ jobs:
      GPG_KEY: ${{ secrets.GPG_KEY }}
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
+  # uses precompiled ubuntu binaries, hence the testplatform override
+ x86_64-archlinux:
+   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+   with:
+     image_name: archlinux:latest
+     platform: focal
+     testplatform: archlinux
+     osnick: ubuntu20.04
+     arch: x86_64
+     osname: Linux
+     target: pkg
+     build_deps: pacman -Syyu --noconfirm gcc gcc-libs git openssl jq wget python python-pip openssh make
+     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 libarchive-tools
+     redisversion: 7.0.4
+     packagedredisversion: 7.0.4-1
+     pythonversion: "3.10"
+   secrets:
+     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+     GPG_KEY: ${{ secrets.GPG_KEY }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+
  bullseye:
    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
    with:
@@ -264,7 +286,7 @@ jobs:
      redisversion: 7.0.4
      packagedredisversion: 7.0.4-1
      pythonversion: "3.10"
-     fpmversion: 1.14.1
+     fpmversion: 1.14.2
      rubyversion: 2.7.2
 
    runs-on: macos-latest
@@ -281,7 +303,7 @@ jobs:
      id: redis-already-built
      continue-on-error: true
      run: |
-       wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.packagedredisversion}}-${{inputs.osname}}-$${{inputs.osnick}}-${{inputs.arch}}.tgz
+       wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
    - uses: ruby/setup-ruby@v1
      with:
        ruby-version: ${{env.rubyversion}}
@@ -389,11 +411,6 @@ jobs:
        cd redis-stack
        source .venv/bin/activate
        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server -k fetch
-       for i in `ls *.zip`; do
-         sha256sum $i |awk '{print $1}' > $i.sha256
-       done
-       mkdir s3dist
-       cp *.zip *.sha256 s3dist
 
    - name: perist the zipfile
      uses: actions/upload-artifact@v2
@@ -448,7 +465,7 @@ jobs:
      uses: actions/checkout@v2
    - name: install dependencies
      run: |
-       brew install libomp openssl
+       brew install libomp openssl coreutils
        poetry install
    - name: gather artifacts
      uses: actions/download-artifact@v2
@@ -460,9 +477,20 @@ jobs:
        ls -R
        mkdir -p redis-stack
        unzip redis-stack/redis-stack*.${{env.target}} -d redis-stack/redis-stack-server
+
    - name: run osx tests
      run: |
-       .venv/bin/pytest -m macos
+       .venv/bin/pytest -m macos --junit-xml=results.xml
+   - uses: dorny/test-reporter@v1
+     if: success() || failure()
+     with:
+       name: Test Results ${{env.platform}} ${{env.osnick}} ${{env.arch}}
+       path: '*.xml'
+       reporter: java-junit
+       list-suites: all
+       list-tests: all
+       max-annotations: 10
+
    - name: get package version
      id: get_version
      run: |
@@ -482,8 +510,12 @@ jobs:
    - name: persist redis to s3
      if: steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
-       s3cmd put -P redis-stack/redis-stack-server*.${{env.target}} \
-       s3://redismodules/redis-stack/snapshots/redis-stack-server-${{steps.get_version.outputs.VERSION}}.${{env.osnick}}.${{env.arch}}.${{env.target}}
+      mkdir s3dist
+      cp redis-stack/redis-stack*.${{env.target}} s3dist
+      for i in `ls s3dist`; do
+        sha256sum $i | awk '{print $1'} > s3dist/$i.sha256
+      done
+      s3cmd put -P s3dist/* s3://redismodules/redis-stack/snapshots/
 
  # the m1 requires a zip file so that homebrew can unpack it
  build-package-osx-m1:
@@ -497,7 +529,7 @@ jobs:
      redisversion: 7.0.4
      packagedredisversion: 7.0.4-1
      pythonversion: "3.10"
-     fpmversion: 1.14.1
+     fpmversion: 1.14.2
      rubyversion: 2.7.2
    runs-on: macos-latest
    steps:
@@ -510,6 +542,9 @@ jobs:
      uses: actions/setup-python@v3
      with:
        python-version: "${{ env.pythonversion }}"
+   - name: install dependencies
+     run: |
+      brew install coreutils
    - name: install poetry
      uses: snok/install-poetry@v1
      with:
@@ -614,7 +649,7 @@ jobs:
        s3cmd put -P *.sha256 s3://redismodules/redis-stack/snapshots/
 
  test-osx-m1:
-   name: M1 tests
+   name: Mac (M1) tests
    needs: [build-package-osx-m1]
    env:
      arch: arm64
@@ -630,7 +665,7 @@ jobs:
      - name: determine if in fork
        id: iamafork
        run: |
-         amfork=`cat /Users/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
+         amfork=`cat /github/workflow/event.json | jq '.pull_request.head.repo.fork'`
          echo "am I fork: ${amfork}"
          echo "::set-output name=IAMAFORK::$amfork"
 

@@ -30,7 +30,7 @@ on:
       fpmversion:
         required: false
         type: string
-        default: 1.14.1
+        default: 1.14.2
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
