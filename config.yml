@@ -7,15 +7,9 @@ versions:
   redisgraph: 2.8.20
   redisbloom: 2.2.18
   nodejs: v16.15.1
-<<<<<<< HEAD
-  redis: 7.0.4-1
+  redis: 7.0.5-1
   redis-stack: 7.0.2-RC3
   redis-stack-server: 7.0.2-RC3
-=======
-  redis: 7.0.5-1
-  redis-stack: 99.99.99
-  redis-stack-server: 99.99.99
->>>>>>> 7292fd6 (Redis 7.0.5 (#220))
   redisinsight: 2.10.0
   redisinsight-web: 2.10.0
 
