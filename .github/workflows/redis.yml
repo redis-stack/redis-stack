@@ -578,7 +578,7 @@ jobs:
 #    - name: build redis from source
 #      run: |
 #        cd redis
-#        make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a" CFLAGS="-I /opt/homebrew/opt/openssl@1.1/include"
+#        make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /opt/homebrew/opt/openssl/lib/libssl.a /opt/homebrew/opt/openssl/lib/libcrypto.a" CFLAGS="-I /opt/homebrew/opt/openssl@3/include"
 #
    - name: collect dependencies prior to packaging
      run: |
