@@ -27,8 +27,8 @@ jobs:
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-     redisversion: 7.0.4
-     packagedredisversion: 7.0.4-1
+     redisversion: 7.0.5
+     packagedredisversion: 7.0.5-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -101,8 +101,8 @@ jobs:
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-     redisversion: 7.0.4
-     packagedredisversion: 7.0.4-1
+     redisversion: 7.0.5
+     packagedredisversion: 7.0.5-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -156,8 +156,8 @@ jobs:
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-     redisversion: 7.0.4
-     packagedredisversion: 7.0.4-1
+     redisversion: 7.0.5
+     packagedredisversion: 7.0.5-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -176,8 +176,8 @@ jobs:
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-     redisversion: 7.0.4
-     packagedredisversion: 7.0.4-1
+     redisversion: 7.0.5
+     packagedredisversion: 7.0.5-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -185,7 +185,6 @@ jobs:
      GPG_KEY: ${{ secrets.GPG_KEY }}
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
-  # uses precompiled ubuntu binaries, hence the testplatform override
 # x86_64-archlinux:
 #   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
 #   with:
@@ -198,8 +197,8 @@ jobs:
 #     target: pkg
 #     build_deps: pacman -Syyu --noconfirm gcc gcc-libs git openssl jq wget python python-pip openssh make
 #     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 libarchive-tools
-#     redisversion: 7.0.4
-#     packagedredisversion: 7.0.4-1
+#     redisversion: 7.0.5
+#     packagedredisversion: 7.0.5-1
 #     pythonversion: "3.10"
 #   secrets:
 #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -218,8 +217,8 @@ jobs:
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
      packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-     redisversion: 7.0.4
-     packagedredisversion: 7.0.4-1
+     redisversion: 7.0.5
+     packagedredisversion: 7.0.5-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -240,8 +239,8 @@ jobs:
       yum install -y epel-release
       yum install -y gcc make jemalloc-devel openssl-devel python3 python3-pip jq wget
      packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2 curl
-     redisversion: 7.0.4
-     packagedredisversion: 7.0.4-1
+     redisversion: 7.0.5
+     packagedredisversion: 7.0.5-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -263,8 +262,8 @@ jobs:
        dnf install -y oracle-epel-release-el8
        dnf install -y gcc make jemalloc-devel openssl-devel tar git python3 python3-pip jq wget
      packaging_deps: sudo apt-get install -y rpm unzip curl gnupg2
-     redisversion: 7.0.4
-     packagedredisversion: 7.0.4-1
+     redisversion: 7.0.5
+     packagedredisversion: 7.0.5-1
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -283,8 +282,8 @@ jobs:
      target: zip
      platform: catalina
      osname: macos
-     redisversion: 7.0.4
-     packagedredisversion: 7.0.4-1
+     redisversion: 7.0.5
+     packagedredisversion: 7.0.5-1
      pythonversion: "3.10"
      fpmversion: 1.14.2
      rubyversion: 2.7.2
@@ -526,8 +525,8 @@ jobs:
      target: zip
      platform: monterey
      osname: macos
-     redisversion: 7.0.4
-     packagedredisversion: 7.0.4-1
+     redisversion: 7.0.5
+     packagedredisversion: 7.0.5-1
      pythonversion: "3.10"
      fpmversion: 1.14.2
      rubyversion: 2.7.2
@@ -578,7 +577,7 @@ jobs:
 #    - name: build redis from source
 #      run: |
 #        cd redis
-#        make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a" CFLAGS="-I /opt/homebrew/opt/openssl@1.1/include"
+#        make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /opt/homebrew/opt/openssl/lib/libssl.a /opt/homebrew/opt/openssl/lib/libcrypto.a" CFLAGS="-I /opt/homebrew/opt/openssl@3/include"
 #
    - name: collect dependencies prior to packaging
      run: |
@@ -657,8 +656,8 @@ jobs:
      target: zip
      platform: monterey
      osname: macos
-     redisversion: 7.0.4
-     packagedredisversion: 7.0.4-1
+     redisversion: 7.0.5
+     packagedredisversion: 7.0.5-1
      pythonversion: "3.10"
    runs-on: ubuntu-latest
    steps:
