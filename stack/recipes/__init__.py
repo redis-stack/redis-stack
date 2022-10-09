@@ -131,7 +131,7 @@ class Recipe(object):
                 if v.find('--version') != -1:
                     break
             f = re.findall("[0-9]{1,3}", ver[1])
-            fpmargs[idx] = f"--version {ver}"
+            fpmargs[idx] = f"--version {ver[0]}"
             fpmargs.append(f"--iteration {f[0]}")
         
         fpmargs.append(
