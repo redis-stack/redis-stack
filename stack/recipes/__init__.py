@@ -125,7 +125,7 @@ class Recipe(object):
         # so, if we have a non-master (or non fixed) release (i.e 6.2.4-v5)
         # we split accordingly, and reseed the version
         config = Config()
-        ver = config.get_key("version")[self.PACKAGE_NAME].split("-")
+        ver = config.get_key("versions")[self.PACKAGE_NAME].split("-")
         if len(ver) != 0:
             for idx, v in enumerate(fpmargs):
                 if v.find('--version') != -1:
