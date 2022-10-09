@@ -6,7 +6,6 @@ from mixins import RedisPackagingMixin, RedisTestMixin
 
 @pytest.mark.archlinux
 class TestArchPackage(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
-<<<<<<< HEAD
 
     PLATFORM = "linux/amd64"
     DOCKER_NAME = "archlinux:latest"
