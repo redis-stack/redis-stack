@@ -104,11 +104,12 @@ For the various pytest markers, see the *pyproject.toml*
 The following steps only apply to non-prerelease, releases. As of this writing only a single package version can be released for the following installation methods.
 
 2. Tag the [rpm repository](https://github.com/redis-stack/redis-stack-rpm) and wait for the [publish action to complete](https://github.com/redis-stack/redis-stack-rpm/actions/workflows/release.yml).
-3. Tag the [debian repository](https://github.com/redis-stack/redis-stack-deb)
+3. Tag the [debian repository](https://github.com/redis-stack/redis-stack-deb) and wait for and wait for the [publish action to complete](https://github.com/redis-stack/redis-stack-deb/actions/workflows/release.yml).
 4. Update [homebrew](https://github.com/redis-stack/homebrew-redis-stack) with the latest version of redis-stack
     1. Note that if RedisInsight is being upgraded, it too needs to be edited in that pull request,
-    1. Tag the repository, after the merge to master.
+    1. Merge to master. There are no tags for this repository.
 5. Update the [helm charts](https://github.com/redis-stack/helm-redis-stack) with the latest version of redis-stack
+    1. After the pull request, create a release, using the release drafter.
 
 ------------------------
 
