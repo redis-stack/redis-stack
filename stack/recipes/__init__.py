@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import re
 
 import jinja2
 from loguru import logger
@@ -118,6 +119,21 @@ class Recipe(object):
         return fpmargs
 
     def pacman(self, fpmargs, distribution):
+
+        # replace the version, due to an awesome - archlinux packaging bug
+        # we can't rely on the split in semver
+        # so, if we have a non-master (or non fixed) release (i.e 6.2.4-v5)
+        # we split accordingly, and reseed the version
+        config = Config()
+        ver = config.get_key("versions")[self.PACKAGE_NAME].split("-")
+        if len(ver) != 1:
+            for idx, v in enumerate(fpmargs):
+                if v.find('--version') != -1:
+                    break
+            f = re.findall("[0-9]{1,3}", ver[1])
+            fpmargs[idx] = f"--version {ver[0]}"
+            fpmargs.append(f"--iteration {f[0]}")
+
         fpmargs.append(
             f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{self.ARCH}.pkg"
         )
