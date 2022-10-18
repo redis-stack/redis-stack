@@ -96,6 +96,20 @@ class TestFocal(TARTestBase):
         ]
 
 
+@pytest.mark.jammy
+class TestJammy(TARTestBase):
+
+    DOCKER_NAME = "ubuntu:jammy"
+    CONTAINER_NAME = "redis-stack-jammy"
+    PLATFORM = "linux/amd64"
+
+    def __precommands__(self):
+        return [
+            "apt-get update -yq",
+            "apt-get install -yq libssl-dev libgomp1",
+        ]
+
+
 @pytest.mark.rhel7
 class TestCentos7(TARTestBase):
 
@@ -122,14 +136,14 @@ class TestCentos8(TARTestBase):
             "yum install -y epel-release tar",
             "yum install -y openssl-devel jemalloc-devel libgomp",
         ]
-        
+
 @pytest.mark.archlinux
 class TestArchLinux(TARTestBase):
 
     DOCKER_NAME = "archlinux:latest"
     CONTAINER_NAME = "redis-stack-centos8"
     PLATFORM = "linux/amd64"
-    
+
     def __precommands__(self):
         return [
             "pacman -Fy"

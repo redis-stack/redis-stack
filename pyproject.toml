@@ -27,6 +27,7 @@ markers = [
     "xenial: ubuntu xenial tests",
     "bionic: ubuntu bionic tests",
     "focal: ubuntu focal tests",
+    "jammy: ubuntu jammy tests",
     "bullseye: bullseye tests",
     "archlinux: archlinux tests",
     "rhel7: RedHat 7 (rhel7) tests",
