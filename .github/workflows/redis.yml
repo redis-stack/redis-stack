@@ -308,7 +308,7 @@ jobs:
        mkdir redis-stack
        cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
        cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
-       pytest -m "${{env.testplatform}} and not physical and not arm"
+       pytest -m "${{env.testplatform}} and not physical and not arm" --junit-xml=results.xml
 
    - uses: dorny/test-reporter@v1
      if: success() || failure()
