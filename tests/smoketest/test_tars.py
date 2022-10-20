@@ -149,7 +149,6 @@ class TestCentos8(TARTestBase):
             "yum install -y openssl-devel jemalloc-devel libgomp",
         ]
 
-
 @pytest.mark.archlinux
 class TestArchLinux(TARTestBase):
 
