@@ -25,10 +25,13 @@ CONFIGYAML = os.path.join(ROOT, "config.yml")
 
 
 def stack_dockloader(cls):
+
+    app_path = getattr(cls, "REDIS_STACK_BINARY", "/opt/redis-stack/bin/redis-stack-server")
+
     if getattr(cls, "HOST_TYPE", None) == "docker":
         cls.container.reload()
         res, out = cls.container.exec_run(
-            "/opt/redis-stack/bin/redis-stack-server", detach=True
+            app_path, detach=True
         )
         time.sleep(2)
 
