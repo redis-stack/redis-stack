@@ -110,12 +110,13 @@ jobs:
             sha256sum $i | awk '{print $1}' > $i.sha256
           done
 
-#      - name: validate packages
-#        run: |
-#          mkdir redis-stack
-#          cp *.snap redis-stack/${{ matrix.package }}.${{ env.target }}
-#          sudo .venv/bin/pytest -m snaps
-#
+      - name: validate packages
+        run:
+          mkdir redis-stack
+          cp out/${{matrix.package}}-${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}.AppImage redis-stack/${{matrix.package}}.AppImage
+          chmod a+x redis-stack/*.AppImage
+          pytest -m appimage
+
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
         with:
