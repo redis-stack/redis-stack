@@ -115,6 +115,7 @@ jobs:
           mkdir redis-stack
           cp out/${{matrix.package}}-${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}.AppImage redis-stack/${{matrix.package}}.AppImage
           chmod a+x redis-stack/*.AppImage
+          source .venv/bin/activate
           pytest -m appimage
 
       - name: perist ${{env.target}} package
