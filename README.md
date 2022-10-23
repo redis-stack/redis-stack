@@ -8,7 +8,7 @@
 
 # redis-stack
 
-This repository builds redis, and downloads various components (modules, RedisInsight) in order to build redis-stack packages for it's CI process. 
+This repository builds redis, and downloads various components (modules, RedisInsight) in order to build redis-stack packages for it's CI process.
 
 [Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
 [Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
@@ -181,7 +181,8 @@ For the various pytest markers, see the *pyproject.toml*
 The following steps only apply to non-prerelease, releases. As of this writing only a single package version can be released for the following installation methods.
 
 2. Tag the [rpm repository](https://github.com/redis-stack/redis-stack-rpm) and wait for the [publish action to complete](https://github.com/redis-stack/redis-stack-rpm/actions/workflows/release.yml).
-3. Tag the [debian repository](https://github.com/redis-stack/redis-stack-deb)
+    1. This repository cannot release multiple versions simultaneously. This means that each release must wait for the outcome of the previous release's output tasks.
+3. Tag the [debian repository](https://github.com/redis-stack/redis-stack-deb) and wait for and wait for the [publish action to complete](https://github.com/redis-stack/redis-stack-deb/actions/workflows/release.yml).
 4. Update [homebrew](https://github.com/redis-stack/homebrew-redis-stack) with the latest version of redis-stack
     1. Note that if RedisInsight is being upgraded, it too needs to be edited in that pull request,
     1. Tag the repository, after the merge to master.
