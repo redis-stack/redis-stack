@@ -269,6 +269,77 @@ jobs:
      GPG_KEY: ${{ secrets.GPG_KEY }}
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
+ x86_64_amazonlinux2:
+  name: Amazonlinux2 (x86_64)
+  runs-on: ubuntu-latest
+  needs: [ x86_64-rhel7 ]
+  strategy:
+    matrix:
+      package: ['redis-stack-server']  # add the matrix back if multiple packages are a thing again
+  env:
+    arch: x86_64
+    platform: rhel7
+    testplatform: amazonlinux2
+    osnick: rhel7
+    osname: Linux
+    target: rpm
+    pythonversion: "3.10"
+  steps:
+
+   - name: checkout sources
+     uses: actions/checkout@v2
+   - name: Cache dependencies
+     uses: actions/cache@v2
+     with:
+       path: |
+         /var/cache/apt
+         /var/cache/yum
+         ~/.cache/pip
+         ~/.cache/pypoetry
+         ~/.local/share/gem
+       key: pypoetry-${{hashFiles('pyproject.toml', '.github/workflows/*.yml')}}-${{env.platform}}-${{env.arch}}-package
+   - name: install python
+     uses: actions/setup-python@v3
+     with:
+       python-version: "${{env.pythonversion}}"
+   - name: install poetry
+     uses: snok/install-poetry@v1
+     with:
+       version: latest
+       virtualenvs-in-project: true
+       virtualenvs-create: true
+       installer-parallel: true
+
+   - name: install packaging and testing tools
+     run: |
+       poetry install
+
+   - uses: actions/download-artifact@v2
+     with:
+       name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
+
+   - uses: actions/download-artifact@v2
+     with:
+       name: redis-stack-server-${{env.platform}}-${{env.arch}}.tar.gz
+
+   - name: run tests in dockers
+     run: |
+       source .venv/bin/activate
+       mkdir redis-stack
+       cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
+       cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
+       pytest -m "${{env.testplatform}} and not physical and not arm" --junit-xml=results.xml
+
+   - uses: dorny/test-reporter@v1
+     if: success() || failure()
+     with:
+       name: Test Results ${{env.testplatform}} ${{env.osnick}} ${{env.arch}}
+       path: '*.xml'
+       reporter: java-junit
+       list-suites: all
+       list-tests: all
+       max-annotations: 10
+
  x86-64_rhel8:
    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
    with:

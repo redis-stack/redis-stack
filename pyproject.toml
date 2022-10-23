@@ -12,15 +12,15 @@ isort = "^5.10.1"
 Fabric = "^2.7.0"
 
 [tool.poetry.dev-dependencies]
-invoke = "^1.6.0"
-requests = "^2.27.1"
+invoke = "^1.7.3"
+requests = "^2.28.1"
 loguru = "^0.6.0"
 Jinja2 = "^3.0.3"
 redis = "^4.3.4"
-pytest = "^7.0.0"
-docker = "^5.0.3"
+pytest = "^7.1.3"
+docker = "^6.0.0"
 flake8 = "^4.0.1"
-black = "^22.1.0"
+black = "^22.10.0"
 
 [tool.pytest.ini_options]
 markers = [
@@ -30,6 +30,8 @@ markers = [
     "jammy: ubuntu jammy tests",
     "bullseye: bullseye tests",
     "archlinux: archlinux tests",
+    "amazonlinux2: amazonlinux2 (centos7 in reality) tests",
+    "appimage: appimage tests",
     "rhel7: RedHat 7 (rhel7) tests",
     "rhel8: RedHat 8 (rhel8) tests",
     "physical: run tests only within a vagrant image",
