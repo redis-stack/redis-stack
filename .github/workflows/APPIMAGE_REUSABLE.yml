@@ -111,12 +111,12 @@ jobs:
           done
 
       - name: validate packages
-        run:
-          mkdir redis-stack
-          cp out/${{matrix.package}}-${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}.AppImage redis-stack/${{matrix.package}}.AppImage
-          chmod a+x redis-stack/*.AppImage
+        run: |
           source .venv/bin/activate
-          pytest -m appimage
+          mkdir redis-stack
+          cp out/*.AppImage redis-stack/${{matrix.package}}.AppImage
+          chmod a+x redis-stack/*.AppImage
+          invoke test -m appimage -n physical -n arm
 
       - name: perist ${{env.target}} package
         uses: actions/upload-artifact@v2
