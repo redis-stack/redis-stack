@@ -62,6 +62,12 @@ class TestFocal(DEBTestBase):
     PLATFORM = "linux/amd64"
 
 
+@pytest.mark.focal
+@pytest.mark.arm
+class TestARMFocal(TestFocal):
+    PLATFORM = "linux/arm64"
+
+
 @pytest.mark.bullseye
 class TestBullseye(DEBTestBase):
 

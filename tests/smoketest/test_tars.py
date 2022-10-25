@@ -1,7 +1,7 @@
 import docker
 import pytest
-from helpers import ROOT
 from env import DockerTestEnv
+from helpers import ROOT
 from mixins import RedisPackagingMixin, RedisTestMixin
 
 
@@ -68,6 +68,12 @@ class TestARMBionic(TestBionic):
     PLATFORM = "linux/amd64"
 
 
+@pytest.mark.focal
+@pytest.mark.arm
+class TestARMFocal(TestFocal):
+    PLATFORM = "linux/amd64"
+
+
 @pytest.mark.xenial
 class TestXenial(TARTestBase):
 
@@ -123,6 +129,7 @@ class TestCentos8(TARTestBase):
             "yum install -y openssl-devel jemalloc-devel libgomp",
         ]
 
+
 @pytest.mark.archlinux
 class TestArchLinux(TARTestBase):
 
@@ -131,9 +138,8 @@ class TestArchLinux(TARTestBase):
     PLATFORM = "linux/amd64"
 
     def __precommands__(self):
-        return [
-            "pacman -Fy"
-        ]
+        return ["pacman -Fy"]
+
 
 @pytest.mark.amazonlinux2
 class TestAmazonLinuxTar(TARTestBase):
