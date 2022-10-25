@@ -132,7 +132,7 @@ jobs:
         path: |
           /var/cache/apt
           /var/cache/yum
-        key: cache-${{hashFiles('.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.arch}}-build
+        key: cache-${{hashFiles('.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.testplatform}}-${{inputs.arch}}-build
     - name: make
       if: steps.redis-already-built.outcome != 'success'
       run: make -C redis/src all BUILD_TLS=yes
@@ -211,7 +211,7 @@ jobs:
             ~/.cache/pip
             ~/.cache/pypoetry
             ~/.local/share/gem
-          key: pypoetry-${{hashFiles('pyproject.toml', '.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.arch}}-package
+          key: pypoetry-${{hashFiles('pyproject.toml', '.github/workflows/*.yml')}}-${{env.platform}}-${{env.testplatform}}-${{env.arch}}-package
 
       - uses: ruby/setup-ruby@v1
       - name: install python
