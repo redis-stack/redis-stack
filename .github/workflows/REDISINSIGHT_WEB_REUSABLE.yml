@@ -108,9 +108,6 @@ jobs:
        run: |
          echo '${{secrets.GPG_PASSWORD}}' > .passfile
          dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{steps.get_gpg_id.outputs.GPG_ID}} *.deb
-         for i in `ls *.deb`; do
-           sha256sum $i |awk '{print $1}' > $i.sha256
-         done
          rm -f .passfile
 
      - name: perist ${{inputs.target}} package
@@ -124,6 +121,9 @@ jobs:
        continue-on-error: true
        run: |
          mkdir -p s3uploads
+         for i in `ls *.deb`; do
+           sha256sum $i |awk '{print $1}' > $i.sha256
+         done
          cp *.${{inputs.target}} *.sha256 s3uploads
      - uses: s3-actions/s3cmd@v1.1
        if: steps.iamafork.outputs.IAMAFORK == 'false'
