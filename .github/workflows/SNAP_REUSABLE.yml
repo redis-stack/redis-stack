@@ -50,15 +50,15 @@ jobs:
         run: |
           amfork=`cat /home/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
           echo "am I fork: ${amfork}"
-          echo "::set-output name=IAMAFORK::$amfork"
-      - uses: actions/checkout@v2
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+      - uses: actions/checkout@v3
       - name: install python
         uses: actions/setup-python@v3
         with:
           python-version: "${{inputs.pythonversion}}"
       - uses: ruby/setup-ruby@v1
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             /var/cache/apt

@@ -267,9 +267,9 @@ jobs:
   steps:
 
    - name: checkout sources
-     uses: actions/checkout@v2
+     uses: actions/checkout@v3
    - name: Cache dependencies
-     uses: actions/cache@v2
+     uses: actions/cache@v3
      with:
        path: |
          /var/cache/apt
@@ -294,11 +294,11 @@ jobs:
      run: |
        poetry install
 
-   - uses: actions/download-artifact@v2
+   - uses: actions/download-artifact@v3
      with:
        name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
 
-   - uses: actions/download-artifact@v2
+   - uses: actions/download-artifact@v3
      with:
        name: redis-stack-server-${{env.platform}}-${{env.arch}}.tar.gz
 
@@ -368,7 +368,7 @@ jobs:
      run: |
        amfork=`cat /Users/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
        echo "am I fork: ${amfork}"
-       echo "::set-output name=IAMAFORK::$amfork"
+       echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
    - name: check if already built
      id: redis-already-built
@@ -391,12 +391,12 @@ jobs:
        installer-parallel: true
 
    - name: checkout sources
-     uses: actions/checkout@v2
+     uses: actions/checkout@v3
      with:
        path: redis-stack
    - name: clone redis
      if: steps.redis-already-built.outcome != 'success'
-     uses: actions/checkout@v2
+     uses: actions/checkout@v3
      with:
        repository: redis/redis
        path: redis
@@ -442,7 +442,7 @@ jobs:
 
    - name: perist redis
      if: steps.redis-already-built.outcome != 'success'
-     uses: actions/upload-artifact@v2
+     uses: actions/upload-artifact@v3
      with:
        name: redis-${{env.packagedredisversion}}-osx
        path: |
@@ -484,7 +484,7 @@ jobs:
        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server -k fetch
 
    - name: perist the zipfile
-     uses: actions/upload-artifact@v2
+     uses: actions/upload-artifact@v3
      with:
        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
        path: |
@@ -519,7 +519,7 @@ jobs:
      run: |
        amfork=`cat /Users/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
        echo "am I fork: ${amfork}"
-       echo "::set-output name=IAMAFORK::$amfork"
+       echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
    - name: install python
      uses: actions/setup-python@v3
@@ -533,13 +533,13 @@ jobs:
        virtualenvs-create: true
        installer-parallel: true
    - name: checkout sources
-     uses: actions/checkout@v2
+     uses: actions/checkout@v3
    - name: install dependencies
      run: |
        brew install libomp openssl coreutils
        poetry install
    - name: gather artifacts
-     uses: actions/download-artifact@v2
+     uses: actions/download-artifact@v3
      with:
        path: redis-stack
        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
@@ -568,7 +568,7 @@ jobs:
        poetry install
        source .venv/bin/activate
        realversion=`invoke version`
-       echo "::set-output name=VERSION::$realversion"
+       echo "VERSION=$realversion" >> $GITHUB_OUTPUT
 
    - uses: s3-actions/s3cmd@v1.1
      if: steps.iamafork.outputs.IAMAFORK == 'false'
@@ -605,7 +605,7 @@ jobs:
    runs-on: macos-latest
    steps:
    - name: checkout sources
-     uses: actions/checkout@v2
+     uses: actions/checkout@v3
    - uses: ruby/setup-ruby@v1
      with:
        ruby-version: ${{env.rubyversion}}
@@ -624,7 +624,7 @@ jobs:
        virtualenvs-create: true
        installer-parallel: true
    - name: Cache dependencies
-     uses: actions/cache@v2
+     uses: actions/cache@v3
      with:
        path: |
          /var/cache/apt
@@ -642,7 +642,7 @@ jobs:
      run: |
        amfork=`cat /Users/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
        echo "am I fork: ${amfork}"
-       echo "::set-output name=IAMAFORK::$amfork"
+       echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
 ### Once https://github.com/actions/runner/issues/805 is resolved we can do this ###
 ### For now, this is how it is manually built, on the platform ###
@@ -682,7 +682,7 @@ jobs:
        done
 
    - name: persist the zipfile
-     uses: actions/upload-artifact@v2
+     uses: actions/upload-artifact@v3
      with:
        name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
        path: |
@@ -694,7 +694,7 @@ jobs:
        zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
 
    - name: persist the codesigned artifacts
-     uses: actions/upload-artifact@v2
+     uses: actions/upload-artifact@v3
      with:
        name: codesigned-${{env.platform}}-${{env.arch}}
        path: |
@@ -738,12 +738,12 @@ jobs:
        run: |
          amfork=`cat /github/workflow/event.json | jq '.pull_request.head.repo.fork'`
          echo "am I fork: ${amfork}"
-         echo "::set-output name=IAMAFORK::$amfork"
+         echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
      - name: checkout sources
-       uses: actions/checkout@v2
+       uses: actions/checkout@v3
      - name: Cache dependencies
-       uses: actions/cache@v2
+       uses: actions/cache@v3
        with:
          path: |
            /var/cache/apt
@@ -764,7 +764,7 @@ jobs:
          virtualenvs-create: true
          installer-parallel: true
      - name: gather artifacts
-       uses: actions/download-artifact@v2
+       uses: actions/download-artifact@v3
        with:
          name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
 
@@ -780,7 +780,7 @@ jobs:
          poetry install
          source .venv/bin/activate
          realversion=`invoke version`
-         echo "::set-output name=VERSION::$realversion"
+         echo "VERSION=$realversion" >> $GITHUB_OUTPUT
      - name: run the tests
        if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
@@ -806,7 +806,7 @@ jobs:
      pythonversion: "3.10"
    runs-on: ubuntu-latest
    steps:
-     - uses: actions/checkout@v2
+     - uses: actions/checkout@v3
      - name: install python
        uses: actions/setup-python@v3
        with:
@@ -824,18 +824,18 @@ jobs:
          poetry install
          source .venv/bin/activate
          realversion=`invoke version -p ${{ matrix.package }} -d true`
-         echo "::set-output name=VERSION::$realversion"
+         echo "VERSION=$realversion" >> $GITHUB_OUTPUT
 
      - name: determine if in fork
        id: iamafork
        run: |
          amfork=`cat /home/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
          echo "am I fork: ${amfork}"
-         echo "::set-output name=IAMAFORK::$amfork"
+         echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
      - name: Log in to DockerHub
        if: steps.iamafork.outputs.IAMAFORK == 'false'
-       uses: docker/login-action@v1
+       uses: docker/login-action@v2
        with:
          username: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
          password: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}

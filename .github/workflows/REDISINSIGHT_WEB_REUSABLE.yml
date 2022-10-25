@@ -55,11 +55,11 @@ jobs:
        run: |
          amfork=`cat /home/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
          echo "am I fork: ${amfork}"
-         echo "::set-output name=IAMAFORK::$amfork"
+         echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
-     - uses: actions/checkout@v2
+     - uses: actions/checkout@v3
      - name: Cache dependencies
-       uses: actions/cache@v2
+       uses: actions/cache@v3
        with:
          path: |
            /var/cache/apt
@@ -101,7 +101,7 @@ jobs:
        id: get_gpg_id
        run: |
          gpg_id=`gpg --list-keys|sed -n 4p|awk '{print $1}'`
-         echo "::set-output name=GPG_ID::$gpg_id"
+         echo "GPG_ID=$gpg_id" >> $GITHUB_OUTPUT
 
      - name: gpg sign package
        if: steps.iamafork.outputs.IAMAFORK == 'false'
@@ -114,7 +114,7 @@ jobs:
          rm -f .passfile
 
      - name: perist ${{inputs.target}} package
-       uses: actions/upload-artifact@v2
+       uses: actions/upload-artifact@v3
        with:
          name: redisinsight-web-${{inputs.platform}}-${{inputs.arch}}.${{inputs.target}}
          path: |
