@@ -130,7 +130,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: |
-          /var/cache/apt
+          /var/cache/apt/archives/**.deb
           /var/cache/yum
         key: cache-${{hashFiles('.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.testplatform}}-${{inputs.arch}}-build
     - name: make
@@ -206,7 +206,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            /var/cache/apt
+            /var/cache/apt/archives/**.deb
             /var/cache/yum
             ~/.cache/pip
             ~/.cache/pypoetry
