@@ -355,7 +355,7 @@ jobs:
           for i in `ls`; do
             sha256sum $i |awk '{print $1}' > $i.sha256
           done
-      - uses: s3-actions/s3cmd@v1.1
+      - uses: s3-actions/s3cmd@v1.2.0
         if: steps.iamafork.outputs.IAMAFORK == 'false'
         with:
           provider: aws
@@ -399,7 +399,7 @@ jobs:
 #          virtualenvs-in-project: true
 #          virtualenvs-create: true
 #          installer-parallel: true
-#      - uses: s3-actions/s3cmd@v1.1
+#      - uses: s3-actions/s3cmd@v1.2.0
 #        with:
 #          provider: aws
 #          region: us-east-1
@@ -416,7 +416,7 @@ jobs:
 #          source .venv/bin/activate
 #          realversion=`invoke version`
 #          echo "VERSION=$realversion" >> $GITHUB_OUTPUT
-#      - uses: s3-actions/s3cmd@v1.1
+#      - uses: s3-actions/s3cmd@v1.2.0
 #        with:
 #          provider: aws
 #          region: us-east-1

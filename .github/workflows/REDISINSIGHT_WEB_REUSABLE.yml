@@ -125,7 +125,7 @@ jobs:
        run: |
          mkdir -p s3uploads
          cp *.${{inputs.target}} *.sha256 s3uploads
-     - uses: s3-actions/s3cmd@v1.1
+     - uses: s3-actions/s3cmd@v1.2.0
        if: steps.iamafork.outputs.IAMAFORK == 'false'
        with:
          provider: aws
