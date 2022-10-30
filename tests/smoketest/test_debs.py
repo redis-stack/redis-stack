@@ -54,6 +54,12 @@ class TestARMBionic(TestBionic):
     PLATFORM = "linux/arm64"
 
 
+@pytest.mark.jammy
+@pytest.mark.arm
+class TestARMJammy(TestJammy):
+    PLATFORM = "linux/arm64"
+
+
 @pytest.mark.focal
 class TestFocal(DEBTestBase):
 

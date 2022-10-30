@@ -65,7 +65,13 @@ class TestBionic(TARTestBase):
 @pytest.mark.bionic
 @pytest.mark.arm
 class TestARMBionic(TestBionic):
-    PLATFORM = "linux/amd64"
+    PLATFORM = "linux/arm64"
+
+
+@pytest.mark.jammy
+@pytest.mark.arm
+class TestARMJammy(TestJammy):
+    PLATFORM = "linux/arm64"
 
 
 @pytest.mark.xenial
@@ -123,6 +129,7 @@ class TestCentos8(TARTestBase):
             "yum install -y openssl-devel jemalloc-devel libgomp",
         ]
 
+
 @pytest.mark.archlinux
 class TestArchLinux(TARTestBase):
 
@@ -131,9 +138,8 @@ class TestArchLinux(TARTestBase):
     PLATFORM = "linux/amd64"
 
     def __precommands__(self):
-        return [
-            "pacman -Fy"
-        ]
+        return ["pacman -Fy"]
+
 
 @pytest.mark.amazonlinux2
 class TestAmazonLinuxTar(TARTestBase):
