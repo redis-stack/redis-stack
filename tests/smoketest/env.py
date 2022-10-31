@@ -1,7 +1,7 @@
 import os
 import subprocess
-import time
 import sys
+import time
 
 import docker
 from helpers import ROOT

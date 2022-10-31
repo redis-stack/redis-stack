@@ -1,5 +1,6 @@
-import subprocess
 import abc
+import subprocess
+
 import pytest
 from env import VagrantTestEnv
 from mixins import RedisPackagingMixin, RedisTestMixin

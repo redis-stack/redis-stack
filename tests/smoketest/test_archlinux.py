@@ -1,5 +1,4 @@
 import pytest
-
 from env import DockerTestEnv
 from mixins import RedisPackagingMixin, RedisTestMixin
 

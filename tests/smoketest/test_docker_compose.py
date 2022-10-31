@@ -1,7 +1,8 @@
-import subprocess
 import os
-import pytest
+import subprocess
 import time
+
+import pytest
 from mixins import RedisInsightTestMixin, RedisTestMixin
 
 
