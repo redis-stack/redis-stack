@@ -36,7 +36,7 @@ class Modules(object):
             module = "redisearch-oss"
 
         if module == "rejson":
-            module = "rejson-oss"
+            module = "rejson-oss"t
 
         # eg: if rejson-url-override is set, fetch from that location
         # this solves someone's testing need
@@ -48,12 +48,12 @@ class Modules(object):
             )
 
         # FIXME mac M1 temporary hack until it moves
-        if self.ARCH == "arm64" and self.OSNAME != "Linux":
-            return urllib.parse.urljoin(
-                f"https://{self.AWS_S3_BUCKET}",
-                f"lab/23-macos-m1/{module}.{self.OSNAME}-{self.OSNICK}-arm64v8.{version}.zip",
-            )
-
+#        if self.ARCH == "arm64" and self.OSNAME != "Linux":
+#            return urllib.parse.urljoin(
+#                f"https://{self.AWS_S3_BUCKET}",
+#                f"lab/23-macos-m1/{module}.{self.OSNAME}-{self.OSNICK}-arm64v8.{version}.zip",
+#            )
+#
         # by default, fetch releaes
         # but if a specific versoin (i.e 99.99.99) has been specified, we're
         # getting a snapshot
