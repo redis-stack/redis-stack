@@ -62,6 +62,20 @@ class TestBionic(TARTestBase):
         ]
 
 
+@pytest.mark.jammy
+class TestJammy(TARTestBase):
+
+    DOCKER_NAME = "ubuntu:jammy"
+    CONTAINER_NAME = "redis-stack-jammy"
+    PLATFORM = "linux/amd64"
+
+    def __precommands__(self):
+        return [
+            "apt-get update -yq",
+            "apt-get install -yq libssl-dev libgomp1",
+        ]
+
+
 @pytest.mark.bionic
 @pytest.mark.arm
 class TestARMBionic(TestBionic):
@@ -93,20 +107,6 @@ class TestFocal(TARTestBase):
 
     DOCKER_NAME = "ubuntu:focal"
     CONTAINER_NAME = "redis-stack-focal"
-    PLATFORM = "linux/amd64"
-
-    def __precommands__(self):
-        return [
-            "apt-get update -yq",
-            "apt-get install -yq libssl-dev libgomp1",
-        ]
-
-
-@pytest.mark.jammy
-class TestJammy(TARTestBase):
-
-    DOCKER_NAME = "ubuntu:jammy"
-    CONTAINER_NAME = "redis-stack-jammy"
     PLATFORM = "linux/amd64"
 
     def __precommands__(self):
