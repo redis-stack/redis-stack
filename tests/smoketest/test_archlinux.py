@@ -16,7 +16,9 @@ class TestArchPackage(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object
         res, out = container.exec_run("pacman -Fy")
         assert res == 0
 
-        res, out = container.exec_run("pacman -U --noconfirm /build/redis-stack/redis-stack-server.pkg")
+        res, out = container.exec_run(
+            "pacman -U --noconfirm /build/redis-stack/redis-stack-server.pkg"
+        )
         if res != 0:
             raise IOError(out)
 

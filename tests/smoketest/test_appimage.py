@@ -36,7 +36,6 @@ class AppImageTestBase(DockerTestEnv, RedisTestMixin, object):
                 out, run = container.exec_run(cmd)
                 assert out == 0
 
-
     def uninstall(self, container):  # irrelevant in this case
         pass
 
@@ -52,4 +51,3 @@ class TestAppImageX86(AppImageTestBase):
     DOCKER_NAME = "ubuntu:focal"
     CONTAINER_NAME = "redis-stack-appimage"
     PLATFORM = "linux/amd64"
-
