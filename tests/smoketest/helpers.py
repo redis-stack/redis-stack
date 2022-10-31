@@ -2,7 +2,6 @@ import os
 import subprocess
 import time
 
-
 BASEPATH = "/opt/redis-stack"
 BINDIR = os.path.join(BASEPATH, "bin")
 LIBDIR = os.path.join(BASEPATH, "lib")

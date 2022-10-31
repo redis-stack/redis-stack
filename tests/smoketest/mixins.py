@@ -1,12 +1,12 @@
 import os
-import yaml
 import subprocess
+import time
 from urllib.request import urlopen
 
-from helpers import assert_path_exists, stack_dockloader, CONFIGYAML
+import yaml
+from helpers import CONFIGYAML, assert_path_exists, stack_dockloader
 from redis.commands.search.field import TextField
 from redis.commands.search.query import Query
-import time
 
 
 class RedisInsightTestMixin:

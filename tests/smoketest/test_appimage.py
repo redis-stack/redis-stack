@@ -1,9 +1,10 @@
-from env import DockerTestEnv
 import os
 import shutil
-from mixins import RedisTestMixin
 import time
+
 import pytest
+from env import DockerTestEnv
+from mixins import RedisTestMixin
 
 
 class AppImageTestBase(DockerTestEnv, RedisTestMixin, object):

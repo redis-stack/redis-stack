@@ -1,7 +1,7 @@
 import docker
 import pytest
-from helpers import ROOT
 from env import DockerTestEnv
+from helpers import ROOT
 from mixins import RedisPackagingMixin, RedisTestMixin
 
 
@@ -62,6 +62,20 @@ class TestBionic(TARTestBase):
         ]
 
 
+@pytest.mark.focal
+class TestFocal(TARTestBase):
+
+    DOCKER_NAME = "ubuntu:focal"
+    CONTAINER_NAME = "redis-stack-focal"
+    PLATFORM = "linux/amd64"
+
+    def __precommands__(self):
+        return [
+            "apt-get update -yq",
+            "apt-get install -yq libssl-dev libgomp1",
+        ]
+
+
 @pytest.mark.jammy
 class TestJammy(TARTestBase):
 
@@ -88,25 +102,17 @@ class TestARMJammy(TestJammy):
     PLATFORM = "linux/arm64"
 
 
+@pytest.mark.focal
+@pytest.mark.arm
+class TestARMFocal(TestFocal):
+    PLATFORM = "linux/amd64"
+
+
 @pytest.mark.xenial
 class TestXenial(TARTestBase):
 
     DOCKER_NAME = "ubuntu:xenial"
     CONTAINER_NAME = "redis-stack-xenial"
-    PLATFORM = "linux/amd64"
-
-    def __precommands__(self):
-        return [
-            "apt-get update -yq",
-            "apt-get install -yq libssl-dev libgomp1",
-        ]
-
-
-@pytest.mark.focal
-class TestFocal(TARTestBase):
-
-    DOCKER_NAME = "ubuntu:focal"
-    CONTAINER_NAME = "redis-stack-focal"
     PLATFORM = "linux/amd64"
 
     def __precommands__(self):
