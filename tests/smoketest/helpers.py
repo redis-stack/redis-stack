@@ -2,7 +2,6 @@ import os
 import subprocess
 import time
 
-
 BASEPATH = "/opt/redis-stack"
 BINDIR = os.path.join(BASEPATH, "bin")
 LIBDIR = os.path.join(BASEPATH, "lib")
@@ -26,13 +25,13 @@ CONFIGYAML = os.path.join(ROOT, "config.yml")
 
 def stack_dockloader(cls):
 
-    app_path = getattr(cls, "REDIS_STACK_BINARY", "/opt/redis-stack/bin/redis-stack-server")
+    app_path = getattr(
+        cls, "REDIS_STACK_BINARY", "/opt/redis-stack/bin/redis-stack-server"
+    )
 
     if getattr(cls, "HOST_TYPE", None) == "docker":
         cls.container.reload()
-        res, out = cls.container.exec_run(
-            app_path, detach=True
-        )
+        res, out = cls.container.exec_run(app_path, detach=True)
         time.sleep(2)
 
 

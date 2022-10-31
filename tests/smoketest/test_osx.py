@@ -1,9 +1,10 @@
 import os
-from helpers import ROOT
-from mixins import RedisTestMixin, RedisPackagingMixin
 import subprocess
 import time
+
 import pytest
+from helpers import ROOT
+from mixins import RedisPackagingMixin, RedisTestMixin
 
 
 class OSXTestBase(RedisPackagingMixin, RedisTestMixin, object):

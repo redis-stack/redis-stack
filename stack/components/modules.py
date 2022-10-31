@@ -35,6 +35,9 @@ class Modules(object):
         if module == "redisearch":
             module = "redisearch-oss"
 
+        if module == "rejson":
+            module = "rejson-oss"
+
         # eg: if rejson-url-override is set, fetch from that location
         # this solves someone's testing need
         url_base_override = self.C.get_key(f"{module}-url-override")

@@ -1,7 +1,7 @@
 import os
 import subprocess
-import time
 import sys
+import time
 
 import docker
 from helpers import ROOT
@@ -33,7 +33,6 @@ class DockerTestEnv:
 
         portmap = getattr(cls, "PORTMAP", {"6379/tcp": 6379})
 
-        sys.stdout.write(f"Using image: {cls.DOCKER_NAME}\n")
         m = docker.types.Mount("/build", ROOT, read_only=True, type="bind")
         container = cls.env.containers.run(
             image=cls.DOCKER_NAME,

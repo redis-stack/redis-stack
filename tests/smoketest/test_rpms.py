@@ -67,4 +67,3 @@ class TestAmazonLinux2(RPMTestBase):
         res, out = container.exec_run("yum remove -y redis-stack-server")
         if res != 0:
             raise IOError(out)
-

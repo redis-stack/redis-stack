@@ -1,12 +1,12 @@
 import os
-import yaml
 import subprocess
+import time
 from urllib.request import urlopen
 
-from helpers import assert_path_exists, stack_dockloader, CONFIGYAML
+import yaml
+from helpers import CONFIGYAML, assert_path_exists, stack_dockloader
 from redis.commands.search.field import TextField
 from redis.commands.search.query import Query
-import time
 
 
 class RedisInsightTestMixin:
@@ -104,10 +104,16 @@ class RedisTestMixin:
 
             # remap
             parts = yamlversion.split(".")
-            last = parts[2]
-            if len(parts[2]) == 1:
-                last = f"{parts[2]}0"
-            version = f"{parts[0]}0{parts[1]}{last}"
+            version = ""
+            if len(parts[1]) == 2:
+                base = f"{parts[0]}"
+            else:
+                base = f"{parts[0]}0"
+            if len(parts[2]) == 2:
+                patch = parts[2]
+            else:
+                patch = f"0{parts[2]}"
+            version = f"{base}{parts[1]}{patch}"
 
             remoteversion = modules.get(v)
             assert str(version) == str(remoteversion)

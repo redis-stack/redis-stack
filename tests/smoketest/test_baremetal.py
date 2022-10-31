@@ -1,5 +1,6 @@
-import subprocess
 import abc
+import subprocess
+
 import pytest
 from env import VagrantTestEnv
 from mixins import RedisPackagingMixin, RedisTestMixin
@@ -65,6 +66,13 @@ class RPMVagrant(VagrantBase):
 class TestFocal(DebVagrant):
 
     OSNICK = "focal"
+
+
+@pytest.mark.jammy
+@pytest.mark.physical
+class TestJammy(DebVagrant):
+
+    OSNICK = "jammy"
 
 
 @pytest.mark.bionic
