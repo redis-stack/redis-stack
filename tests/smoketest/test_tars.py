@@ -96,6 +96,20 @@ class TestFocal(TARTestBase):
         ]
 
 
+@pytest.mark.jammy
+class TestJammy(TARTestBase):
+
+    DOCKER_NAME = "ubuntu:jammy"
+    CONTAINER_NAME = "redis-stack-jammy"
+    PLATFORM = "linux/amd64"
+
+    def __precommands__(self):
+        return [
+            "apt-get update -yq",
+            "apt-get install -yq libssl-dev libgomp1",
+        ]
+
+
 @pytest.mark.rhel7
 class TestCentos7(TARTestBase):
 
@@ -133,17 +147,4 @@ class TestArchLinux(TARTestBase):
     def __precommands__(self):
         return [
             "pacman -Fy"
-        ]
-
-@pytest.mark.amazonlinux2
-class TestAmazonLinuxTar(TARTestBase):
-    DOCKER_NAME = "amazonlinux:2"
-    CONTAINER_NAME = "redis-stack-aml2"
-    PLATFORM = "linux/amd64"
-
-    def __precommands__(self):
-
-        return [
-            "amazon-linux-extras install epel -y",
-            "yum install -y openssl-devel jemalloc-devel libgomp tar gzip",
         ]

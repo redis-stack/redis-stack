@@ -62,6 +62,14 @@ class TestFocal(DEBTestBase):
     PLATFORM = "linux/amd64"
 
 
+@pytest.mark.jammy
+class TestJammy(DEBTestBase):
+
+    DOCKER_NAME = "ubuntu:jammy"
+    CONTAINER_NAME = "redis-stack-jammy"
+    PLATFORM = "linux/amd64"
+
+
 @pytest.mark.bullseye
 class TestBullseye(DEBTestBase):
 
