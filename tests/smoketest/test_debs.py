@@ -48,6 +48,14 @@ class TestBionic(DEBTestBase):
     PLATFORM = "linux/amd64"
 
 
+@pytest.mark.jammy
+class TestJammy(DEBTestBase):
+
+    DOCKER_NAME = "ubuntu:jammy"
+    CONTAINER_NAME = "redis-stack-jammy"
+    PLATFORM = "linux/amd64"
+
+
 @pytest.mark.bionic
 @pytest.mark.arm
 class TestARMBionic(TestBionic):
@@ -65,14 +73,6 @@ class TestFocal(DEBTestBase):
 
     DOCKER_NAME = "ubuntu:focal"
     CONTAINER_NAME = "redis-stack-focal"
-    PLATFORM = "linux/amd64"
-
-
-@pytest.mark.jammy
-class TestJammy(DEBTestBase):
-
-    DOCKER_NAME = "ubuntu:jammy"
-    CONTAINER_NAME = "redis-stack-jammy"
     PLATFORM = "linux/amd64"
 
 
