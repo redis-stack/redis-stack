@@ -5,7 +5,7 @@ versions:
   rejson: 2.4.0
   redistimeseries: 1.8.2
   redisearch: 2.6.1
-  redisgraph: 2.10.1
+  redisgraph: 2.10.2
   redisbloom: 2.4.2
   nodejs: v16.15.1
   redis: 7.0.5-1
