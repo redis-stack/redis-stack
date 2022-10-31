@@ -68,6 +68,13 @@ class TestFocal(DebVagrant):
     OSNICK = "focal"
 
 
+@pytest.mark.jammy
+@pytest.mark.physical
+class TestJammy(DebVagrant):
+
+    OSNICK = "jammy"
+
+
 @pytest.mark.bionic
 @pytest.mark.physical
 class TestBionic(DebVagrant):
