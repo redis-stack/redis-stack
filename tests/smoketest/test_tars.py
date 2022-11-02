@@ -1,7 +1,7 @@
 import docker
 import pytest
-from helpers import ROOT
 from env import DockerTestEnv
+from helpers import ROOT
 from mixins import RedisPackagingMixin, RedisTestMixin
 
 
@@ -62,17 +62,11 @@ class TestBionic(TARTestBase):
         ]
 
 
-@pytest.mark.bionic
-@pytest.mark.arm
-class TestARMBionic(TestBionic):
-    PLATFORM = "linux/amd64"
+@pytest.mark.focal
+class TestFocal(TARTestBase):
 
-
-@pytest.mark.xenial
-class TestXenial(TARTestBase):
-
-    DOCKER_NAME = "ubuntu:xenial"
-    CONTAINER_NAME = "redis-stack-xenial"
+    DOCKER_NAME = "ubuntu:focal"
+    CONTAINER_NAME = "redis-stack-focal"
     PLATFORM = "linux/amd64"
 
     def __precommands__(self):
@@ -82,11 +76,43 @@ class TestXenial(TARTestBase):
         ]
 
 
-@pytest.mark.focal
-class TestFocal(TARTestBase):
+@pytest.mark.jammy
+class TestJammy(TARTestBase):
 
-    DOCKER_NAME = "ubuntu:focal"
-    CONTAINER_NAME = "redis-stack-focal"
+    DOCKER_NAME = "ubuntu:jammy"
+    CONTAINER_NAME = "redis-stack-jammy"
+    PLATFORM = "linux/amd64"
+
+    def __precommands__(self):
+        return [
+            "apt-get update -yq",
+            "apt-get install -yq libssl-dev libgomp1",
+        ]
+
+
+@pytest.mark.bionic
+@pytest.mark.arm
+class TestARMBionic(TestBionic):
+    PLATFORM = "linux/arm64"
+
+
+@pytest.mark.jammy
+@pytest.mark.arm
+class TestARMJammy(TestJammy):
+    PLATFORM = "linux/arm64"
+
+
+@pytest.mark.focal
+@pytest.mark.arm
+class TestARMFocal(TestFocal):
+    PLATFORM = "linux/amd64"
+
+
+@pytest.mark.xenial
+class TestXenial(TARTestBase):
+
+    DOCKER_NAME = "ubuntu:xenial"
+    CONTAINER_NAME = "redis-stack-xenial"
     PLATFORM = "linux/amd64"
 
     def __precommands__(self):
@@ -123,6 +149,7 @@ class TestCentos8(TARTestBase):
             "yum install -y openssl-devel jemalloc-devel libgomp",
         ]
 
+
 @pytest.mark.archlinux
 class TestArchLinux(TARTestBase):
 
@@ -131,9 +158,8 @@ class TestArchLinux(TARTestBase):
     PLATFORM = "linux/amd64"
 
     def __precommands__(self):
-        return [
-            "pacman -Fy"
-        ]
+        return ["pacman -Fy"]
+
 
 @pytest.mark.amazonlinux2
 class TestAmazonLinuxTar(TARTestBase):
