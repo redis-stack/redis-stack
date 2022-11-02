@@ -10,8 +10,8 @@ versions:
   redis: 6.2.7-1
   redis-stack: 6.2.6-v1
   redis-stack-server: 6.2.6-v1
-  redisinsight: 2.10.0
-  redisinsight-web: 2.10.0
+  redisinsight: 2.12.0
+  redisinsight-web: 2.12.0
 
 # common package variables
 email: Redis OSS <oss@redislabs.com>
