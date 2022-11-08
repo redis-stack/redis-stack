@@ -645,7 +645,7 @@ jobs:
       mkdir s3dist
       cp redis-stack/redis-stack*.${{env.target}} s3dist
       for i in `ls s3dist`; do
-        sha256sum $i | awk '{print $1}' > s3dist/$i.sha256
+        sha256sum s3dist/$i | awk '{print $1}' > s3dist/$i.sha256
       done
       s3cmd put -P s3dist/* s3://redismodules/redis-stack/snapshots/
 
