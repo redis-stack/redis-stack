@@ -246,27 +246,27 @@ jobs:
      GPG_KEY: ${{ secrets.GPG_KEY }}
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
-  # uses precompiled ubuntu binaries, hence the testplatform override
- x86_64-archlinux:
-   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-   with:
-     image_name: archlinux:latest
-     platform: focal
-     testplatform: archlinux
-     osnick: ubuntu20.04
-     arch: x86_64
-     osname: Linux
-     target: pkg
-     build_deps: pacman -Syyu --noconfirm gcc gcc-libs git openssl jq wget python python-pip openssh make
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 libarchive-tools
-     redisversion: 7.0.5
-     packagedredisversion: 7.0.5-1
-     pythonversion: "3.10"
-   secrets:
-     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+#  # uses precompiled ubuntu binaries, hence the testplatform override
+# x86_64-archlinux:
+#   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+#   with:
+#     image_name: archlinux:latest
+#     platform: focal
+#     testplatform: archlinux
+#     osnick: ubuntu20.04
+#     arch: x86_64
+#     osname: Linux
+#     target: pkg
+#     build_deps: pacman -Syyu --noconfirm gcc gcc-libs git openssl jq wget python python-pip openssh make
+#     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 libarchive-tools
+#     redisversion: 7.0.5
+#     packagedredisversion: 7.0.5-1
+#     pythonversion: "3.10"
+#   secrets:
+#     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#     GPG_KEY: ${{ secrets.GPG_KEY }}
+#     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
  bullseye:
    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
