@@ -4,8 +4,8 @@ from urllib.request import urlopen
 
 import docker
 import pytest
-from mixins import RedisInsightTestMixin, RedisTestMixin
 from env import DockerTestEnv
+from mixins import RedisInsightTestMixin, RedisTestMixin
 
 
 @pytest.mark.dockers_redis_stack
