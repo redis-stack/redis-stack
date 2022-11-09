@@ -15,7 +15,7 @@ env:
   s3publicreponame: s3://packages.redis.io/redis-stack
 
   # set to YES (in caps) so that in the specified branch, the release will mark as latest
-  ISLATEST: YES
+  ISLATEST: NO
 
 jobs:
 
