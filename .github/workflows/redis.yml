@@ -9,6 +9,7 @@ on:
     branches:
       - master
       - '[0-9].[0-9]'
+      - '[0-9].[0-9].[0-9]'
   pull_request:
   schedule:
     - cron: "0 1 * * *"
@@ -185,7 +186,7 @@ jobs:
      GPG_KEY: ${{ secrets.GPG_KEY }}
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
-  bullseye:
+ bullseye:
    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
    with:
      image_name: debian:bullseye-slim
