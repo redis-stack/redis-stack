@@ -341,7 +341,7 @@ jobs:
          ~/.local/share/gem
        key: pypoetry-${{hashFiles('pyproject.toml', '.github/workflows/*.yml')}}-${{env.platform}}-${{env.arch}}-package
    - name: install python
-     uses: actions/setup-python@v3
+     uses: actions/setup-python@v4
      with:
        python-version: "${{env.pythonversion}}"
    - name: install poetry
@@ -441,7 +441,7 @@ jobs:
      with:
        ruby-version: ${{env.rubyversion}}
    - name: install python
-     uses: actions/setup-python@v3
+     uses: actions/setup-python@v4
      with:
        python-version: "${{ env.pythonversion }}"
    - name: install poetry
@@ -584,7 +584,7 @@ jobs:
        echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
    - name: install python
-     uses: actions/setup-python@v3
+     uses: actions/setup-python@v4
      with:
        python-version: "${{ env.pythonversion }}"
    - name: install poetry
@@ -672,7 +672,7 @@ jobs:
      with:
        ruby-version: ${{env.rubyversion}}
    - name: install python
-     uses: actions/setup-python@v3
+     uses: actions/setup-python@v4
      with:
        python-version: "${{ env.pythonversion }}"
    - name: install dependencies
@@ -815,7 +815,7 @@ jobs:
            poetry.lock
          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
      - name: install python
-       uses: actions/setup-python@v3
+       uses: actions/setup-python@v4
        with:
          python-version: "${{ env.pythonversion }}"
      - name: install poetry
@@ -870,7 +870,7 @@ jobs:
    steps:
      - uses: actions/checkout@v3
      - name: install python
-       uses: actions/setup-python@v3
+       uses: actions/setup-python@v4
        with:
          python-version: "${{inputs.pythonversion}}"
      - name: install poetry

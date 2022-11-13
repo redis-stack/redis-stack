@@ -180,7 +180,7 @@ jobs:
 
      - uses: ruby/setup-ruby@v1
      - name: install python
-       uses: actions/setup-python@v3
+       uses: actions/setup-python@v4
        with:
          python-version: "${{env.pythonversion}}"
      - name: install poetry
