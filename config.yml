@@ -1,7 +1,7 @@
 ---
 
 # module versions
-versions1
+versions:
   rejson: 2.4.1
   redistimeseries: 1.8.3
   redisearch: 2.6.2
