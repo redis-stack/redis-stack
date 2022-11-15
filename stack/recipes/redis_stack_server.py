@@ -1,9 +1,14 @@
+#
+# Copyright Redis Ltd. [2022] - present
+# Licensed under your choice of the Redis Source Available License 2.0 (RSALv2) or
+# the Server Side Public License v1 (SSPLv1).
+#
 import os
 import shutil
+from typing import Union
 
 import requests
 from loguru import logger
-from typing import Union
 
 from ..components.modules import Modules
 from ..components.redis import Redis
@@ -64,7 +69,7 @@ class RedisStackServer(Recipe):
         logger.debug("Copying redis-stack-server script")
         stackdest = os.path.join(self.__PATHS__.BINDIR, "redis-stack-server")
         shutil.copyfile(
-            os.path.join(self.__PATHS__.SCRIPTDIR, "scripts", f"redis-stack-server"),
+            os.path.join(self.__PATHS__.SCRIPTDIR, "scripts", "redis-stack-server"),
             stackdest,
         )
         os.chmod(stackdest, mode=0o755)
