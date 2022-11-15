@@ -1,11 +1,11 @@
 ---
 # module versions
 versions:
-  rejson: 2.4.0
-  redistimeseries: 1.8.2
-  redisearch: 2.6.1
-  redisgraph: 2.10.2
-  redisbloom: 2.4.2
+  rejson: 2.4.1
+  redistimeseries: 1.8.3
+  redisearch: 2.6.2
+  redisgraph: 2.10.3
+  redisbloom: 2.4.3
   nodejs: v16.15.1
   redis: 6.2.7-1
   redis-stack: 6.2.6-v0
