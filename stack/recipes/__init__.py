@@ -1,8 +1,13 @@
+#
+# Copyright Redis Ltd. [2022] - present
+# Licensed under your choice of the Redis Source Available License 2.0 (RSALv2) or
+# the Server Side Public License v1 (SSPLv1).
+#
 import os
+import re
 import shutil
 import subprocess
 import tempfile
-import re
 
 import jinja2
 from loguru import logger
@@ -128,7 +133,7 @@ class Recipe(object):
         ver = config.get_key("versions")[self.PACKAGE_NAME].split("-")
         if len(ver) != 0:
             for idx, v in enumerate(fpmargs):
-                if v.find('--version') != -1:
+                if v.find("--version") != -1:
                     break
             f = re.findall("[0-9]{1,3}", ver[1])
             fpmargs[idx] = f"--version {ver[0]}"
