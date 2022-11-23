@@ -62,6 +62,9 @@ jobs:
           python-version: "${{inputs.pythonversion}}"
       - uses: ruby/setup-ruby@v1
 
+      - name: install libfuse
+        run: apt update -qq && aptget install -yqq libfuse-dev
+
       - uses: actions/cache@v2
         with:
           path: |
