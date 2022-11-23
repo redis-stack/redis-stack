@@ -63,7 +63,9 @@ jobs:
       - uses: ruby/setup-ruby@v1
 
       - name: install libfuse
-        run: apt update -qq && aptget install -yqq libfuse-dev
+        run: |
+          sudo apt update -qq
+          sudo apt-get install -yqq libfuse-dev
 
       - uses: actions/cache@v2
         with:
