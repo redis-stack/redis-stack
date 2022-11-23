@@ -1,3 +1,8 @@
+#
+# Copyright Redis Ltd. [2022] - present
+# Licensed under your choice of the Redis Source Available License 2.0 (RSALv2) or
+# the Server Side Public License v1 (SSPLv1).
+#
 import sys
 from optparse import OptionParser
 
@@ -106,7 +111,8 @@ if __name__ == "__main__":
 
     # a = Package(opts.OSNICK, opts.ARCH, opts.OSNAME)
     if opts.PACKAGE == "redis-stack-server":
-        from stack.recipes.redis_stack_server import RedisStackServer as pkgklass
+        from stack.recipes.redis_stack_server import \
+            RedisStackServer as pkgklass
     elif opts.PACKAGE == "redis-stack":
         from stack.recipes.redis_stack import RedisStack as pkgklass
     elif opts.PACKAGE == "redisinsight":
@@ -114,7 +120,7 @@ if __name__ == "__main__":
     elif opts.PACKAGE == "redisinsight-web":
         from stack.recipes.redisinsight import RedisInsightWeb as pkgklass
     else:
-        sys.stderr.write(f"{opts.PACKAGE} is an unsupported package recipe.\n")
+        sys.stderr.write(f"{opts.PACKAGE} is an unsupported package recipe.")
         sys.exit(3)
 
     a = pkgklass(opts.OSNICK, opts.ARCH, opts.OSNAME)
