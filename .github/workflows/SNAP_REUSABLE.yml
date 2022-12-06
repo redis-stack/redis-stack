@@ -48,7 +48,7 @@ jobs:
       - name: determine if in fork
         id: iamafork
         run: |
-          amfork=`cat /home/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
+          amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
           echo "am I fork: ${amfork}"
           echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3

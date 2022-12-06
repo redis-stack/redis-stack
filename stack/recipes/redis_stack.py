@@ -1,5 +1,11 @@
+#
+# Copyright Redis Ltd. [2022] - present
+# Licensed under your choice of the Redis Source Available License 2.0 (RSALv2) or
+# the Server Side Public License v1 (SSPLv1).
+#
 import os
 import shutil
+from typing import Union
 
 import requests
 from loguru import logger
@@ -8,7 +14,6 @@ from ..components.modules import Modules
 from ..config import Config
 from ..paths import Paths
 from . import Recipe
-from typing import Union
 
 # FUTURE this is a placeholder for the package depending on packages, in Linux
 # This is not a real package

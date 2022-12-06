@@ -1,6 +1,10 @@
+#
+# Copyright Redis Ltd. [2022] - present
+# Licensed under your choice of the Redis Source Available License 2.0 (RSALv2) or
+# the Server Side Public License v1 (SSPLv1).
+#
 import os
 import shutil
-
 # import zipfile
 import tarfile
 import urllib
@@ -34,7 +38,7 @@ class RedisInsightBase(object):
         else:
             arch = self.ARCH
 
-        url_base_override = self.C.get_key(f"redisinsight-url-override")
+        url_base_override = self.C.get_key("redisinsight-url-override")
         if url_base_override is not None:
             return urllib.parse.urljoin(
                 f"{url_base_override}",
