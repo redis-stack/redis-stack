@@ -77,10 +77,10 @@ jobs:
      GPG_KEY: ${{ secrets.GPG_KEY }}
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
- arm64-bionic-redisinsight-web:
+ arm64-focal-redisinsight-web:
    uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
    with:
-     platform: bionic
+     platform: focal
      osname: Linux
      osnick: ubuntu20.04
      arch: arm64
@@ -94,11 +94,11 @@ jobs:
 
  arm64-docker:
    uses: ./.github/workflows/DOCKER_REUSABLE.yml
-   needs: [arm64-bionic, arm64-bionic-redisinsight-web]
+   needs: [arm64-focal, arm64-focal-redisinsight-web]
    with:
      pythonversion: "3.10"
      arch: arm64
-     platform: bionic
+     platform: focal
    secrets:
      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
