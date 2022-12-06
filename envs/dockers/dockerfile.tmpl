@@ -1,8 +1,4 @@
-{% if arch == "x86_64" %}
 FROM ubuntu:focal
-{% elif arch == "arm64" %}
-FROM ubuntu:bionic
-{% endif %}
 
 RUN apt-get update -qqy
 RUN apt-get upgrade -qqy
