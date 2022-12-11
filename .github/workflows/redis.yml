@@ -27,7 +27,7 @@ jobs:
      arch: arm64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
+     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
      redisversion: 7.0.5
      packagedredisversion: 7.0.5-1
      pythonversion: "3.10"
@@ -142,7 +142,7 @@ jobs:
      arch: x86_64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
+     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
      redisversion: 7.0.5
      packagedredisversion: 7.0.5-1
      pythonversion: "3.10"
@@ -217,7 +217,7 @@ jobs:
      arch: x86_64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
+     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
      redisversion: 7.0.5
      packagedredisversion: 7.0.5-1
      pythonversion: "3.10"
@@ -237,7 +237,7 @@ jobs:
      arch: x86_64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
+     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
      redisversion: 7.0.5
      packagedredisversion: 7.0.5-1
      pythonversion: "3.10"
@@ -279,7 +279,7 @@ jobs:
      arch: x86_64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
+     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
      redisversion: 7.0.5
      packagedredisversion: 7.0.5-1
      pythonversion: "3.10"
@@ -301,7 +301,7 @@ jobs:
      build_deps: |
       yum install -y epel-release
       yum install -y gcc make jemalloc-devel openssl-devel python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2 curl
+     packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2 curl tar
      redisversion: 7.0.5
      packagedredisversion: 7.0.5-1
      pythonversion: "3.10"
@@ -329,19 +329,19 @@ jobs:
   steps:
 
    - name: checkout sources
-     uses: actions/checkout@v2
+     uses: actions/checkout@v3
    - name: Cache dependencies
-     uses: actions/cache@v2
+     uses: actions/cache@v3
      with:
        path: |
-         /var/cache/apt
+         /var/cache/apt/archives/**.deb
          /var/cache/yum
          ~/.cache/pip
          ~/.cache/pypoetry
          ~/.local/share/gem
        key: pypoetry-${{hashFiles('pyproject.toml', '.github/workflows/*.yml')}}-${{env.platform}}-${{env.arch}}-package
    - name: install python
-     uses: actions/setup-python@v3
+     uses: actions/setup-python@v4
      with:
        python-version: "${{env.pythonversion}}"
    - name: install poetry
@@ -356,11 +356,11 @@ jobs:
      run: |
        poetry install
 
-   - uses: actions/download-artifact@v2
+   - uses: actions/download-artifact@v3
      with:
        name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
 
-   - uses: actions/download-artifact@v2
+   - uses: actions/download-artifact@v3
      with:
        name: redis-stack-server-${{env.platform}}-${{env.arch}}.tar.gz
 
@@ -395,7 +395,7 @@ jobs:
      build_deps: |
        dnf install -y oracle-epel-release-el8
        dnf install -y gcc make jemalloc-devel openssl-devel tar git python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y rpm unzip curl gnupg2
+     packaging_deps: sudo apt-get install -y rpm unzip curl gnupg2 tar
      redisversion: 7.0.5
      packagedredisversion: 7.0.5-1
    secrets:
@@ -430,7 +430,7 @@ jobs:
      run: |
        amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
        echo "am I fork: ${amfork}"
-       echo "::set-output name=IAMAFORK::$amfork"
+       echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
    - name: check if already built
      id: redis-already-built
@@ -441,7 +441,7 @@ jobs:
      with:
        ruby-version: ${{env.rubyversion}}
    - name: install python
-     uses: actions/setup-python@v3
+     uses: actions/setup-python@v4
      with:
        python-version: "${{ env.pythonversion }}"
    - name: install poetry
@@ -453,12 +453,12 @@ jobs:
        installer-parallel: true
 
    - name: checkout sources
-     uses: actions/checkout@v2
+     uses: actions/checkout@v3
      with:
        path: redis-stack
    - name: clone redis
      if: steps.redis-already-built.outcome != 'success'
-     uses: actions/checkout@v2
+     uses: actions/checkout@v3
      with:
        repository: redis/redis
        path: redis
@@ -490,7 +490,7 @@ jobs:
        tar -czvf redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
            redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
 
-   - uses: s3-actions/s3cmd@v1.1
+   - uses: s3-actions/s3cmd@v1.2.0
      with:
        provider: aws
        region: us-east-1
@@ -504,7 +504,7 @@ jobs:
 
    - name: perist redis
      if: steps.redis-already-built.outcome != 'success'
-     uses: actions/upload-artifact@v2
+     uses: actions/upload-artifact@v3
      with:
        name: redis-${{env.packagedredisversion}}-osx
        path: |
@@ -546,7 +546,7 @@ jobs:
        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server -k fetch
 
    - name: perist the zipfile
-     uses: actions/upload-artifact@v2
+     uses: actions/upload-artifact@v3
      with:
        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
        path: |
@@ -581,10 +581,10 @@ jobs:
      run: |
        amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
        echo "am I fork: ${amfork}"
-       echo "::set-output name=IAMAFORK::$amfork"
+       echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
    - name: install python
-     uses: actions/setup-python@v3
+     uses: actions/setup-python@v4
      with:
        python-version: "${{ env.pythonversion }}"
    - name: install poetry
@@ -595,13 +595,13 @@ jobs:
        virtualenvs-create: true
        installer-parallel: true
    - name: checkout sources
-     uses: actions/checkout@v2
+     uses: actions/checkout@v3
    - name: install dependencies
      run: |
        brew install libomp openssl coreutils
        poetry install
    - name: gather artifacts
-     uses: actions/download-artifact@v2
+     uses: actions/download-artifact@v3
      with:
        path: redis-stack
        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
@@ -630,9 +630,9 @@ jobs:
        poetry install
        source .venv/bin/activate
        realversion=`invoke version`
-       echo "::set-output name=VERSION::$realversion"
+       echo "VERSION=$realversion" >> $GITHUB_OUTPUT
 
-   - uses: s3-actions/s3cmd@v1.1
+   - uses: s3-actions/s3cmd@v1.2.0
      if: steps.iamafork.outputs.IAMAFORK == 'false'
      with:
        provider: aws
@@ -667,12 +667,12 @@ jobs:
    runs-on: macos-latest
    steps:
    - name: checkout sources
-     uses: actions/checkout@v2
+     uses: actions/checkout@v3
    - uses: ruby/setup-ruby@v1
      with:
        ruby-version: ${{env.rubyversion}}
    - name: install python
-     uses: actions/setup-python@v3
+     uses: actions/setup-python@v4
      with:
        python-version: "${{ env.pythonversion }}"
    - name: install dependencies
@@ -686,10 +686,10 @@ jobs:
        virtualenvs-create: true
        installer-parallel: true
    - name: Cache dependencies
-     uses: actions/cache@v2
+     uses: actions/cache@v3
      with:
        path: |
-         /var/cache/apt
+         /var/cache/apt/archives/**.deb
          ~/.cache/pip
          ~/.cache/pypoetry
          ~/.local/share/gem
@@ -704,7 +704,7 @@ jobs:
      run: |
        amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
        echo "am I fork: ${amfork}"
-       echo "::set-output name=IAMAFORK::$amfork"
+       echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
 ### Once https://github.com/actions/runner/issues/805 is resolved we can do this ###
 ### For now, this is how it is manually built, on the platform ###
@@ -744,7 +744,7 @@ jobs:
        done
 
    - name: persist the zipfile
-     uses: actions/upload-artifact@v2
+     uses: actions/upload-artifact@v3
      with:
        name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
        path: |
@@ -756,7 +756,7 @@ jobs:
        zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
 
    - name: persist the codesigned artifacts
-     uses: actions/upload-artifact@v2
+     uses: actions/upload-artifact@v3
      with:
        name: codesigned-${{env.platform}}-${{env.arch}}
        path: |
@@ -768,7 +768,7 @@ jobs:
        cd build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
        sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
 
-   - uses: s3-actions/s3cmd@v1.1
+   - uses: s3-actions/s3cmd@v1.2.0
      if: steps.iamafork.outputs.IAMAFORK == 'false'
      with:
        provider: aws
@@ -800,22 +800,22 @@ jobs:
        run: |
          amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
          echo "am I fork: ${amfork}"
-         echo "::set-output name=IAMAFORK::$amfork"
+         echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
      - name: checkout sources
-       uses: actions/checkout@v2
+       uses: actions/checkout@v3
      - name: Cache dependencies
-       uses: actions/cache@v2
+       uses: actions/cache@v3
        with:
          path: |
-           /var/cache/apt
+           /var/cache/apt/archives/**.deb
            ~/.cache/pip
            ~/.cache/pypoetry
            ~/.local/share/gem
            poetry.lock
          key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
      - name: install python
-       uses: actions/setup-python@v3
+       uses: actions/setup-python@v4
        with:
          python-version: "${{ env.pythonversion }}"
      - name: install poetry
@@ -826,7 +826,7 @@ jobs:
          virtualenvs-create: true
          installer-parallel: true
      - name: gather artifacts
-       uses: actions/download-artifact@v2
+       uses: actions/download-artifact@v3
        with:
          name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
 
@@ -842,7 +842,7 @@ jobs:
          poetry install
          source .venv/bin/activate
          realversion=`invoke version`
-         echo "::set-output name=VERSION::$realversion"
+         echo "VERSION=$realversion" >> $GITHUB_OUTPUT
      - name: run the tests
        if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
@@ -868,9 +868,9 @@ jobs:
      pythonversion: "3.10"
    runs-on: ubuntu-latest
    steps:
-     - uses: actions/checkout@v2
+     - uses: actions/checkout@v3
      - name: install python
-       uses: actions/setup-python@v3
+       uses: actions/setup-python@v4
        with:
          python-version: "${{inputs.pythonversion}}"
      - name: install poetry
@@ -886,18 +886,18 @@ jobs:
          poetry install
          source .venv/bin/activate
          realversion=`invoke version -p ${{ matrix.package }} -d true`
-         echo "::set-output name=VERSION::$realversion"
+         echo "VERSION=$realversion" >> $GITHUB_OUTPUT
 
      - name: determine if in fork
        id: iamafork
        run: |
          amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
          echo "am I fork: ${amfork}"
-         echo "::set-output name=IAMAFORK::$amfork"
+         echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
      - name: Log in to DockerHub
        if: steps.iamafork.outputs.IAMAFORK == 'false'
-       uses: docker/login-action@v1
+       uses: docker/login-action@v2
        with:
          username: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
          password: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}

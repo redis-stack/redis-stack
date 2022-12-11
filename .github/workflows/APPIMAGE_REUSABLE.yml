@@ -53,11 +53,11 @@ jobs:
         run: |
           amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
           echo "am I fork: ${amfork}"
-          echo "::set-output name=IAMAFORK::$amfork"
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: install python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: "${{inputs.pythonversion}}"
       - uses: ruby/setup-ruby@v1
@@ -67,10 +67,10 @@ jobs:
           sudo apt update -qq
           sudo apt-get install -yqq libfuse-dev
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
-            /var/cache/apt
+            /var/cache/apt/archives/**.deb
             /var/cache/yum
             ~/.cache/pip
             ~/.cache/pypoetry
@@ -93,7 +93,7 @@ jobs:
           wget -q https://github.com/AppImage/pkg2appimage/releases/download/continuous/pkg2appimage-${{inputs.pkg2appimageversion}}-${{inputs.arch}}.AppImage -O pkg2appimage.AppImage
           chmod a+x *.AppImage
       - name: fetch artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: redis-stack-server-${{inputs.platform}}-${{inputs.arch}}.tar.gz
           path: .
@@ -104,7 +104,7 @@ jobs:
           poetry install
           source .venv/bin/activate
           realversion=`invoke version -p redis-stack-server`
-          echo "::set-output name=VERSION::$realversion"
+          echo "VERSION=$realversion" >> $GITHUB_OUTPUT
           echo ${realversion} > VERSION
           cat VERSION
       - name: build appimage
@@ -124,13 +124,13 @@ jobs:
           invoke test -m appimage -n physical -n arm
 
       - name: perist ${{env.target}} package
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.package }}-${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}.AppImage
           path: |
             out/${{ matrix.package }}*.AppImage
 
-      - uses: s3-actions/s3cmd@v1.1
+      - uses: s3-actions/s3cmd@v1.2.0
         if: steps.iamafork.outputs.IAMAFORK == 'false'
         with:
           provider: aws

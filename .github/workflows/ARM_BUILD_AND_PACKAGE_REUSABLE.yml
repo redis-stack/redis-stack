@@ -74,24 +74,24 @@ jobs:
       run: |
         amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
         echo "am I fork: ${amfork}"
-        echo "::set-output name=IAMAFORK::$amfork"
+        echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
     - name: check if already built
       id: redis-already-built
       continue-on-error: true
       run: |
         wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       if: steps.redis-already-built.outcome != 'success'
       with:
         repository: redis/redis
         path: redis
         ref: ${{env.redisversion}}
     - name: Cache dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       if: steps.redis-already-built.outcome != 'success'
       with:
         path: |
-          /var/cache/apt
+          /var/cache/apt/archives/**.deb
           /var/cache/yum
         key: cache-${{hashFiles('.github/workflows/redis.yml')}}-${{inputs.platform}}-${{inputs.arch}}-build
     - name: make
@@ -127,7 +127,7 @@ jobs:
           s3://redismodules/redis-stack/dependencies/redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
 
     - name: perist redis
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       if: steps.redis-already-built.outcome != 'success'
       with:
         name: redis-${{env.packagedredisversion}}-${{inputs.platform}}-${{inputs.arch}}
@@ -164,14 +164,14 @@ jobs:
        run: |
          amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
          echo "am I fork: ${amfork}"
-         echo "::set-output name=IAMAFORK::$amfork"
+         echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
-     - uses: actions/checkout@v2
+     - uses: actions/checkout@v3
      - name: Cache dependencies
-       uses: actions/cache@v2
+       uses: actions/cache@v3
        with:
          path: |
-           /var/cache/apt
+           /var/cache/apt/archives/**.deb
            /var/cache/yum
            ~/.cache/pip
            ~/.cache/pypoetry
@@ -180,7 +180,7 @@ jobs:
 
      - uses: ruby/setup-ruby@v1
      - name: install python
-       uses: actions/setup-python@v3
+       uses: actions/setup-python@v4
        with:
          python-version: "${{env.pythonversion}}"
      - name: install poetry
@@ -228,21 +228,21 @@ jobs:
        id: get_gpg_id
        run: |
          gpg_id=`gpg --list-keys|sed -n 4p|awk '{print $1}'`
-         echo "::set-output name=GPG_ID::$gpg_id"
+         echo "GPG_ID=$gpg_id" >> $GITHUB_OUTPUT
 
      - name: get gpg email address
        if: steps.iamafork.outputs.IAMAFORK == 'false'
        id: get_gpg_email
        run: |
          gpg_email=`gpg -k|grep uid|cut -d '<' -f 2-2|cut -d '>' -f 1-1`
-         echo "::set-output name=GPG_EMAIL::$gpg_email"
+         echo "GPG_EMAIL=$gpg_email" >> $GITHUB_OUTPUT
 
      - name: get gpg_keygrip
        if: steps.iamafork.outputs.IAMAFORK == 'false'
        id: get_gpg_keygrip
        run: |
          keygrip=`gpg -k --with-keygrip |sed -n 5p|cut -d '=' -f 2-2`
-         echo "::set-output name=GPG_KEYGRIP::$keygrip"
+         echo "GPG_KEYGRIP=$keygrip" >> $GITHUB_OUTPUT
 
      - name: gpg sign package
        if: steps.iamafork.outputs.IAMAFORK == 'false'
@@ -270,13 +270,13 @@ jobs:
     #      invoke test -m ${{env.platform}} -m arm -n physical
 
      - name: perist ${{env.target}} package
-       uses: actions/upload-artifact@v2
+       uses: actions/upload-artifact@v3
        with:
          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
          path: |
            ${{ matrix.package }}*.${{env.target}}
      - name: perist tarball
-       uses: actions/upload-artifact@v2
+       uses: actions/upload-artifact@v3
        with:
          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.tar.gz
          path: |
@@ -292,7 +292,7 @@ jobs:
          for i in `ls`; do
            sha256sum $i |awk '{print $1}' > $i.sha256
          done
-     - uses: s3-actions/s3cmd@v1.1
+     - uses: s3-actions/s3cmd@v1.2.0
        if: steps.iamafork.outputs.IAMAFORK == 'false'
        with:
          provider: aws
