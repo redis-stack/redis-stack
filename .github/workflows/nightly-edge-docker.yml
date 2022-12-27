@@ -1,9 +1,8 @@
 name: Edge Docker
 
 on:
-  push:
-  # schedule:
-  #   - cron: "0 5 * * *"
+  schedule:
+    - cron: "0 5 * * *"
 
 # forcing the version to edge, since this is a nightly build only
 env:
