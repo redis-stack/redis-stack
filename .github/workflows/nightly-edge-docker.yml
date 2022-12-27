@@ -104,7 +104,7 @@ jobs:
      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
 
-docker-push:
+ docker-push:
    needs: [x86_64-docker, arm64-docker]
    name: Push ${{matrix.package}} manifest
    strategy:
