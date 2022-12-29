@@ -48,20 +48,20 @@ jobs:
       - name: determine if in fork
         id: iamafork
         run: |
-          amfork=`cat /home/runner/work/_temp/_github_workflow/event.json | jq '.pull_request.head.repo.fork'`
+          amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
           echo "am I fork: ${amfork}"
-          echo "::set-output name=IAMAFORK::$amfork"
-      - uses: actions/checkout@v2
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+      - uses: actions/checkout@v3
       - name: install python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: "${{inputs.pythonversion}}"
       - uses: ruby/setup-ruby@v1
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
-            /var/cache/apt
+            /var/cache/apt/archives/**.deb
             /var/cache/yum
             ~/.cache/pip
             ~/.cache/pypoetry
@@ -93,7 +93,7 @@ jobs:
 #          cp *.snap redis-stack/${{ matrix.package }}.${{ env.target }}
 #          sudo invoke test -m snaps
 
-      - uses: s3-actions/s3cmd@v1.1
+      - uses: s3-actions/s3cmd@v1.2.0
         if: steps.iamafork.outputs.IAMAFORK == 'false'
         with:
           provider: aws
