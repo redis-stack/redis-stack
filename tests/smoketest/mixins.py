@@ -87,41 +87,41 @@ class RedisTestMixin:
         assert "doc2" in docs
         assert "doc1" in docs
 
-    def test_versions_match(self, r):
-        stack_dockloader(r)
-        modmap = {
-            "redisearch": "search",
-            "redisgraph": "graph",
-            "redistimeseries": "timeseries",
-            "redisbloom": "bf",
-            "rejson": "rejson",
-        }
-
-        with open(CONFIGYAML, "r") as fp:
-            data = yaml.load(fp, yaml.SafeLoader)
-            versions = data.get("versions")
-
-        modlist = r.module_list()
-        modules = {m.get("name").lower(): m.get("ver") for m in modlist}
-        for k, v in modmap.items():
-            yamlversion = versions.get(k)
-
-            # remap
-            parts = yamlversion.split(".")
-            version = ""
-            if len(parts[1]) == 2:
-                base = f"{parts[0]}"
-            else:
-                base = f"{parts[0]}0"
-            if len(parts[2]) == 2:
-                patch = parts[2]
-            else:
-                patch = f"0{parts[2]}"
-            version = f"{base}{parts[1]}{patch}"
-
-            remoteversion = modules.get(v)
-            assert str(version) == str(remoteversion)
-
+#    def test_versions_match(self, r):
+#        stack_dockloader(r)
+#        modmap = {
+#            "redisearch": "search",
+#            "redisgraph": "graph",
+#            "redistimeseries": "timeseries",
+#            "redisbloom": "bf",
+#            "rejson": "rejson",
+#        }
+#
+#        with open(CONFIGYAML, "r") as fp:
+#            data = yaml.load(fp, yaml.SafeLoader)
+#            versions = data.get("versions")
+#
+#        modlist = r.module_list()
+#        modules = {m.get("name").lower(): m.get("ver") for m in modlist}
+#        for k, v in modmap.items():
+#            yamlversion = versions.get(k)
+#
+#            # remap
+#            parts = yamlversion.split(".")
+#            version = ""
+#            if len(parts[1]) == 2:
+#                base = f"{parts[0]}"
+#            else:
+#                base = f"{parts[0]}0"
+#            if len(parts[2]) == 2:
+#                patch = parts[2]
+#            else:
+#                patch = f"0{parts[2]}"
+#            version = f"{base}{parts[1]}{patch}"
+#
+#            remoteversion = modules.get(v)
+#            assert str(version) == str(remoteversion)
+#
 
 class RedisPackagingMixin:
     @property
