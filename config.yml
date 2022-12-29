@@ -1,11 +1,10 @@
 ---
-
 # module versions
 versions:
   rejson: 2.4.2
-  redistimeseries: 1.8.3
-  redisearch: 2.6.3
-  redisgraph: 2.10.4
+  redistimeseries: 1.8.4
+  redisearch: 2.6.4
+  redisgraph: 2.10.5
   redisbloom: 2.4.3
   nodejs: v16.15.1
   redis: 7.0.6-1
@@ -34,6 +33,7 @@ redis-stack:
 
     Manage your Redis server and view your data with the RedisInsight graphical tool, which is also included in this package.
 
+
 redis-stack-server:
   product: redis-stack-server
   summary: Redis Stack Server installs a Redis server with additional database capabilities.
@@ -52,6 +52,7 @@ redisinsight-web:
   summary: A graphical tool for visualizing data and managing Redis databases
   description: RedisInsight is an easy to use graphical tool that enables you to visualize and manage data in Redis databases.  Connect to multiple Redis servers, browse and edit data, and view operating metrics.  Use RedisInsight with open source Redis, Redis Cloud, Redis Enterprise and Amazon ElastiCache.  RedisInsight has specialized views for many Redis data types, and supports popular modules including RediSearch and RedisJSON.
 
+# standalone version
 redisinsight:
   product: redisinsight
   summary: A graphical tool for visualizing data and managing Redis databases
