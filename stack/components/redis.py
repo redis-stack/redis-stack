@@ -50,7 +50,7 @@ class Redis(object):
 
     def prepare(self, version: Union[str, None] = None):
         if version is None:
-            version = self.C.get_key("versions")["redis"]
+            version = self.C.get_key("versions")["packagedredisversion"]
         logger.info("Fetching redis")
         destfile = os.path.join(
             self.__PATHS__.EXTERNAL,

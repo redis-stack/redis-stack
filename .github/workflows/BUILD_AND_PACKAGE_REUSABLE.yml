@@ -50,16 +50,6 @@ on:
         required: true
         type: string
 
-      # redis version to compile
-      redisversion:
-        required: false
-        type: string
-
-      # prcompiled redis package version to try downloading
-      packagedredisversion:
-        required: false
-        type: string
-
       # self explanatory
       pythonversion:
         required: false
@@ -91,19 +81,12 @@ jobs:
     name: Build ${{inputs.platform}} (${{inputs.arch}})
 
     env:
-      redisversion: ${{inputs.redisversion}}
-      packagedredisversion: ${{inputs.packagedredisversion}}
       pythonversion: "${{inputs.pythonversion}}"
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
     runs-on: ubuntu-latest
     container: ${{inputs.image_name}}
     steps:
-
-    - name: vars for here
-      run: |
-        env
-        set
 
     - name: install dependencies
       run: ${{inputs.build_deps}}
@@ -115,17 +98,27 @@ jobs:
         echo "am I fork: ${amfork}"
         echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
+    - name: check out redis-stack
+      uses: actions/checkout@v3
+      with:
+        path: redis-stack
+
+    - name: get versions from config file
+      run: |
+        echo PACKAGEDREDISVERSION=`grep w "packagedredisversion" redis-stack/config.yml | cut -d ":" -f 2-2` >> $GITHUB_OUTPUT
+        echo REDISVERSION=`grep w "redis:" redis-stack/config.yml | cut -d ":" -f 2-2` >> $GITHUB_OUTPUT
+
     - name: check if already built
       id: redis-already-built
       continue-on-error: true
       run: |
-        wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
+        wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
     - uses: actions/checkout@v3
       if: steps.redis-already-built.outcome != 'success'
       with:
         repository: redis/redis
         path: redis
-        ref: ${{env.redisversion}}
+        ref: ${{env.REDISVERSION}}
     - name: Cache dependencies
       uses: actions/cache@v3
       with:
@@ -139,16 +132,16 @@ jobs:
     - name: package redis for s3
       if: steps.redis-already-built.outcome != 'success'
       run: |
-        mkdir redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
+        mkdir redis-${{env.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
         cp redis/src/redis-server \
            redis/src/redis-sentinel \
            redis/src/redis-check-aof \
            redis/src/redis-check-rdb \
            redis/src/redis-benchmark \
            redis/src/redis-cli \
-           redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
-        tar -czvf redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
-           redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
+           redis-${{env.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
+        tar -czvf redis-${{env.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
+           redis-${{env.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
     - name: install s3cmd
       if: steps.redis-already-built.outcome != 'success'
       run: |
@@ -156,14 +149,14 @@ jobs:
     - name: persist redis to s3
       if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
       run: |
-        s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
-          s3://redismodules/redis-stack/dependencies/redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
+        s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
+          s3://redismodules/redis-stack/dependencies/redis-${{env.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
 
     - name: perist redis
       if: steps.redis-already-built.outcome != 'success'
       uses: actions/upload-artifact@v3
       with:
-        name: redis-${{env.packagedredisversion}}-${{inputs.platform}}
+        name: redis-${{env.PACKAGEDREDISVERSION}}-${{inputs.platform}}
         path: |
           redis/src/redis-server
           redis/src/redis-sentinel
@@ -175,7 +168,6 @@ jobs:
    package:
     name: Package ${{inputs.platform}} (${{inputs.arch}}) ${{matrix.package}}
     env:
-      redisversion: ${{inputs.redisversion}}
       pythonversion: "${{inputs.pythonversion}}"
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
@@ -235,10 +227,7 @@ jobs:
           poetry install
 
       - run: gem install fpm -v ${{env.fpmversion}}
-      # - uses: actions/download-artifact@v3
-      #   with:
-      #     name: redis-${{env.redisversion}}-${{env.platform}}
-      #     path: deps/redis-${{env.redisversion}}-${{env.platform}}
+
       - name: display structure
         run: ls -R
       - name: build ${{matrix.package}}
