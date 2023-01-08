@@ -27,7 +27,6 @@ jobs:
      arch: arm64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
      redisversion: 7.0.6
      packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
@@ -48,7 +47,6 @@ jobs:
      arch: arm64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
      redisversion: 7.0.6
      packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
@@ -68,7 +66,6 @@ jobs:
      arch: arm64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
      redisversion: 7.0.6
      packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
@@ -142,7 +139,6 @@ jobs:
      arch: x86_64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
      redisversion: 7.0.6
      packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
@@ -162,7 +158,6 @@ jobs:
      arch: x86_64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
      redisversion: 7.0.6
      packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
@@ -217,7 +212,6 @@ jobs:
      arch: x86_64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
      redisversion: 7.0.6
      packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
@@ -237,7 +231,6 @@ jobs:
      arch: x86_64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
      redisversion: 7.0.6
      packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
@@ -259,7 +252,6 @@ jobs:
 #     osname: Linux
 #     target: pkg
 #     build_deps: pacman -Syyu --noconfirm gcc gcc-libs git openssl jq wget python python-pip openssh make
-#     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 libarchive-tools
 #     redisversion: 7.0.6
 #     packagedredisversion: 7.0.6-1
 #     pythonversion: "3.10"
@@ -279,7 +271,6 @@ jobs:
      arch: x86_64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
      redisversion: 7.0.6
      packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
@@ -301,7 +292,6 @@ jobs:
      build_deps: |
       yum install -y epel-release
       yum install -y gcc make jemalloc-devel openssl-devel python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2 curl tar tar
      redisversion: 7.0.6
      packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
@@ -395,7 +385,6 @@ jobs:
      build_deps: |
        dnf install -y oracle-epel-release-el8
        dnf install -y gcc make jemalloc-devel openssl-devel tar git python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y rpm unzip curl gnupg2 tar tar
      redisversion: 7.0.6
      packagedredisversion: 7.0.6-1
    secrets:

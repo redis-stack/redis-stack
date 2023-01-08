@@ -25,9 +25,6 @@ on:
       build_deps:
         required: true
         type: string
-      packaging_deps:
-        required: true
-        type: string
       redisversion:
         required: false
         type: string
@@ -46,6 +43,9 @@ on:
         required: false
         type: string
         default: 1.14.2
+      moduleoverride:
+        required: false
+        type: string
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -152,6 +152,7 @@ jobs:
       osnick: ${{inputs.osnick}}
       arch: ${{inputs.arch}}
       target: ${{inputs.target}}
+      moduleoverride: ${{inputs.moduleoverride}}
     runs-on: ubuntu-latest
     needs: [build-redis]
     strategy:
@@ -193,7 +194,7 @@ jobs:
 
      - name: install packaging and testing tools
        run: |
-         sudo ${{inputs.packaging_deps}}
+         sudo apt-get update && apt-get install -y unzip curl rpm dpkg-sig gpg gnupg2 tar
          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
          sudo apt-get update && sudo apt-get install vagrant virtualbox
@@ -211,12 +212,12 @@ jobs:
      - name: build ${{matrix.package}}
        run: |
          source .venv/bin/activate
-         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p ${{ matrix.package }}
+         invoke package -e "${{env.moduleoverride}}" -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p ${{ matrix.package }}
 
      - name: build downloadable tarball
        run: |
          source .venv/bin/activate
-         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t tar -p ${{ matrix.package }}
+         invoke package -e "${{env.moduleoverride}}" -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t tar -p ${{ matrix.package }}
 
      - name: install gpg key
        if: steps.iamafork.outputs.IAMAFORK == 'false'
