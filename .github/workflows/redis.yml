@@ -5,6 +5,7 @@ on:
     paths-ignore:
       - 'docs/**'
       - '**/*.md'
+      - '*.md'
       - '.github/worfklows/release.yml'
     branches:
       - master
