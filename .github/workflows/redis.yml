@@ -646,7 +646,7 @@ jobs:
      pythonversion: "3.10"
      fpmversion: 1.14.2
      rubyversion: 2.7.2
-   runs-on: macos-latest
+   runs-on: ubuntu-latest  # since this triggers ssh onto a mac
    steps:
    - name: checkout sources
      uses: actions/checkout@v3
@@ -697,8 +697,8 @@ jobs:
    - name: get versions from config file
      id: get_config_versions
      run: |
-       echo PACKAGEDREDISVERSION=`grep -w "packagedredisversion" redis-stack/config.yml | cut -d ":" -f 2-2|tr -d ' '` >> $GITHUB_OUTPUT
-       echo REDISVERSION=`grep -w "redis:" redis-stack/config.yml | cut -d ":" -f 2-2|tr -f ' '` >> $GITHUB_OUTPUT
+       echo PACKAGEDREDISVERSION=`grep -w "packagedredisversion" config.yml | cut -d ":" -f 2-2|tr -d ' '` >> $GITHUB_OUTPUT
+       echo REDISVERSION=`grep -w "redis:" config.yml | cut -d ":" -f 2-2|tr -f ' '` >> $GITHUB_OUTPUT
 
    - name: check if already built
      id: redis-already-built
@@ -709,6 +709,7 @@ jobs:
    - name: build redis from source
      if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
+       source .venv/bin/activate
        invoke build-over-ssh \
         -i ${{ secrets.M1_IP }} \
         -u ${{ secrets.M1_SSH_USER }} \
