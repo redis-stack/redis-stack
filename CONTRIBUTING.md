@@ -1,5 +1,5 @@
 Note: by contributing code to this project in any form, including sending
-a pull request via Github, a code fragment or patch via private email or
+a pull request via GitHub, a code fragment or patch via private email or
 public discussion groups, you agree to release your code under the terms
 of the [LICENSEs](license.txt).
 
