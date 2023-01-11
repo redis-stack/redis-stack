@@ -141,6 +141,37 @@ def build_redis(c, redis_repo_path="redis", build_args="all build_tls=yes"):
     redispath = os.path.join(os.getcwd(), redis_repo_path, "src")
     run(f"make -C {redispath} -j `nproc` {build_args}")
 
+@task(
+    help={
+        "ip": "IP address of the server",
+        "user": "ssh user name",
+        "version": "redis version",
+        "ssh_key_path": "path to ssh key",
+        "osname": "operating system name (eg: macos)",
+        "osnick": "osnick for packages to fetch (eg: monterey)",
+        "arch": "architecture (eg: arm64)",
+        "packagedversion": "version to package this as",
+    }
+)
+def build_m1_over_ssh(c, ip="", user="", ssh_key_path="", version="", packagedversion="", osname="macos", osnick="monterey", arch="arm64"):
+    """Triggering the m1 build, via ssh and fetch the outputs"""
+    dest = f"depos/redis-{version}"
+    argsdest = f"redis-{packagedversion}-{osname}-{osnick}-{arch}"
+    os.mkdir(os.path.join(os.getcwd(), argsdest))
+    c = Connection(host=ip, user=user, connect_kwargs={"key_filename": ssh_key_path})
+    c.run(f"rm -rf {dest}")
+    c.run(f"git clone https://github.com/redis/redis depos/redis-{version}")
+    c.run(f"""make -C {dest} all BUILD_TLS=yes
+            FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /opt/homebrew/opt/openssl/lib/libssl.a /opt/homebrew/opt/openssl/lib/libcrypto.a"
+            CFLAGS="-I /opt/homebrew/opt/openssl@3/include"
+          """)
+
+    t = Transfer(c)
+    for b in ['redis-server', 'redis-sentinel', 'redis-check-aof', 'redis-check-rdb', 'redis-benchmark', 'redis-cli']:
+        src = f"{dest}/src/{b}"
+        ldest = os.path.join(argsdest, b)
+        t.get(src, ldest)
+        os.chmod(ldest, 0o755)
 
 @task(
     help={
