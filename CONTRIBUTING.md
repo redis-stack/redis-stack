@@ -28,11 +28,4 @@ to accomplish and why. Use cases are important for features to be accepted.
     d. Initiate a [pull request](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request) on this repository.
     e. Done :)
 
-3. Keep in mind that we are very overloaded, so issues and PRs sometimes wait
-for a *very* long time. However this is not lack of interest, as the project
-gets more and more users, we find ourselves in a constant need to prioritize
-certain issues/PRs over others. If you think your issue/PR is very important
-try to popularize it, have other users commenting and sharing their point of
-view and so forth. This helps.
-
 Thanks!

@@ -15,7 +15,7 @@ unless this is not possible or feasible with a reasonable effort.
 ## Reporting a Vulnerability
 
 If you believe you’ve discovered a serious vulnerability, please contact the
-Redis core team at redis@redis.io. We will evaluate your report and if
+Redis core team at stack@redis.io. We will evaluate your report and if
 necessary issue a fix and an advisory. If the issue was previously undisclosed,
 we’ll also mention your name in the credits.
 
