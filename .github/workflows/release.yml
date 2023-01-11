@@ -1,8 +1,9 @@
 name: Publish release
 
 on:
-  release:
-    types: [published]
+  push:
+  # release:
+  #   types: [published]
 
 env:
   pythonversion: "3.10"
@@ -24,80 +25,93 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: install python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "${{env.pythonversion}}"
-      - name: install poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: latest
-          virtualenvs-in-project: true
-          virtualenvs-create: true
-          installer-parallel: true
-      - name: get package version
-        id: get_version
-        run: |
-          poetry install
-          source .venv/bin/activate
-          realversion=`invoke version -p redis-stack-server -d true`
-          echo "VERSION=$realversion" >>$GITHUB_OUTPUT
+      # - name: install python
+      #   uses: actions/setup-python@v4
+      #   with:
+      #     python-version: "${{env.pythonversion}}"
+      # - name: install poetry
+      #   uses: snok/install-poetry@v1
+      #   with:
+      #     version: latest
+      #     virtualenvs-in-project: true
+      #     virtualenvs-create: true
+      #     installer-parallel: true
 
-      - uses: s3-actions/s3cmd@v1.2.0
-        with:
-          provider: aws
-          region: us-east-1
-          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: get files from s3
-        run: |
-          mkdir s3uploads/
-          s3cmd get ${{env.s3root}}/snapshots/*${{ steps.get_version.outputs.VERSION }}* s3uploads/
-      - name: publish all files to s3  # maintain a copy with redis-stack itself so that rpms (etc) can be signed
-        run: |
-          s3cmd put -P s3uploads/* ${{ env.s3root}}/
+      # - name: get package version
+      #   id: get_version
+      #   run: |
+      #     poetry install
+      #     source .venv/bin/activate
+      #     realversion=`invoke version -p redis-stack-server -d true`
+      #     echo "VERSION=$realversion" >>$GITHUB_OUTPUT
+ 
+      # - uses: s3-actions/s3cmd@v1.2.0
+      #   with:
+      #     provider: aws
+      #     region: us-east-1
+      #     access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # - name: get files from s3
+      #   run: |
+      #     mkdir s3uploads/
+      #     s3cmd get ${{env.s3root}}/snapshots/*${{ steps.get_version.outputs.VERSION }}* s3uploads/
+      # - name: publish all files to s3  # maintain a copy with redis-stack itself so that rpms (etc) can be signed
+      #   run: |
+      #     s3cmd put -P s3uploads/* ${{ env.s3root}}/
 
-      # copy to the distribution bucket
-      - uses: s3-actions/s3cmd@v1.2.0
-        with:
-          provider: aws
-          region: us-east-2
-          access_key: ${{ secrets.PUBLICREPO_AWS_ACCESS_KEY_ID }}
-          secret_key: ${{ secrets.PUBLICREPO_AWS_SECRET_ACCESS_KEY }}
-      - name: publish all files to s3
-        run: |
-          s3cmd put -P s3uploads/* ${{ env.s3publicreponame }}/
+      # # copy to the distribution bucket
+      # - uses: s3-actions/s3cmd@v1.2.0
+      #   with:
+      #     provider: aws
+      #     region: us-east-2
+      #     access_key: ${{ secrets.PUBLICREPO_AWS_ACCESS_KEY_ID }}
+      #     secret_key: ${{ secrets.PUBLICREPO_AWS_SECRET_ACCESS_KEY }}
+      # - name: publish all files to s3
+      #   run: |
+      #     s3cmd put -P s3uploads/* ${{ env.s3publicreponame }}/
 
-      - name: Log in to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - name: Log in to DockerHub
+      #   uses: docker/login-action@v2
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: publish redis-stack docker
-        run: |
-          docker manifest create redis/redis-stack:${{steps.get_version.outputs.VERSION}} \
-              redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-x86_64 \
-              redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-arm64
-          docker manifest push redis/redis-stack:${{ steps.get_version.outputs.VERSION}}
-      - name: publish redis-stack-server docker
-        run: |
-          docker manifest create redis/redis-stack-server:${{steps.get_version.outputs.VERSION}} \
-              redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-x86_64 \
-              redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
-          docker manifest push redis/redis-stack-server:${{ steps.get_version.outputs.VERSION}}
+      # - name: publish redis-stack docker
+      #   run: |
+      #     docker manifest create redis/redis-stack:${{steps.get_version.outputs.VERSION}} \
+      #         redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-x86_64 \
+      #         redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-arm64
+      #     docker manifest push redis/redis-stack:${{ steps.get_version.outputs.VERSION}}
+      # - name: publish redis-stack-server docker
+      #   run: |
+      #     docker manifest create redis/redis-stack-server:${{steps.get_version.outputs.VERSION}} \
+      #         redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-x86_64 \
+      #         redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
+      #     docker manifest push redis/redis-stack-server:${{ steps.get_version.outputs.VERSION}}
 
-      - name: publish redis-stack docker as latest
-        if: ${{ env.ISLATEST == 'YES' }}
+      - name: determine if LATEST for docker
         run: |
-          docker manifest create redis/redis-stack:latest \
-              redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-x86_64 \
-              redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-arm64
-          docker manifest push redis/redis-stack:latest
-      - name: publish redis-stack-server docker
-        if: ${{ env.ISLATEST == 'YES' }}
+          grep "islatest: yes" config.yaml
+          if [ $? -eq 0 ];
+            echo "ISLATEST=YES" >>$GITHUB_OUTPUT
+          fi
+
+      - name: am i latest
+        if: ${{env.ISLATEST == 'YES'}}
         run: |
-          docker manifest create redis/redis-stack-server:latest \
-              redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-x86_64 \
-              redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
-          docker manifest push redis/redis-stack-server:latest
+          echo "ok"
+
+      # - name: publish redis-stack docker as latest
+      #   if: ${{ env.ISLATEST == 'YES' }}
+      #   run: |
+      #     docker manifest create redis/redis-stack:latest \
+      #         redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-x86_64 \
+      #         redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-arm64
+      #     docker manifest push redis/redis-stack:latest
+      # - name: publish redis-stack-server docker
+      #   if: ${{ env.ISLATEST == 'YES' }}
+      #   run: |
+      #     docker manifest create redis/redis-stack-server:latest \
+      #         redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-x86_64 \
+      #         redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
+      #     docker manifest push redis/redis-stack-server:latest

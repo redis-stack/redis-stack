@@ -1,4 +1,7 @@
 ---
+
+islatest: yes
+
 # module versions
 versions:
   rejson: 2.4.3
