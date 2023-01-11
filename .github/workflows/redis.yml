@@ -698,7 +698,7 @@ jobs:
      id: get_config_versions
      run: |
        echo PACKAGEDREDISVERSION=`grep -w "packagedredisversion" config.yml | cut -d ":" -f 2-2|tr -d ' '` >> $GITHUB_OUTPUT
-       echo REDISVERSION=`grep -w "redis:" config.yml | cut -d ":" -f 2-2|tr -f ' '` >> $GITHUB_OUTPUT
+       echo REDISVERSION=`grep -w "redis:" config.yml | cut -d ":" -f 2-2|tr -d ' '` >> $GITHUB_OUTPUT
 
    - name: check if already built
      id: redis-already-built
@@ -715,7 +715,7 @@ jobs:
         -u ${{ secrets.M1_SSH_USER }} \
         -s ssh.key \
         -v ${{ steps.get_config_versions.outputs.REDISVERSION }} \
-        -P ${{ ENV.PACKAGEDREDISVERSION }}
+        -P ${{ steps.get_config_versions.outputs.PACKAGEDREDISVERSION }}
 
    - name: package redis for s3
      if: steps.redis-already-built.outcome != 'success'
