@@ -715,7 +715,7 @@ jobs:
         -u ${{ secrets.M1_SSH_USER }} \
         -s ssh.key \
         -v ${{ steps.get_config_versions.outputs.REDISVERSION }} \
-        -P ${{ steps.get_config_versions.outputs.PACKAGEDREDISVERSION }}
+        -p ${{ steps.get_config_versions.outputs.PACKAGEDREDISVERSION }}
 
    - name: package redis for s3
      if: steps.redis-already-built.outcome != 'success'
