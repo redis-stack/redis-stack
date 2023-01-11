@@ -884,7 +884,6 @@ jobs:
          realversion=`invoke version`
          echo "VERSION=$realversion" >> $GITHUB_OUTPUT
 
-     - uses: nelonoel/branch-name@v1.0.1
      - name: run the tests
        if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
@@ -897,7 +896,7 @@ jobs:
            -s ssh.key \
            -u ${{secrets.M1_SSH_USER}} \
            -v `echo $RANDOM` \
-           -g ${BRANCH_NAME}
+           -g ${github.head_ref}
 
 ###################### COLLATE DOCKERS ##################
  docker-push:
