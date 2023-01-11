@@ -697,8 +697,8 @@ jobs:
    - name: get versions from config file
      id: get_config_versions
      run: |
-       echo PACKAGEDREDISVERSION=`grep w "packagedredisversion" redis-stack/config.yml | cut -d ":" -f 2-2` >> $GITHUB_OUTPUT
-       echo REDISVERSION=`grep w "redis:" redis-stack/config.yml | cut -d ":" -f 2-2` >> $GITHUB_OUTPUT
+       echo PACKAGEDREDISVERSION=`grep -w "packagedredisversion" redis-stack/config.yml | cut -d ":" -f 2-2` >> $GITHUB_OUTPUT
+       echo REDISVERSION=`grep -w "redis:" redis-stack/config.yml | cut -d ":" -f 2-2` >> $GITHUB_OUTPUT
 
    - name: check if already built
      id: redis-already-built
