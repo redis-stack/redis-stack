@@ -90,16 +90,22 @@ jobs:
       #     docker manifest push redis/redis-stack-server:${{ steps.get_version.outputs.VERSION}}
 
       - name: determine if LATEST for docker
+        id: latestcheck
         run: |
           grep "islatest: yes" config.yml
           if [ $? -eq 0 ]; then
             echo "ISLATEST=YES" >>$GITHUB_OUTPUT
           fi
 
-      - name: am i latest
-        if: ${{env.ISLATEST == 'YES'}}
+      - name: am i latest [yes]
+        if: ${{steps.latestcheck.outputs.ISLATEST == 'YES'}}
         run: |
           echo "ok"
+
+      - name: am i latest [no]
+        if: ${{steps.latestcheck.outputs.ISLATEST != 'YES'}}
+        run: |
+          echo "not ok"
 
       # - name: publish redis-stack docker as latest
       #   if: ${{ env.ISLATEST == 'YES' }}
