@@ -92,7 +92,7 @@ jobs:
       - name: determine if LATEST for docker
         run: |
           grep "islatest: yes" config.yml
-          if [ $? -eq 0 ];
+          if [ $? -eq 0 ]; then
             echo "ISLATEST=YES" >>$GITHUB_OUTPUT
           fi
 
