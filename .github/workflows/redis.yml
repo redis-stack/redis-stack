@@ -710,7 +710,7 @@ jobs:
      if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
        source .venv/bin/activate
-       invoke build-over-ssh \
+       invoke build-m1-over-ssh \
         -i ${{ secrets.M1_IP }} \
         -u ${{ secrets.M1_SSH_USER }} \
         -s ssh.key \
