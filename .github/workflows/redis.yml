@@ -659,7 +659,7 @@ jobs:
        python-version: "${{ env.pythonversion }}"
    - name: install dependencies
      run: |
-      brew install coreutils
+       sudo apt install -y python3 python3-pip wget
    - name: install poetry
      uses: snok/install-poetry@v1
      with:
