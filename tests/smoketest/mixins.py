@@ -22,13 +22,18 @@ class RedisInsightTestMixin:
 
 
 class RedisTestMixin:
-    
+
     def test_redis_version(self, r):
         stack_dockloader(self)
         version = r.info().get('redis_version')
         data = yaml.load(open(CONFIGYAML, "r"), yaml.SafeLoader)
-        assert version == data.get("versions").get("redis")
-    
+        try:
+            assert version == data.get("versions").get("redis")
+        except:
+            v = data.get("versions").get("redis")
+            print(f"VERSION {v}")
+            raise
+
     def test_basic_redis(self, r):
         stack_dockloader(self)
         r.flushdb()
