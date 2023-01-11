@@ -646,7 +646,7 @@ jobs:
      pythonversion: "3.10"
      fpmversion: 1.14.2
      rubyversion: 2.7.2
-   runs-on: ubuntu-latest  # since this triggers ssh onto a mac
+   runs-on: macos-latest
    steps:
    - name: checkout sources
      uses: actions/checkout@v3
@@ -659,7 +659,7 @@ jobs:
        python-version: "${{ env.pythonversion }}"
    - name: install dependencies
      run: |
-       sudo apt install -y python3 python3-pip wget
+       brew install coreutils
    - name: install poetry
      uses: snok/install-poetry@v1
      with:
