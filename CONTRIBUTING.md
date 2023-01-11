@@ -5,7 +5,7 @@ of the [LICENSEs](license.txt).
 
 # IMPORTANT: HOW TO USE REDIS GITHUB ISSUES
 
-Github issues SHOULD ONLY BE USED to report bugs, and for DETAILED feature
+GitHub issues SHOULD ONLY BE USED to report bugs, and for DETAILED feature
 requests.
 
 Issues and pull requests for documentation belong in the [redis-stack-docs](https://github.com/redis/redis-stack-docs) respository.
