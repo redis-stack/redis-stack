@@ -15,7 +15,7 @@ env:
   s3publicreponame: s3://packages.redis.io/redis-stack
 
   # set to YES (in caps) so that in the specified branch, the release will mark as latest
-  ISLATEST: YES
+  ISLATEST: no
 
 jobs:
 
@@ -35,6 +35,7 @@ jobs:
           virtualenvs-in-project: true
           virtualenvs-create: true
           installer-parallel: true
+
       - name: get package version
         id: get_version
         run: |
@@ -42,7 +43,7 @@ jobs:
           source .venv/bin/activate
           realversion=`invoke version -p redis-stack-server -d true`
           echo "VERSION=$realversion" >>$GITHUB_OUTPUT
-
+ 
       - uses: s3-actions/s3cmd@v1.2.0
         with:
           provider: aws
@@ -87,15 +88,23 @@ jobs:
               redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
           docker manifest push redis/redis-stack-server:${{ steps.get_version.outputs.VERSION}}
 
+      - name: determine if LATEST for docker
+        id: latestcheck
+        run: |
+          grep "islatest: yes" config.yml
+          if [ $? -eq 0 ]; then
+            echo "ISLATEST=YES" >>$GITHUB_OUTPUT
+          fi
+
       - name: publish redis-stack docker as latest
-        if: ${{ env.ISLATEST == 'YES' }}
+        if: ${{steps.latestcheck.outputs.ISLATEST == 'YES'}}
         run: |
           docker manifest create redis/redis-stack:latest \
               redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-x86_64 \
               redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-arm64
           docker manifest push redis/redis-stack:latest
       - name: publish redis-stack-server docker
-        if: ${{ env.ISLATEST == 'YES' }}
+        if: ${{steps.latestcheck.outputs.ISLATEST == 'YES'}}
         run: |
           docker manifest create redis/redis-stack-server:latest \
               redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-x86_64 \
