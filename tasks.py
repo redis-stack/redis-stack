@@ -160,7 +160,7 @@ def build_m1_over_ssh(c, ip="", user="", ssh_key_path="", version="", packagedve
     os.mkdir(os.path.join(os.getcwd(), argsdest))
     c = Connection(host=ip, user=user, connect_kwargs={"key_filename": ssh_key_path})
     c.run(f"rm -rf {dest}")
-    c.run(f"git clone https://github.com/redis/redis depos/redis-{version}")
+    c.run(f"git clone https://github.com/redis/redis -b {version} depos/redis-{version}")
     c.run(f"""make -C {dest} all BUILD_TLS=yes
             FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /opt/homebrew/opt/openssl/lib/libssl.a /opt/homebrew/opt/openssl/lib/libcrypto.a"
             CFLAGS="-I /opt/homebrew/opt/openssl@3/include"
