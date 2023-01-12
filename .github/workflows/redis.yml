@@ -698,7 +698,7 @@ jobs:
      id: get_config_versions
      run: |
        echo PACKAGEDREDISVERSION=`grep -w "packagedredisversion" config.yml | cut -d ":" -f 2-2|tr -d ' '` >> $GITHUB_OUTPUT
-       echo REDISVERSION=`grep -w "redis:" config.yml | cut -d ":" -f 2-2|tr -f ' '` >> $GITHUB_OUTPUT
+       echo REDISVERSION=`grep -w "redis:" config.yml | cut -d ":" -f 2-2|tr -d ' '` >> $GITHUB_OUTPUT
 
    - name: check if already built
      id: redis-already-built
@@ -710,12 +710,12 @@ jobs:
      if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
        source .venv/bin/activate
-       invoke build-over-ssh \
+       invoke build-m1-over-ssh \
         -i ${{ secrets.M1_IP }} \
         -u ${{ secrets.M1_SSH_USER }} \
         -s ssh.key \
         -v ${{ steps.get_config_versions.outputs.REDISVERSION }} \
-        -P ${{ ENV.PACKAGEDREDISVERSION }}
+        -p ${{ steps.get_config_versions.outputs.PACKAGEDREDISVERSION }}
 
    - name: package redis for s3
      if: steps.redis-already-built.outcome != 'success'
@@ -883,6 +883,7 @@ jobs:
          source .venv/bin/activate
          realversion=`invoke version`
          echo "VERSION=$realversion" >> $GITHUB_OUTPUT
+
      - name: run the tests
        if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
@@ -895,7 +896,7 @@ jobs:
            -s ssh.key \
            -u ${{secrets.M1_SSH_USER}} \
            -v `echo $RANDOM` \
-           -g HEAD
+           -g ${{github.head_ref}}
 
 ###################### COLLATE DOCKERS ##################
  docker-push:
