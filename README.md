@@ -6,87 +6,9 @@
 [![redis-stack docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack?label=redis-stack)](https://img.shields.io/docker/pulls/redis/redis-stack)
 [![redis-stack-server docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack-server?label=redis-stack-server)](https://img.shields.io/docker/pulls/redis/redis-stack-server)
 
-
 # redis-stack
 
 This repository builds redis, and downloads various components (modules, RedisInsight) in order to build redis-stack packages for it's CI process.
-
-[Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
-[Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
-[Docker images](https://hub.docker.com/r/redis/redis-stack) |
-[Other downloads](https://redis.io/download/#redis-stack-downloads)
-
-[Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
-[Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
-[Docker images](https://hub.docker.com/r/redis/redis-stack) |
-[Other downloads](https://redis.io/download/#redis-stack-downloads)
-
----
-
-## Quick start
-
-*Start a docker*
- ```docker run redis/redis-stack:latest```
-
-*Start a docker with the custom password foo*
- ```docker run -e REDIS_ARGS="--requirepass foo" redis/redis-stack:latest```
-
-*Start a docker with both custom redis arguments and a search configuration*
-```docker run -e REDIS_ARGS="--requirepass foo" -e REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis/redis-stack:latest```
-
-*From a locally installed package: start a redis stack with custom search results and passwords*
-
-```REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis-stack-server --requirepass foo```
-
-----
-
-[Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
-[Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
-[Docker images](https://hub.docker.com/r/redis/redis-stack) |
-[Other downloads](https://redis.io/download/#redis-stack-downloads)
-
----
-
-## Quick start
-
-*Start a docker*
- ```docker run redis/redis-stack:latest```
-
-*Start a docker with the custom password foo*
- ```docker run -e REDIS_ARGS="--requirepass foo" redis/redis-stack:latest```
-
-*Start a docker with both custom redis arguments and a search configuration*
-```docker run -e REDIS_ARGS="--requirepass foo" -e REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis/redis-stack:latest```
-
-*From a locally installed package: start a redis stack with custom search results and passwords*
-
-```REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis-stack-server --requirepass foo```
-
-----
-
-[Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
-[Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
-[Docker images](https://hub.docker.com/r/redis/redis-stack) |
-[Other downloads](https://redis.io/download/#redis-stack-downloads)
-
----
-
-## Quick start
-
-*Start a docker*
- ```docker run redis/redis-stack:latest```
-
-*Start a docker with the custom password foo*
- ```docker run -e REDIS_ARGS="--requirepass foo" redis/redis-stack:latest```
-
-*Start a docker with both custom redis arguments and a search configuration*
-```docker run -e REDIS_ARGS="--requirepass foo" -e REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis/redis-stack:latest```
-
-*From a locally installed package: start a redis stack with custom search results and passwords*
-
-```REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis-stack-server --requirepass foo```
-
-----
 
 [Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
 [Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
@@ -186,8 +108,9 @@ The following steps only apply to non-prerelease, releases. As of this writing o
 3. Tag the [debian repository](https://github.com/redis-stack/redis-stack-deb) and wait for and wait for the [publish action to complete](https://github.com/redis-stack/redis-stack-deb/actions/workflows/release.yml).
 4. Update [homebrew](https://github.com/redis-stack/homebrew-redis-stack) with the latest version of redis-stack
     1. Note that if RedisInsight is being upgraded, it too needs to be edited in that pull request,
-    1. Tag the repository, after the merge to master.
+    1. Merge to master. There are no tags for this repository.
 5. Update the [helm charts](https://github.com/redis-stack/helm-redis-stack) with the latest version of redis-stack
+    1. After the pull request, create a release, using the release drafter.
 
 ------------------------
 

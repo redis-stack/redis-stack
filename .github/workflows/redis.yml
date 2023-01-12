@@ -5,10 +5,11 @@ on:
     paths-ignore:
       - 'docs/**'
       - '**/*.md'
-      - '.github/worfklows/release.yml'
+      - '.github/workflows/release.yml'
     branches:
       - master
       - '[0-9].[0-9]'
+      - '[0-9].[0-9].[0-9]'
   pull_request:
   schedule:
     - cron: "0 1 * * *"
@@ -26,9 +27,6 @@ jobs:
      arch: arm64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
-     redisversion: 7.0.6
-     packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -47,9 +45,6 @@ jobs:
      arch: arm64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-     redisversion: 7.0.6
-     packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -67,9 +62,6 @@ jobs:
      arch: arm64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-     redisversion: 7.0.6
-     packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -141,9 +133,6 @@ jobs:
      arch: x86_64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
-     redisversion: 7.0.6
-     packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -161,9 +150,6 @@ jobs:
      arch: x86_64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2
-     redisversion: 7.0.6
-     packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -196,11 +182,11 @@ jobs:
 
  x86_64-appimage:
    uses: ./.github/workflows/APPIMAGE_REUSABLE.yml
-   needs: [x86_64-focal]
+   needs: [x86_64-bionic]
    with:
      arch: x86_64
-     platform: focal
-     osnick: ubuntu20.04
+     platform: bionic
+     osnick: ubuntu18.04
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -216,9 +202,6 @@ jobs:
      arch: x86_64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
-     redisversion: 7.0.6
-     packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -236,9 +219,6 @@ jobs:
      arch: x86_64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
-     redisversion: 7.0.6
-     packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -258,9 +238,6 @@ jobs:
 #     osname: Linux
 #     target: pkg
 #     build_deps: pacman -Syyu --noconfirm gcc gcc-libs git openssl jq wget python python-pip openssh make
-#     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 libarchive-tools
-#     redisversion: 7.0.6
-#     packagedredisversion: 7.0.6-1
 #     pythonversion: "3.10"
 #   secrets:
 #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -278,9 +255,6 @@ jobs:
      arch: x86_64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y unzip dpkg-sig curl gnupg2 tar
-     redisversion: 7.0.6
-     packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -300,9 +274,6 @@ jobs:
      build_deps: |
       yum install -y epel-release
       yum install -y gcc make jemalloc-devel openssl-devel python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y rpm unzip gpg gnupg2 curl tar
-     redisversion: 7.0.6
-     packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -394,9 +365,6 @@ jobs:
      build_deps: |
        dnf install -y oracle-epel-release-el8
        dnf install -y gcc make jemalloc-devel openssl-devel tar git python3 python3-pip jq wget
-     packaging_deps: sudo apt-get install -y rpm unzip curl gnupg2 tar
-     redisversion: 7.0.6
-     packagedredisversion: 7.0.6-1
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -415,8 +383,6 @@ jobs:
      target: zip
      platform: catalina
      osname: macos
-     redisversion: 7.0.6
-     packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
      fpmversion: 1.14.2
      rubyversion: 2.7.2
@@ -431,11 +397,23 @@ jobs:
        echo "am I fork: ${amfork}"
        echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
+   - name: checkout sources
+     uses: actions/checkout@v3
+     with:
+       path: redis-stack
+
+   - name: get versions from config file
+     id: get_config_versions
+     run: |
+       echo PACKAGEDREDISVERSION=`grep -w "packagedredisversion" redis-stack/config.yml | cut -d ":" -f 2-2|tr -d ' '` >> $GITHUB_OUTPUT
+       echo REDISVERSION=`grep -w "redis:" redis-stack/config.yml | cut -d ":" -f 2-2|tr -d ' '` >> $GITHUB_OUTPUT
+
    - name: check if already built
      id: redis-already-built
      continue-on-error: true
      run: |
-       wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
+       wget -q https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
+
    - uses: ruby/setup-ruby@v1
      with:
        ruby-version: ${{env.rubyversion}}
@@ -451,17 +429,13 @@ jobs:
        virtualenvs-create: true
        installer-parallel: true
 
-   - name: checkout sources
-     uses: actions/checkout@v3
-     with:
-       path: redis-stack
    - name: clone redis
      if: steps.redis-already-built.outcome != 'success'
      uses: actions/checkout@v3
      with:
        repository: redis/redis
        path: redis
-       ref: ${{env.redisversion}}
+       ref: ${{steps.get_config_versions.outputs.REDISVERSION}}
 
    - name: install dependencies
      run: |
@@ -478,16 +452,16 @@ jobs:
    - name: package redis for s3
      if: steps.redis-already-built.outcome != 'success'
      run: |
-       mkdir redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
+       mkdir redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
        cp redis/src/redis-server \
            redis/src/redis-sentinel \
            redis/src/redis-check-aof \
            redis/src/redis-check-rdb \
            redis/src/redis-benchmark \
            redis/src/redis-cli \
-           redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
-       tar -czvf redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
-           redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
+           redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
+       tar -czvf redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
+           redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
 
    - uses: s3-actions/s3cmd@v1.2.0
      with:
@@ -498,14 +472,14 @@ jobs:
    - name: persist redis to s3
      if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
-       s3cmd put -P redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
-       s3://redismodules/redis-stack/dependencies/redis-${{env.packagedredisversion}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
+       s3cmd put -P redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
+       s3://redismodules/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
 
    - name: perist redis
      if: steps.redis-already-built.outcome != 'success'
      uses: actions/upload-artifact@v3
      with:
-       name: redis-${{env.packagedredisversion}}-osx
+       name: redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-osx
        path: |
          redis/src/redis-server
          redis/src/redis-sentinel
@@ -658,8 +632,6 @@ jobs:
      target: zip
      platform: monterey
      osname: macos
-     redisversion: 7.0.6
-     packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
      fpmversion: 1.14.2
      rubyversion: 2.7.2
@@ -676,7 +648,7 @@ jobs:
        python-version: "${{ env.pythonversion }}"
    - name: install dependencies
      run: |
-      brew install coreutils
+       brew install coreutils
    - name: install poetry
      uses: snok/install-poetry@v1
      with:
@@ -704,6 +676,66 @@ jobs:
        amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
        echo "am I fork: ${amfork}"
        echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+
+   - name: write the ssh key to a file
+     if: steps.iamafork.outputs.IAMAFORK == 'false'
+     run: |
+       echo "${{secrets.OPERETO_KEY}}" > ssh.key
+       chmod 0400 ssh.key
+
+   - name: get versions from config file
+     id: get_config_versions
+     run: |
+       echo PACKAGEDREDISVERSION=`grep -w "packagedredisversion" config.yml | cut -d ":" -f 2-2|tr -d ' '` >> $GITHUB_OUTPUT
+       echo REDISVERSION=`grep -w "redis:" config.yml | cut -d ":" -f 2-2|tr -d ' '` >> $GITHUB_OUTPUT
+
+   - name: check if already built
+     id: redis-already-built
+     continue-on-error: true
+     run: |
+       wget -q https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
+
+   - name: build redis from source
+     if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
+     run: |
+       source .venv/bin/activate
+       invoke build-m1-over-ssh \
+        -i ${{ secrets.M1_IP }} \
+        -u ${{ secrets.M1_SSH_USER }} \
+        -s ssh.key \
+        -v ${{ steps.get_config_versions.outputs.REDISVERSION }} \
+        -p ${{ steps.get_config_versions.outputs.PACKAGEDREDISVERSION }}
+
+   - name: package redis for s3
+     if: steps.redis-already-built.outcome != 'success'
+     run: |
+       tar -czvf redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
+           redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
+   - uses: s3-actions/s3cmd@v1.2.0
+     with:
+       provider: aws
+       region: us-east-1
+       access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+       secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+   - name: persist redis to s3
+     if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
+     run: |
+       s3cmd put -P redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
+       s3://redismodules/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
+
+   - name: perist redis
+     if: steps.redis-already-built.outcome != 'success'
+     uses: actions/upload-artifact@v3
+     with:
+       name: redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.arch}}-osx
+       path: |
+         redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}*/redis-server
+         redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}*/redis-sentinel
+         redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}*/redis-check-aof
+         redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}*/redis-check-rdb
+         redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}*/redis-benchmark
+         redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}*/redis-cli
 
 ### Once https://github.com/actions/runner/issues/805 is resolved we can do this ###
 ### For now, this is how it is manually built, on the platform ###
@@ -789,8 +821,6 @@ jobs:
      target: zip
      platform: monterey
      osname: macos
-     redisversion: 7.0.6
-     packagedredisversion: 7.0.6-1
      pythonversion: "3.10"
    runs-on: ubuntu-latest
    steps:
@@ -842,6 +872,7 @@ jobs:
          source .venv/bin/activate
          realversion=`invoke version`
          echo "VERSION=$realversion" >> $GITHUB_OUTPUT
+
      - name: run the tests
        if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
@@ -854,7 +885,7 @@ jobs:
            -s ssh.key \
            -u ${{secrets.M1_SSH_USER}} \
            -v `echo $RANDOM` \
-           -g HEAD
+           -g ${{github.head_ref}}
 
 ###################### COLLATE DOCKERS ##################
  docker-push:
