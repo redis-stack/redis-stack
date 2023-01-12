@@ -31,7 +31,6 @@ class RedisTestMixin:
             assert version == data.get("versions").get("redis")
         except:
             v = data.get("versions").get("redis")
-            print(f"VERSION {v}")
             raise
 
     def test_basic_redis(self, r):
