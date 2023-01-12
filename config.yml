@@ -1,6 +1,6 @@
 ---
 
-islatest: yes
+islatest: no
 
 # module versions
 versions:
@@ -17,8 +17,8 @@ versions:
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
   packagedredisversion: 7.0.7-1
-  redis-stack: 99.99.99
-  redis-stack-server: 99.99.99
+  redis-stack: 7.0.6-RC3
+  redis-stack-server: 7.0.6-RC3
   redisinsight: 2.14.0
   redisinsight-web: 2.14.0
 
