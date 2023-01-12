@@ -2,16 +2,16 @@
 # module versions
 versions:
   rejson: 2.4.3
-  redistimeseries: 1.8.4
+  redistimeseries: 1.8.5
   redisearch: 2.6.4
   redisgraph: 2.10.5
   redisbloom: 2.4.3
   nodejs: v16.15.1
   redis: 7.0.6-1
-  redis-stack: 7.0.6-RC3
-  redis-stack-server: 7.0.6-RC3
-  redisinsight: 2.14.0
-  redisinsight-web: 2.14.0
+  redis-stack: 7.0.6-RC4
+  redis-stack-server: 7.0.6-RC4
+  redisinsight: 2.16.0
+  redisinsight-web: 2.16.0
 
 # common package variables
 email: Redis OSS <oss@redislabs.com>
