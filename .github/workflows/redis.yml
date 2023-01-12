@@ -896,7 +896,7 @@ jobs:
            -s ssh.key \
            -u ${{secrets.M1_SSH_USER}} \
            -v `echo $RANDOM` \
-           -g ${{github.ref_name}}
+           -g ${{github.head_ref}}
 
 ###################### COLLATE DOCKERS ##################
  docker-push:
