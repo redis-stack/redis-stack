@@ -25,7 +25,7 @@ jobs:
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
      pythonversion: "3.10"
-     moduleoverride: "99.99.99"
+     moduleoverride: "master"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -84,7 +84,7 @@ jobs:
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
      pythonversion: "3.10"
-     moduleoverride: "99.99.99"
+     moduleoverride: "master"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -118,6 +118,7 @@ jobs:
          username: ${{ secrets.DOCKERHUB_USERNAME }}
          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # to solve the issues with cross-org pushes (as returned by the docker API)
      - name: pull, retag, push x86
        run: |
          docker pull redisfab/${{matrix.package}}:${{env.version}}-x86_64
