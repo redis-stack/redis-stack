@@ -265,6 +265,15 @@ jobs:
            rm key
          fi
 
+      - name: gpg sign tarball
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
+        run: |
+            echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
+            gpg-connect-agent reloadagent /bye
+            /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ steps.get_gpg_keygrip.outputs.GPG_KEYGRIP }}
+            gpg --detach-sign --armor *.tar.gz
+
+
     #  - name: run tests
     #    run: |
     #      source .venv/bin/activate
@@ -291,7 +300,7 @@ jobs:
        continue-on-error: true
        run: |
          mkdir -p s3uploads
-         cp *.${{env.target}} *.tar.gz s3uploads
+         cp *.${{env.target}} *.tar.gz *.asc s3uploads
          cd s3uploads
          for i in `ls`; do
            sha256sum $i |awk '{print $1}' > $i.sha256
