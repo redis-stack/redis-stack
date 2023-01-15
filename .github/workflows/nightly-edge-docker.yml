@@ -118,6 +118,7 @@ jobs:
          username: ${{ secrets.DOCKERHUB_USERNAME }}
          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # to solve the issues with cross-org pushes (as returned by the docker API)
      - name: pull, retag, push x86
        run: |
          docker pull redisfab/${{matrix.package}}:${{env.version}}-x86_64
