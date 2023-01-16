@@ -95,6 +95,8 @@ jobs:
    secrets:
      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
+     DOCKER_TRUST_PASSPHRASE: ${{ secrets.DOCKER_TRUST_PASSPHRASE }}
+     DOCKER_TRUST_PRIVATE_KEY: ${{ secrets.DOCKER_TRUST_PRIVATE_KEY }}
 
  arm64-snap:
    uses: ./.github/workflows/SNAP_REUSABLE.yml
@@ -168,6 +170,8 @@ jobs:
    secrets:
      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
+     DOCKER_TRUST_PASSPHRASE: ${{ secrets.DOCKER_TRUST_PASSPHRASE }}
+     DOCKER_TRUST_PRIVATE_KEY: ${{ secrets.DOCKER_TRUST_PRIVATE_KEY }}
 
  x86_64-snap:
    uses: ./.github/workflows/SNAP_REUSABLE.yml
@@ -939,5 +943,8 @@ jobs:
            redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-arm64
      - name: push the manifest
        if: steps.iamafork.outputs.IAMAFORK == 'false'
+       env:
+         DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE: ${{ secrets.DOCKER_TRUST_PASSPHRASE }}
        run: |
+         docker trust sign redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}
          docker manifest push redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}
