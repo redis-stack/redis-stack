@@ -1,0 +1,142 @@
+name: Edge Docker
+
+on:
+
+  workflow_dispatch:
+
+  schedule:
+    - cron: "0 5 * * *"
+
+# forcing the version to edge, since this is a nightly build only
+env:
+  version: edge
+
+jobs:
+
+##### arm ####
+ arm64-focal:
+   uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
+   with:
+     image_name: ubuntu:focal
+     platform: focal
+     osname: Linux
+     osnick: ubuntu20.04
+     arch: arm64
+     target: deb
+     build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
+     pythonversion: "3.10"
+     moduleoverride: "master"
+   secrets:
+     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+     GPG_KEY: ${{ secrets.GPG_KEY }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+
+ arm64-focal-redisinsight-web:
+   uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
+   with:
+     platform: focal
+     osname: Linux
+     osnick: ubuntu20.04
+     arch: arm64
+     target: deb
+     pythonversion: "3.10"
+   secrets:
+     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+     GPG_KEY: ${{ secrets.GPG_KEY }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+
+ arm64-docker:
+   uses: ./.github/workflows/DOCKER_REUSABLE.yml
+   needs: [arm64-focal, arm64-focal-redisinsight-web]
+   with:
+     pythonversion: "3.10"
+     arch: arm64
+     platform: focal
+   secrets:
+     DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
+     DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
+
+#### x86_64 JOBS ####
+ x86_64-focal-redisinsight-web:
+   uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
+   with:
+     platform: focal
+     osname: Linux
+     osnick: ubuntu20.04
+     target: deb
+     pythonversion: "3.10"
+   secrets:
+     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+     GPG_KEY: ${{ secrets.GPG_KEY }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+
+ x86_64-focal:
+   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+   with:
+     image_name: ubuntu:focal
+     platform: focal
+     osname: Linux
+     osnick: ubuntu20.04
+     arch: x86_64
+     target: deb
+     build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
+     pythonversion: "3.10"
+     moduleoverride: "master"
+   secrets:
+     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+     GPG_KEY: ${{ secrets.GPG_KEY }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+
+ x86_64-docker:
+   uses: ./.github/workflows/DOCKER_REUSABLE.yml
+   needs: [x86_64-focal, x86_64-focal-redisinsight-web]
+   with:
+     pythonversion: "3.10"
+     arch: x86_64
+     platform: focal
+   secrets:
+     DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
+     DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
+
+ docker-push:
+   needs: [x86_64-docker, arm64-docker]
+   name: Push ${{matrix.package}} manifest
+   strategy:
+     matrix:
+       package: ['redis-stack-server', 'redis-stack']
+   env:
+     pythonversion: "3.10"
+   runs-on: ubuntu-latest
+   steps:
+     - name: Log in to DockerHub
+       uses: docker/login-action@v2
+       with:
+         username: ${{ secrets.DOCKERHUB_USERNAME }}
+         password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # to solve the issues with cross-org pushes (as returned by the docker API)
+     - name: pull, retag, push x86
+       run: |
+         docker pull redisfab/${{matrix.package}}:${{env.version}}-x86_64
+         docker tag redisfab/${{matrix.package}}:${{env.version}}-x86_64 redis/${{matrix.package}}:${{env.version}}-x86_64
+         docker push redis/${{matrix.package}}:${{env.version}}-x86_64
+
+     - name: pull, retag, push arm64
+       run: |
+         docker pull redisfab/${{matrix.package}}:${{env.version}}-arm64
+         docker tag redisfab/${{matrix.package}}:${{env.version}}-arm64 redis/${{matrix.package}}:${{env.version}}-arm64
+         docker push redis/${{matrix.package}}:${{env.version}}-arm64
+
+     - name: create the manifest
+       run: |
+         docker manifest create redis/${{ matrix.package }}:${{ env.version }} \
+           redis/${{ matrix.package }}:${{ env.version }}-x86_64 \
+           redis/${{ matrix.package }}:${{ env.version }}-arm64
+
+     - name: push the manifest
+       run: |
+         docker manifest push redis/${{matrix.package}}:${{ env.version }}

@@ -6,87 +6,9 @@
 [![redis-stack docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack?label=redis-stack)](https://img.shields.io/docker/pulls/redis/redis-stack)
 [![redis-stack-server docker pulls](https://img.shields.io/docker/pulls/redis/redis-stack-server?label=redis-stack-server)](https://img.shields.io/docker/pulls/redis/redis-stack-server)
 
-
 # redis-stack
 
 This repository builds redis, and downloads various components (modules, RedisInsight) in order to build redis-stack packages for it's CI process.
-
-[Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
-[Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
-[Docker images](https://hub.docker.com/r/redis/redis-stack) |
-[Other downloads](https://redis.io/download/#redis-stack-downloads)
-
-[Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
-[Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
-[Docker images](https://hub.docker.com/r/redis/redis-stack) |
-[Other downloads](https://redis.io/download/#redis-stack-downloads)
-
----
-
-## Quick start
-
-*Start a docker*
- ```docker run redis/redis-stack:latest```
-
-*Start a docker with the custom password foo*
- ```docker run -e REDIS_ARGS="--requirepass foo" redis/redis-stack:latest```
-
-*Start a docker with both custom redis arguments and a search configuration*
-```docker run -e REDIS_ARGS="--requirepass foo" -e REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis/redis-stack:latest```
-
-*From a locally installed package: start a redis stack with custom search results and passwords*
-
-```REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis-stack-server --requirepass foo```
-
-----
-
-[Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
-[Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
-[Docker images](https://hub.docker.com/r/redis/redis-stack) |
-[Other downloads](https://redis.io/download/#redis-stack-downloads)
-
----
-
-## Quick start
-
-*Start a docker*
- ```docker run redis/redis-stack:latest```
-
-*Start a docker with the custom password foo*
- ```docker run -e REDIS_ARGS="--requirepass foo" redis/redis-stack:latest```
-
-*Start a docker with both custom redis arguments and a search configuration*
-```docker run -e REDIS_ARGS="--requirepass foo" -e REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis/redis-stack:latest```
-
-*From a locally installed package: start a redis stack with custom search results and passwords*
-
-```REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis-stack-server --requirepass foo```
-
-----
-
-[Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
-[Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
-[Docker images](https://hub.docker.com/r/redis/redis-stack) |
-[Other downloads](https://redis.io/download/#redis-stack-downloads)
-
----
-
-## Quick start
-
-*Start a docker*
- ```docker run redis/redis-stack:latest```
-
-*Start a docker with the custom password foo*
- ```docker run -e REDIS_ARGS="--requirepass foo" redis/redis-stack:latest```
-
-*Start a docker with both custom redis arguments and a search configuration*
-```docker run -e REDIS_ARGS="--requirepass foo" -e REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis/redis-stack:latest```
-
-*From a locally installed package: start a redis stack with custom search results and passwords*
-
-```REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis-stack-server --requirepass foo```
-
-----
 
 [Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
 [Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
@@ -186,8 +108,9 @@ The following steps only apply to non-prerelease, releases. As of this writing o
 3. Tag the [debian repository](https://github.com/redis-stack/redis-stack-deb) and wait for and wait for the [publish action to complete](https://github.com/redis-stack/redis-stack-deb/actions/workflows/release.yml).
 4. Update [homebrew](https://github.com/redis-stack/homebrew-redis-stack) with the latest version of redis-stack
     1. Note that if RedisInsight is being upgraded, it too needs to be edited in that pull request,
-    1. Tag the repository, after the merge to master.
+    1. Merge to master. There are no tags for this repository.
 5. Update the [helm charts](https://github.com/redis-stack/helm-redis-stack) with the latest version of redis-stack
+    1. After the pull request, create a release, using the release drafter.
 
 ------------------------
 
@@ -204,3 +127,17 @@ Today, to modify the way a service starts, the following files all need editing:
 Versions for all packages are defined in the config.yaml file, and within a function named *generate_url* for each source type. In the case where you need to test a package that has been built to a custom location, set a variable named <module>-url-override in the config file at the top level.  For example, to override the rejson package location create a variable named *rejson-url-override*.  In the case of RedisInsight, all packages would derive from *redisinsight-url-override*.
 
 Do not commit this change to a mainline branch.
+
+---
+
+## Signed Binaries
+
+The following redis-stack builds are currently signed using the Redis GPG key. The public key can be downloaded from [here](https://packages.redis.io/gpg).
+
+1. Debian archives (deb files) - The indivial packages themselves are signed, as is the debian archive respository. Repository signing can be found in the [debian tagging  repository](https://github.com/redis-stack/redis-stack-deb). Adding the apt repository includes [importing, and validating the GPG key](https://redis.io/docs/stack/get-started/install/linux/).
+
+2. RedHat packages (rpm files) - The indivial packages themselves are signed. Adding the rpm repository includes [importing, and validating the GPG key](https://redis.io/docs/stack/get-started/install/linux/).
+
+3. All binaries within OSX zip files are code-signed using Redis' code-signing certificates. Validation is handled by the operating system.
+
+4. Tarballs generated by redis-stack, are [GPG signed](https://github.com/redis-stack/redis-stack/pull/314).
