@@ -25,15 +25,7 @@ on:
       build_deps:
         required: true
         type: string
-      packaging_deps:
-        required: true
-        type: string
-      redisversion:
-        required: false
-        type: string
-      packagedredisversion:
-        required: false
-        type: string
+
       pythonversion:
         required: false
         type: string
@@ -46,6 +38,9 @@ on:
         required: false
         type: string
         default: 1.14.2
+      moduleoverride:
+        required: false
+        type: string
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -62,8 +57,6 @@ jobs:
     name: Build ${{inputs.platform}} (${{inputs.arch}})
 
     env:
-      redisversion: ${{inputs.redisversion}}
-      packagedredisversion: ${{inputs.packagedredisversion}}
       pythonversion: ${{inputs.pythonversion}}
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
@@ -75,17 +68,29 @@ jobs:
         amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
         echo "am I fork: ${amfork}"
         echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+
+    - name: check out redis-stack
+      uses: actions/checkout@v3
+      with:
+        path: redis-stack
+
+    - name: get versions from config file
+      id: get_config_versions
+      run: |
+        echo PACKAGEDREDISVERSION=`grep -w "packagedredisversion" redis-stack/config.yml | cut -d ":" -f 2-2|tr -d ' '` >> $GITHUB_OUTPUT
+        echo REDISVERSION=`grep -w "redis:" redis-stack/config.yml | cut -d ":" -f 2-2|tr -d ' '` >> $GITHUB_OUTPUT
+
     - name: check if already built
       id: redis-already-built
       continue-on-error: true
       run: |
-        wget https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{inputs.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
+        wget -q https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
     - uses: actions/checkout@v3
       if: steps.redis-already-built.outcome != 'success'
       with:
         repository: redis/redis
         path: redis
-        ref: ${{env.redisversion}}
+        ref: ${{steps.get_config_versions.outputs.REDISVERSION}}
     - name: Cache dependencies
       uses: actions/cache@v3
       if: steps.redis-already-built.outcome != 'success'
@@ -106,16 +111,16 @@ jobs:
     - name: package redis for s3
       if: steps.redis-already-built.outcome != 'success'
       run: |
-        mkdir redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
+        mkdir redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
         cp redis/src/redis-server \
            redis/src/redis-sentinel \
            redis/src/redis-check-aof \
            redis/src/redis-check-rdb \
            redis/src/redis-benchmark \
            redis/src/redis-cli \
-           redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
-        tar -czvf redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
-           redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
+           redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
+        tar -czvf redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
+           redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
     - name: install s3cmd
       if: steps.redis-already-built.outcome != 'success'
       run: |
@@ -123,14 +128,14 @@ jobs:
     - name: persist redis to s3
       if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
       run: |
-        s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
-          s3://redismodules/redis-stack/dependencies/redis-${{env.packagedredisversion}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
+        s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
+          s3://redismodules/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
 
     - name: perist redis
       uses: actions/upload-artifact@v3
       if: steps.redis-already-built.outcome != 'success'
       with:
-        name: redis-${{env.packagedredisversion}}-${{inputs.platform}}-${{inputs.arch}}
+        name: redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.platform}}-${{inputs.arch}}
         path: |
           redis/src/redis-server
           redis/src/redis-sentinel
@@ -142,8 +147,6 @@ jobs:
   package:
     name: Package ${{inputs.platform}} (${{inputs.arch}}) ${{matrix.package}}
     env:
-      redisversion: ${{inputs.redisversion}}
-      packagedredisversion: ${{inputs.packagedredisversion}}
       pythonversion: "${{inputs.pythonversion}}"
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
@@ -152,6 +155,7 @@ jobs:
       osnick: ${{inputs.osnick}}
       arch: ${{inputs.arch}}
       target: ${{inputs.target}}
+      moduleoverride: ${{inputs.moduleoverride}}
     runs-on: ubuntu-latest
     needs: [build-redis]
     strategy:
@@ -193,7 +197,7 @@ jobs:
 
      - name: install packaging and testing tools
        run: |
-         sudo ${{inputs.packaging_deps}}
+         sudo apt-get update && sudo apt-get install -y unzip curl rpm dpkg-sig gpg gnupg2 tar
          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
          sudo apt-get update && sudo apt-get install vagrant virtualbox
@@ -211,12 +215,12 @@ jobs:
      - name: build ${{matrix.package}}
        run: |
          source .venv/bin/activate
-         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p ${{ matrix.package }}
+         invoke package -e "${{env.moduleoverride}}" -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p ${{ matrix.package }}
 
      - name: build downloadable tarball
        run: |
          source .venv/bin/activate
-         invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t tar -p ${{ matrix.package }}
+         invoke package -e "${{env.moduleoverride}}" -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t tar -p ${{ matrix.package }}
 
      - name: install gpg key
        if: steps.iamafork.outputs.IAMAFORK == 'false'
@@ -261,6 +265,15 @@ jobs:
            rm key
          fi
 
+     - name: gpg sign tarball
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
+       run: |
+           echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
+           gpg-connect-agent reloadagent /bye
+           /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ steps.get_gpg_keygrip.outputs.GPG_KEYGRIP }}
+           gpg --detach-sign --armor *.tar.gz
+
+
     #  - name: run tests
     #    run: |
     #      source .venv/bin/activate
@@ -287,7 +300,7 @@ jobs:
        continue-on-error: true
        run: |
          mkdir -p s3uploads
-         cp *.${{env.target}} *.tar.gz s3uploads
+         cp *.${{env.target}} *.tar.gz *.asc s3uploads
          cd s3uploads
          for i in `ls`; do
            sha256sum $i |awk '{print $1}' > $i.sha256

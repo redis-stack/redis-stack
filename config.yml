@@ -1,4 +1,7 @@
 ---
+
+islatest: no
+
 # module versions
 versions:
   rejson: 2.4.3
@@ -7,7 +10,14 @@ versions:
   redisgraph: 2.10.5
   redisbloom: 2.4.3
   nodejs: v16.15.1
-  redis: 7.0.6-1
+
+  # the redis repository tag
+  redis: 7.0.7
+
+  # the version of the package we build and track (separate, in case changes are needed)
+  # as in the past
+  packagedredisversion: 7.0.7-1
+  
   redis-stack: 7.0.6-RC4
   redis-stack-server: 7.0.6-RC4
   redisinsight: 2.16.0
