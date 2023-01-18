@@ -830,7 +830,6 @@ jobs:
      osnick: rhel7
      osname: Linux
      testplatform: amazonlinux2
-     required_job:  x86_64-rhel7 
 
  x86_64_fedora_tests:
    name: Fedora Tests (x86_64)
@@ -843,7 +842,6 @@ jobs:
      osnick: ubuntu22.04
      osname: Linux
      testplatform: fedora
-     required_job:  x86_64-jammy
 
 ###################### COLLATE DOCKERS ##################
  docker-push:

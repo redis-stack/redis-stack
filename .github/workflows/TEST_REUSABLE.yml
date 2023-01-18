@@ -38,7 +38,7 @@ on:
 
       # matrix package (redis-stack/redis-stack-server)
       package:
-        required: true
+        required: false
         type: string
         default: redis-stack-server
 
@@ -96,8 +96,8 @@ jobs:
          run: |
            source .venv/bin/activate
            mkdir redis-stack
-           cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
-           cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
+           cp *.tar.gz redis-stack/${{ inputs.package }}.tar.gz
+           cp *.${{ env.target }} redis-stack/${{ inputs.package }}.${{ env.target }}
            pytest -m "${{env.testplatform}} and not physical and not arm" --junit-xml=results.xml
 
        - uses: dorny/test-reporter@v1
