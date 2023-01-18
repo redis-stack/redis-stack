@@ -50,7 +50,7 @@ on:
 jobs:
 
   test:
-    name: Test ${{inputs.testplatform}} (${{intputs.arch}})
+    name: Test ${{inputs.testplatform}} (${{inputs.arch}})
     runs-on: ubuntu-latest
     needs: [ ${{ inputs.required_job }} ]
     env:
