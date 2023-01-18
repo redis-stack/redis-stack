@@ -42,17 +42,11 @@ on:
         type: string
         default: redis-stack-server
 
-      # dependent job
-      required_job:
-        required: true
-        type: string
-
 jobs:
 
   test:
     name: Test ${{inputs.testplatform}} (${{inputs.arch}})
     runs-on: ubuntu-latest
-    needs: [ ${{ inputs.required_job }} ]
     env:
       pythonversion: "${{inputs.pythonversion}}"
       platform: ${{inputs.platform}}

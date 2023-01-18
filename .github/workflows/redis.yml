@@ -822,6 +822,7 @@ jobs:
  x86_64_amazonlinux2_tests:
    name: Amazonlinux2 Tests (x86_64)
    uses: ./.github/workflows/TEST_REUSABLE.yml
+   needs: [x86_64-rhel7]
    with:
      arch: x86_64
      platform: rhel7
@@ -833,6 +834,7 @@ jobs:
 
  x86_64_fedora_tests:
    name: Fedora Tests (x86_64)
+   needs: [x86_64-jammy]
    uses: ./.github/workflows/TEST_REUSABLE.yml
    with:
      arch: x86_64
