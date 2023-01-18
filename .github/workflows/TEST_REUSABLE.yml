@@ -1,0 +1,117 @@
+name: Test prebuilt package
+
+on:
+
+  workflow_call:
+    inputs:
+
+      # architecture
+      arch:
+        required: false
+        type: string
+        default: x86_64
+
+      # short version of the OS (ubuntu20.04, rhel7, etc)
+      osnick:
+        required: true
+        type: string
+
+      # target package type (deb, rpm, etc)
+      target:
+        required: true
+        type: string
+
+      # a different type of OS shortname (focal, rhel7, etc)
+      platform:
+        required: true
+        type: string
+
+      # an override - if set, use only as the target in testing
+      testplatform:
+        required: false
+        type: string
+
+      # operating system name (i.e Linux)
+      osname:
+        required: true
+        type: string
+
+      # matrix package (redis-stack/redis-stack-server)
+      package:
+        required: true
+        type: string
+        default: redis-stack-server
+
+      # dependent job
+      required_job:
+        required: true
+        type: string
+
+jobs:
+
+  test:
+    name: Test ${{inputs.testplatform}} (${{intputs.arch}})
+    runs-on: ubuntu-latest
+    needs: [ ${{ inputs.required_job }} ]
+    env:
+      pythonversion: "${{inputs.pythonversion}}"
+      platform: ${{inputs.platform}}
+      testplatform: ${{inputs.testplatform}}
+      osname: ${{inputs.osname}}
+      osnick: ${{inputs.osnick}}
+      arch: ${{inputs.arch}}
+      target: ${{inputs.target}}
+    steps:
+       - name: checkout sources
+         uses: actions/checkout@v3
+       - name: Cache dependencies
+         uses: actions/cache@v3
+         with:
+           path: |
+             /var/cache/apt/archives/**.deb
+             /var/cache/yum
+             ~/.cache/pip
+             ~/.cache/pypoetry
+             ~/.local/share/gem
+           key: pypoetry-${{hashFiles('pyproject.toml', '.github/workflows/*.yml')}}-${{env.platform}}-${{env.arch}}-package
+       - name: install python
+         uses: actions/setup-python@v4
+         with:
+           python-version: "${{env.pythonversion}}"
+       - name: install poetry
+         uses: snok/install-poetry@v1
+         with:
+           version: latest
+           virtualenvs-in-project: true
+           virtualenvs-create: true
+           installer-parallel: true
+
+       - name: install packaging and testing tools
+         run: |
+           poetry install
+
+       - uses: actions/download-artifact@v3
+         with:
+           name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
+
+       - uses: actions/download-artifact@v3
+         with:
+           name: redis-stack-server-${{env.platform}}-${{env.arch}}.tar.gz
+
+       - name: run tests in dockers
+         run: |
+           source .venv/bin/activate
+           mkdir redis-stack
+           cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
+           cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
+           pytest -m "${{env.testplatform}} and not physical and not arm" --junit-xml=results.xml
+
+       - uses: dorny/test-reporter@v1
+         if: success() || failure()
+         with:
+           name: Test Results ${{env.testplatform}} ${{env.osnick}} ${{env.arch}}
+           path: '*.xml'
+           reporter: java-junit
+           list-suites: all
+           list-tests: all
+           max-annotations: 10
