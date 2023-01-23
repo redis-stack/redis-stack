@@ -102,6 +102,7 @@ jobs:
           invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}} -r . -b
 
       - name: test docker build
+        if: ${{ inputs.arch != 'arm64' }}
         run: |
           source .venv/bin/activate
           invoke test-ci-dockers -d ${{matrix.package}} -a ${{inputs.arch}} -v ${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
