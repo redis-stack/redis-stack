@@ -75,18 +75,40 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # to solve the issues with cross-org pushes (as returned by the docker API)
       - name: publish redis-stack docker
         run: |
-          docker manifest create redis/redis-stack:${{steps.get_version.outputs.VERSION}} \
-              redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-x86_64 \
-              redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-arm64
-          docker manifest push redis/redis-stack:${{ steps.get_version.outputs.VERSION}}
+          docker pull redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-x86_64
+          docker tag redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-x86_64 \
+            redis/redis-stack:${{steps.get_version.outputs.VERSION}}-x86_64
+          docker push redis/redis-stack:${{steps.get_version.outputs.VERSION}}-x86_64
+
+          docker pull redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-arm64
+          docker tag redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-arm64 \
+            redis/redis-stack:${{steps.get_version.outputs.VERSION}}-arm64
+          docker push redis/redis-stack:${{steps.get_version.outputs.VERSION}}-arm64
+
+          docker manifest create redis/redis-stack-server:${{steps.get_version.outputs.VERSION}} \
+              redis/redis-stack:${{steps.get_version.outputs.VERSION}}-x86_64 \
+              redis/redis-stack:${{steps.get_version.outputs.VERSION}}-arm64
+          docker manifest push redis/redis-stack:${{steps.get_version.outputs.VERSION}}
+
       - name: publish redis-stack-server docker
         run: |
-          docker manifest create redis/redis-stack-server:${{steps.get_version.outputs.VERSION}} \
-              redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-x86_64 \
-              redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
-          docker manifest push redis/redis-stack-server:${{ steps.get_version.outputs.VERSION}}
+          docker pull redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-x86_64
+          docker tag redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-x86_64 \
+            redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}-x86_64
+          docker push redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}-x86_64
+
+          docker pull redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
+          docker tag redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64 \
+            redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
+          docker push redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
+
+          docker manifest create redis/redis-stack-server-server:${{steps.get_version.outputs.VERSION}} \
+              redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}-x86_64 \
+              redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
+          docker manifest push redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}
 
       - name: determine if LATEST for docker
         id: latestcheck
@@ -100,13 +122,14 @@ jobs:
         if: ${{steps.latestcheck.outputs.ISLATEST == 'YES'}}
         run: |
           docker manifest create redis/redis-stack:latest \
-              redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-x86_64 \
-              redisfab/redis-stack:${{steps.get_version.outputs.VERSION}}-arm64
+              redis/redis-stack:${{steps.get_version.outputs.VERSION}}-x86_64 \
+              redis/redis-stack:${{steps.get_version.outputs.VERSION}}-arm64
           docker manifest push redis/redis-stack:latest
+
       - name: publish redis-stack-server docker
         if: ${{steps.latestcheck.outputs.ISLATEST == 'YES'}}
         run: |
           docker manifest create redis/redis-stack-server:latest \
-              redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-x86_64 \
-              redisfab/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
+              redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}-x86_64 \
+              redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
           docker manifest push redis/redis-stack-server:latest
