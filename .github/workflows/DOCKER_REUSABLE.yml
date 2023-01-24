@@ -84,6 +84,9 @@ jobs:
 
       - uses: docker/setup-qemu-action@v2
       - uses: docker/setup-buildx-action@v2
+        with:
+          install: true
+          version: 0.9.1
 
       - name: generate docker file
         run: |

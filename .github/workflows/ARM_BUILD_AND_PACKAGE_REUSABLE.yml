@@ -208,6 +208,9 @@ jobs:
 
      - name: set up buildx
        uses: docker/setup-buildx-action@v2
+       with:
+         install: true
+         version: 0.9.1
 
      - run: gem install fpm -v ${{env.fpmversion}}
      - name: display structure
