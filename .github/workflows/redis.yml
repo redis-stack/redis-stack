@@ -87,11 +87,11 @@ jobs:
 
  arm64-docker:
    uses: ./.github/workflows/DOCKER_REUSABLE.yml
-   needs: [arm64-focal, arm64-focal-redisinsight-web]
+   needs: [arm64-jammy, arm64-focal-redisinsight-web]
    with:
      pythonversion: "3.10"
      arch: arm64
-     platform: focal
+     platform: jammy
    secrets:
      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
@@ -160,11 +160,11 @@ jobs:
 
  x86_64-docker:
    uses: ./.github/workflows/DOCKER_REUSABLE.yml
-   needs: [x86_64-focal, x86_64-focal-redisinsight-web]
+   needs: [x86_64-jammy, x86_64-focal-redisinsight-web]
    with:
      pythonversion: "3.10"
      arch: x86_64
-     platform: focal
+     platform: jammy
    secrets:
      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
