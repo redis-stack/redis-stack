@@ -286,6 +286,14 @@ jobs:
             rpmsign --addsign --key-id ${{ steps.get_gpg_id.outputs.GPG_ID}} *.rpm
             rm key
 
+      - name: gpg sign tarball
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
+        run: |
+            echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
+            gpg-connect-agent reloadagent /bye
+            /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ steps.get_gpg_keygrip.outputs.GPG_KEYGRIP }}
+            gpg --detach-sign --armor *.tar.gz
+
       - name: run tests in dockers
         run: |
           source .venv/bin/activate
@@ -338,7 +346,7 @@ jobs:
         run: |
           mkdir -p s3uploads
           if [ -z ${{env.testplatform }} ]; then
-            cp *.${{env.target}} *.tar.gz s3uploads
+            cp *.${{env.target}} *.tar.gz *.asc s3uploads
           else
             cp *.${{env.target}} s3uploads
           fi
