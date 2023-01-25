@@ -83,6 +83,8 @@ jobs:
           echo "VERSION=$realversion" >> $GITHUB_OUTPUT
 
       - uses: docker/setup-qemu-action@v2
+
+      # https://github.com/docker/buildx/issues/1509
       - uses: docker/setup-buildx-action@v2
         with:
           install: true
