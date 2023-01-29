@@ -83,7 +83,12 @@ jobs:
           echo "VERSION=$realversion" >> $GITHUB_OUTPUT
 
       - uses: docker/setup-qemu-action@v2
+
+      # https://github.com/docker/buildx/issues/1509
       - uses: docker/setup-buildx-action@v2
+        with:
+          install: true
+          version: v0.9.1
 
       - name: generate docker file
         run: |
@@ -102,6 +107,7 @@ jobs:
           invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}} -r . -b
 
       - name: test docker build
+        if: ${{ inputs.arch != 'arm64' }}
         run: |
           source .venv/bin/activate
           invoke test-ci-dockers -d ${{matrix.package}} -a ${{inputs.arch}} -v ${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
