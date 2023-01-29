@@ -104,7 +104,7 @@ jobs:
 
  docker-push:
    needs: [x86_64-docker, arm64-docker]
-   name: Push ${{matrix.package}} manifest
+   name: Push ${{matrix.package}}
    strategy:
      matrix:
        package: ['redis-stack-server', 'redis-stack']
@@ -127,16 +127,13 @@ jobs:
 
      - name: pull, retag, push arm64
        run: |
-         docker pull redisfab/${{matrix.package}}:${{env.version}}-arm64
+         docker pull redisfab/${{matrix.package}}:${{env.version}}-arm64 --platform arm64
          docker tag redisfab/${{matrix.package}}:${{env.version}}-arm64 redis/${{matrix.package}}:${{env.version}}-arm64
          docker push redis/${{matrix.package}}:${{env.version}}-arm64
 
-     - name: create the manifest
+     - name: create and push the manifest
        run: |
          docker manifest create redis/${{ matrix.package }}:${{ env.version }} \
            redis/${{ matrix.package }}:${{ env.version }}-x86_64 \
            redis/${{ matrix.package }}:${{ env.version }}-arm64
-
-     - name: push the manifest
-       run: |
          docker manifest push redis/${{matrix.package}}:${{ env.version }}
