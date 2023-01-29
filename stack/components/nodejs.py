@@ -8,11 +8,11 @@ import shutil
 import tarfile
 from typing import Union
 
-import requests
 from loguru import logger
 
 from ..config import Config
 from ..paths import Paths
+from .get import get_stream_and_store
 
 
 class NodeJS(object):
@@ -51,11 +51,7 @@ class NodeJS(object):
         if os.path.isfile(destfile):
             return
 
-        r = requests.get(url, stream=True)
-        if r.status_code > 204:
-            logger.error(f"{url} could not be retrieved")
-            raise requests.HTTPError
-        open(destfile, "wb").write(r.content)
+        get_stream_and_store(url, destfile)
 
         logger.debug(f"Unzipping {destfile} and storing in {self.__PATHS__.DESTDIR}")
         with tarfile.open(destfile) as tar:
