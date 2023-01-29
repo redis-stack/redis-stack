@@ -9,11 +9,11 @@ import urllib
 import zipfile
 from typing import Union
 
-import requests
 from loguru import logger
 
 from ..config import Config
 from ..paths import Paths
+from .get import get_stream_and_store
 
 
 class Modules(object):
@@ -141,11 +141,7 @@ class Modules(object):
         if os.path.isfile(destfile):
             return
 
-        r = requests.get(url, stream=True)
-        if r.status_code > 204:
-            logger.error(f"{url} could not be retrieved")
-            raise requests.HTTPError
-        open(destfile, "wb").write(r.content)
+        get_stream_and_store(url, destfile)
 
         if custom_dest is None:
             dest = self.__PATHS__.DESTDIR
