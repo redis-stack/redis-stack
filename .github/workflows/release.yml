@@ -105,7 +105,7 @@ jobs:
             redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
           docker push redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
 
-          docker manifest create redis/redis-stack-server-server:${{steps.get_version.outputs.VERSION}} \
+          docker manifest create redis/redis-stack-server:${{steps.get_version.outputs.VERSION}} \
               redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}-x86_64 \
               redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
           docker manifest push redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}
