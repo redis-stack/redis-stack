@@ -104,10 +104,10 @@ jobs:
       uses: uraimo/run-on-arch-action@v2
       with:
         arch: aarch64
-        distro: ubuntu18.04
+        distro: ${{inputs.osnick}}
         install: ${{inputs.build_deps}}
         run: |
-          make -C redis/src all BUILD_TLS=yes MALLOC=libc
+          make -C redis/src all BUILD_TLS=yes MALLOC=libc CFLAGS="-static" LDFLAGS="-static"
     - name: package redis for s3
       if: steps.redis-already-built.outcome != 'success'
       run: |
