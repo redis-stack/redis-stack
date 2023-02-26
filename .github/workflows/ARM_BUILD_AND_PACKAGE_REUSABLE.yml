@@ -107,11 +107,7 @@ jobs:
       uses: uraimo/run-on-arch-action@v2
       with:
         arch: aarch64
-<<<<<<< HEAD
-        distro: ubuntu18.04
-=======
         distro: ${{inputs.osnick}}
->>>>>>> origin/master
         install: ${{inputs.build_deps}}
         run: |
           make -C redis/src all BUILD_TLS=yes MALLOC=libc
