@@ -14,9 +14,6 @@ env:
   # Distination bucket for releases
   s3publicreponame: s3://packages.redis.io/redis-stack
 
-  # set to YES (in caps) so that in the specified branch, the release will mark as latest
-  ISLATEST: yes
-
 jobs:
 
   promote_releases:
@@ -43,7 +40,6 @@ jobs:
           source .venv/bin/activate
           realversion=`invoke version -p redis-stack-server -d true`
           echo "VERSION=$realversion" >>$GITHUB_OUTPUT
-
 
       - uses: s3-actions/s3cmd@v1.2.0
         with:
