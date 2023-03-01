@@ -37,7 +37,7 @@ on:
       fpmversion:
         required: false
         type: string
-        default: 1.14.2
+        default: 1.15.1
       moduleoverride:
         required: false
         type: string

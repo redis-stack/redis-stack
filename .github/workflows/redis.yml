@@ -12,6 +12,9 @@ on:
       - '[0-9].[0-9]'
       - '[0-9].[0-9].[0-9]'
   pull_request:
+
+  workflow_dispatch:
+
   schedule:
     - cron: "0 1 * * *"
 
@@ -385,7 +388,7 @@ jobs:
      platform: catalina
      osname: macos
      pythonversion: "3.10"
-     fpmversion: 1.14.2
+     fpmversion: 1.15.1
      rubyversion: 2.7.2
 
    runs-on: macos-latest
@@ -634,7 +637,7 @@ jobs:
      platform: monterey
      osname: macos
      pythonversion: "3.10"
-     fpmversion: 1.14.2
+     fpmversion: 1.15.1
      rubyversion: 2.7.2
    runs-on: macos-latest
    steps:
