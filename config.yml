@@ -4,10 +4,10 @@ islatest: yes
 
 # module versions
 versions:
-  rejson: 2.4.5
-  redistimeseries: 1.8.5
-  redisearch: 2.6.5
-  redisgraph: 2.10.8
+  rejson: 2.4.6
+  redistimeseries: 1.8.8
+  redisearch: 2.6.6
+  redisgraph: 2.10.9
   redisbloom: 2.4.4
   nodejs: v16.15.1
 
@@ -19,7 +19,7 @@ versions:
   packagedredisversion: 7.0.8-3
   redis-stack: 99.99.99
   redis-stack-server: 99.99.99
-  redisinsight: 2.18.0
+  redisinsight: 2.20.0
   redisinsight-web: 2.18.0
 
 # common package variables
