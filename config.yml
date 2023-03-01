@@ -20,6 +20,9 @@ versions:
 
   redis-stack: 6.2.6-v4
   redis-stack-server: 6.2.6-v4
+
+  # the version of the package we build and track (separate, in case changes are needed)
+  # as in the past
   redisinsight: 2.18.0
   redisinsight-web: 2.18.0
 
