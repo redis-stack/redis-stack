@@ -164,7 +164,7 @@ class TestArchLinux(TARTestBase):
         return ["pacman -Fy"]
 
 
-@pytest.mark.amazonlinux2
+@pytest.mark.amzn2
 class TestAmazonLinuxTar(TARTestBase):
     DOCKER_NAME = "amazonlinux:2"
     CONTAINER_NAME = "redis-stack-aml2"
