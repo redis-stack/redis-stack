@@ -48,7 +48,7 @@ class TestRHEL8(RPMTestBase):
     PLATFORM = "linux/amd64"
 
 
-@pytest.mark.amazonlinux2
+@pytest.mark.amzn2
 class TestAmazonLinux2(RPMTestBase):
     DOCKER_NAME = "amazonlinux:2"
     CONTAINER_NAME = "redis-stack-aml2"
