@@ -34,6 +34,12 @@ This repository builds redis, and downloads various components (modules, RedisIn
 
 ----
 
+## Code contributions
+
+Please see the CONTRIBUTING.md file in this source distribution for more information. For security bugs and vulnerabilities, please see SECURITY.md.
+
+----
+
 ## Development Requirements
 
 * Python > 3.10 (for this toolkit) and [poetry](https://python-poetry.org)
