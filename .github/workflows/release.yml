@@ -118,19 +118,3 @@ jobs:
           if [ $? -eq 0 ]; then
             echo "ISLATEST=YES" >>$GITHUB_OUTPUT
           fi
-
-      - name: publish redis-stack docker as latest
-        if: ${{steps.latestcheck.outputs.ISLATEST == 'YES'}}
-        run: |
-          docker manifest create redis/redis-stack:latest \
-              redis/redis-stack:${{steps.get_version.outputs.VERSION}}-x86_64 \
-              redis/redis-stack:${{steps.get_version.outputs.VERSION}}-arm64
-          docker manifest push redis/redis-stack:latest
-
-      - name: publish redis-stack-server docker as latest
-        if: ${{steps.latestcheck.outputs.ISLATEST == 'YES'}}
-        run: |
-          docker manifest create redis/redis-stack-server:latest \
-              redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}-x86_64 \
-              redis/redis-stack-server:${{steps.get_version.outputs.VERSION}}-arm64
-          docker manifest push redis/redis-stack-server:latest
