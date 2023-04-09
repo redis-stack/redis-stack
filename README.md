@@ -25,6 +25,9 @@ This repository builds redis, and downloads various components (modules, RedisIn
 *Start a docker with the custom password foo*
  ```docker run -e REDIS_ARGS="--requirepass foo" redis/redis-stack:latest```
 
+*Start a docker with docker-compose and .env for REDIS_PASSWORD
+ ```docker-compose up```
+
 *Start a docker with both custom redis arguments and a search configuration*
 ```docker run -e REDIS_ARGS="--requirepass foo" -e REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis/redis-stack:latest```
 
