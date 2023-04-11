@@ -19,13 +19,18 @@ class Redis(object):
     """Helper for fetching redis for S3 and inserting into position."""
 
     def __init__(
-        self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux"
+        self,
+        package: str,
+        osnick: str,
+        arch: str = "x86_64",
+        osname: str = "Linux",
+        basedirname: str = "",
     ):
 
         self.OSNICK = osnick
         self.ARCH = arch
         self.OSNAME = osname
-        self.__PATHS__ = Paths(package, osnick, arch, osname)
+        self.__PATHS__ = Paths(package, osnick, arch, osname, basedirname=basedirname)
         self.C = Config()
 
     def generate_url(self, version: str):

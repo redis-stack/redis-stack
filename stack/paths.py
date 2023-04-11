@@ -10,7 +10,12 @@ class Paths:
     """Paths used throughout"""
 
     def __init__(
-        self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux"
+        self,
+        package: str,
+        osnick: str,
+        arch: str = "x86_64",
+        osname: str = "Linux",
+        basedirname: str = "",
     ):
 
         self.OSNICK = osnick
@@ -33,7 +38,12 @@ class Paths:
         )
 
         # package paths
-        self.BASEDIR = os.path.join(self.WORKDIR, "opt", "redis-stack")
+        self.OPTDIR = os.path.join(self.WORKDIR, "opt")
+        if basedirname == "":
+            self.BASEDIR = os.path.join(self.OPTDIR, "redis-stack")
+        else:
+            self.BASEDIR = os.path.join(self.OPTDIR, basedirname)
+
         self.BASEETCDIR = os.path.join(self.WORKDIR, "etc")
         self.BASEVARDBDIR = os.path.join(self.WORKDIR, "var", "lib", "redis-stack")
         self.LIBDIR = os.path.join(self.BASEDIR, "lib")

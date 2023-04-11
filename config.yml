@@ -17,10 +17,9 @@ versions:
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
   packagedredisversion: 7.0.10-1
+  redis-tools: 7.0.10-1
   redis-stack: 99.99.99
-  redis-stack-server: 99.99.99
   redisinsight: 2.20.0
-  redisinsight-web: 2.18.0
 
 # common package variables
 email: Redis OSS <oss@redislabs.com>
@@ -66,6 +65,12 @@ redisinsight:
   product: redisinsight
   summary: A graphical tool for visualizing data and managing Redis databases
   description: RedisInsight is an easy to use graphical tool that enables you to visualize and manage data in Redis databases.  Connect to multiple Redis servers, browse and edit data, and view operating metrics.  Use RedisInsight with open source Redis, Redis Cloud, Redis Enterprise and Amazon ElastiCache.  RedisInsight has specialized views for many Redis data types, and supports popular modules including RediSearch and RedisJSON.
+
+redis-tools:
+  product: redis-tools
+  summary: redis-tools installs the command line tools that help you manage your redis server.
+  description: |
+    Redis Tools includes command line tools such as redis-cli, to help you manage your redis server.
 
 # uid/gid
 product_user: nobody

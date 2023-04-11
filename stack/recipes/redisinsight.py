@@ -6,15 +6,13 @@
 import os
 import shutil
 
-from loguru import logger
-
 from ..components.nodejs import NodeJS
 from ..config import Config
 from ..paths import Paths
-from . import Recipe
+from . import AbstractRecipe
 
 
-class RedisInsightBase(Recipe):
+class RedisInsightBase(AbstractRecipe):
     def __init__(self, osnick, arch="x86_64", osname="Linux"):
         self.OSNICK = osnick
         self.ARCH = arch
@@ -109,56 +107,6 @@ class RedisInsightBase(Recipe):
 
         return fpmargs
 
-    def osxpkg(self, fpmargs, distribution):
-        fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.osxpkg"
-        )
-        fpmargs.append("-t osxpkg")
-        return fpmargs
-
-    def zip(self, fpmargs, distribution):
-        fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.zip"
-        )
-        return fpmargs
-
-    def tar(self, fpmargs, distribution):
-        fpmargs.append(
-            f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.tar.gz"
-        )
-        return fpmargs
-
-    def package(
-        self,
-        package_type: str = "deb",
-        distribution: str = "bionic",
-    ):
-
-        logger.info(f"Building {package_type} package")
-        fpmargs = self.__package_base_args__
-
-        if package_type == "deb":
-            fpmargs = self.deb(fpmargs, distribution)
-
-        elif package_type == "rpm":
-            fpmargs = self.rpm(fpmargs, distribution)
-
-        elif package_type == "osxpkg":
-            fpmargs = self.osxpkg(fpmargs, distribution)
-
-        elif package_type == "pacman":
-            fpmargs = self.pacman(fpmargs, distribution)
-        elif package_type == "zip":  # ignored
-            fpmargs = self.zip(fpmargs, distribution)
-        elif package_type == "tar":  # ignored
-            fpmargs = self.tar(fpmargs, distribution)
-        else:
-            raise AttributeError(f"{package_type} is an invalid package type")
-
-        cmd = " ".join(fpmargs)
-        logger.debug(f"Packaging: {cmd}")
-        return os.system(cmd)
-
 
 class RedisInsight(RedisInsightBase):
     """A recipe to build a redisinsight package from the native app"""
@@ -170,26 +118,14 @@ class RedisInsight(RedisInsightBase):
     ):
 
         raise NotImplementedError("DISABLED FOR NOW, INTENTIONALY.")
-        for i in [
-            self.__PATHS__.EXTERNAL,
-            self.__PATHS__.DESTDIR,
-            self.__PATHS__.LIBDIR,
-            self.__PATHS__.BINDIR,
-            self.__PATHS__.SHAREDIR,
-        ]:
-            os.makedirs(i, exist_ok=True, mode=0o755)
-
-        from ..components.redisinsight import RedisInsight as RI
-
-        for i in [NodeJS, RI]:
-            n = i(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
-            n.prepare()
 
 
+# HISTORIC this is a placeholder for the package depending on packages, in Linux
+# This is not a real package - unless it comes back to life, again.
 class RedisInsightWeb(RedisInsightBase):
     """A recipe to build a redisinsight package for the web application"""
 
-    PACKAGE_NAME = "redisinsight-web"
+    PACKAGE_NAME = "redisinsight"
 
     def prepackage(
         self, binary_dir: str, ignore: bool = False, version_override: str = None
