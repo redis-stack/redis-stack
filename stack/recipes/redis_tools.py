@@ -26,7 +26,6 @@ class RedisTools(AbstractRecipe):
     def __package_base_args__(self) -> list:
         """Return base arguments for the package."""
         c = Config()
-        print(self.PACKAGE_NAME)
         return [
             "fpm",
             "-s dir",

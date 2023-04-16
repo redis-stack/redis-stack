@@ -48,7 +48,7 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: |
-            /var/cache/apt/archives/**.deb
+            /var/cache/apt/archives/*.deb
             /var/cache/yum
             ~/.cache/pip
             ~/.cache/pypoetry
