@@ -305,7 +305,7 @@ jobs:
       - name: upload snapshots
         if: startsWith(github.ref, 'refs/tags/') != true && steps.iamafork.outputs.IAMAFORK == 'false'
         run: |
-          s3cmd put -P s3uploads/* s3://redismodules/redis-tools/snapshots
+          s3cmd put -P s3uploads/* s3://redismodules/redis-tools/snapshots/
   package:
     name: Package ${{inputs.platform}} (${{inputs.arch}}) ${{matrix.package}}
     env:

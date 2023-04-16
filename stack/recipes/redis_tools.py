@@ -26,7 +26,8 @@ class RedisTools(AbstractRecipe):
     def __package_base_args__(self) -> list:
         """Return base arguments for the package."""
         c = Config()
-        return [
+        version = self.version.split("-")
+        fpmargs = [
             "fpm",
             "-s dir",
             f"-C {self.__PATHS__.WORKDIR}",
@@ -34,14 +35,20 @@ class RedisTools(AbstractRecipe):
             "--provides redis-tools",
             f"--architecture {self.ARCH}",
             f"--vendor '{c.get_key('vendor')}'",
-            f"--version {self.version}",
             f"--url '{c.get_key('url')}'",
             f"--license '{c.get_key('license')}'",
             "--category server",
             f"--maintainer '{c.get_key('email')}'",
             f"--description '{c.get_key(self.PACKAGE_NAME)['description']}'",
-            "--directories '/opt/redis-stack'",
+            "--directories '/opt/redis'",
         ]
+
+        if len(version) == 2:
+            fpmargs.append(f"--version {version[0]}")
+            fpmargs.append(f"--iteration {version[1]}")
+        else:
+            fpmargs.append(f"--version {self.version}")
+        return fpmargs
 
     def prepackage(
         self,
