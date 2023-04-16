@@ -28,6 +28,8 @@ class RedisTestMixin:
         version_parts = r.info().get("redis_version").split(".")
         version = f"{version_parts[0]}.{version_parts[1]}"
         data = yaml.load(open(CONFIGYAML, "r"), yaml.SafeLoader)
+        print(data.get("versions").get("redis"))
+        print(version)
         try:
             assert version in data.get("versions").get("redis")
         except:
