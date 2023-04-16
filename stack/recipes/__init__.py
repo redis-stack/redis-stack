@@ -86,12 +86,14 @@ class AbstractRecipe(ABC):
         fpmargs.append(
             f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.zip"
         )
+        fpmargs.append("-t zip")
         return fpmargs
 
     def tar(self, fpmargs, distribution):
         fpmargs.append(
             f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.tar.gz"
         )
+        fpmargs.append("-t tar")
         return fpmargs
 
     def snap(self, fpmargs, distribution):

@@ -293,23 +293,13 @@ jobs:
 
       - name: persist ${{env.target}} package
         uses: actions/upload-artifact@v3
-        if: env.testplatform == ''
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
           path: |
             ${{ matrix.package }}*.${{env.target}}
 
-      - name: persist ${{env.target}} package
-        uses: actions/upload-artifact@v3
-        if: env.testplatform != ''
-        with:
-          name: ${{ matrix.package }}-${{env.testplatform}}-${{env.arch}}.${{env.target}}
-          path: |
-            ${{ matrix.package }}*.${{env.target}}
-
       - name: persist tarball
         uses: actions/upload-artifact@v3
-        if: env.testplatform == ''
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.tar.gz
           path: |
@@ -319,11 +309,7 @@ jobs:
         continue-on-error: true
         run: |
           mkdir -p s3uploads
-          if [ -z ${{env.testplatform }} ]; then
-            cp *.${{env.target}} *.tar.gz *.asc s3uploads
-          else
-            cp *.${{env.target}} s3uploads
-          fi
+          cp *.${{env.target}} *.tar.gz *.asc s3uploads
           cd s3uploads
           for i in `ls`; do
             sha256sum $i |awk '{print $1}' > $i.sha256
