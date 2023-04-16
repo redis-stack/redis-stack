@@ -22,13 +22,14 @@ class RedisInsightTestMixin:
 
 
 class RedisTestMixin:
-
     def test_redis_version(self, r):
         stack_dockloader(self)
-        version = r.info().get('redis_version')
+        # To modify the version checking process to conform to the milestone version format
+        version_parts = r.info().get("redis_version").split(".")
+        version = f"{version_parts[0]}.{version_parts[1]}"
         data = yaml.load(open(CONFIGYAML, "r"), yaml.SafeLoader)
         try:
-            assert version == data.get("versions").get("redis")
+            assert version in data.get("versions").get("redis")
         except:
             v = data.get("versions").get("redis")
             raise
@@ -98,6 +99,7 @@ class RedisTestMixin:
         assert "doc2" in docs
         assert "doc1" in docs
 
+
 #    def test_versions_match(self, r):
 #        stack_dockloader(r)
 #        modmap = {
@@ -133,6 +135,7 @@ class RedisTestMixin:
 #            remoteversion = modules.get(v)
 #            assert str(version) == str(remoteversion)
 #
+
 
 class RedisPackagingMixin:
     @property
