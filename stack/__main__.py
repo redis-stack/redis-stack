@@ -110,14 +110,8 @@ if __name__ == "__main__":
     else:
         logger.add(sys.stderr, level="INFO")
 
-    # a = Package(opts.OSNICK, opts.ARCH, opts.OSNAME)
     if opts.PACKAGE == "redis-stack-server":
-        from stack.recipes.redis_stack_server import \
-            RedisStackServer as pkgklass
-    elif opts.PACKAGE == "redis-stack":
-        from stack.recipes.redis_stack_server import RedisStack as pkgklass
-    elif opts.PACKAGE == "redisinsight":
-        from stack.recipes.redisinsight import RedisInsight as pkgklass
+        from stack.recipes.redis_stack_server import RedisStackServer as pkgklass
     elif opts.PACKAGE == "redisinsight-web":
         from stack.recipes.redisinsight import RedisInsightWeb as pkgklass
     elif opts.PACKAGE == "redis-tools":

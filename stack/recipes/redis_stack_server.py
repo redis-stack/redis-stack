@@ -104,9 +104,7 @@ class RedisStackBase(AbstractRecipe):
             os.makedirs(self.__PATHS__.SVCDIR)
 
         for i in [
-            # "redis-stack.service",
             "redis-stack-server.service",
-            # "redisinsight.service",
         ]:
             shutil.copyfile(
                 os.path.join(self.__PATHS__.SCRIPTDIR, "services", i),
@@ -229,7 +227,7 @@ class RedisStackBase(AbstractRecipe):
 class RedisStackServer(RedisStackBase):
     """A recipe, to build the redis-stack-server package"""
 
-    PACKAGE_NAME = "redis-stack"
+    PACKAGE_NAME = "redis-stack-server"
 
     def __init__(self, osnick, arch="x86_64", osname="Linux"):
         self.OSNICK = osnick
