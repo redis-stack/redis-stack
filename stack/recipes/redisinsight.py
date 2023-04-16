@@ -111,7 +111,7 @@ class RedisInsightBase(AbstractRecipe):
 class RedisInsight(RedisInsightBase):
     """A recipe to build a redisinsight package from the native app"""
 
-    PACKAGE_NAME = "redisinsight"
+    PACKAGE_NAME = "redisinsight-app"
 
     def prepackage(
         self, binary_dir: str, ignore: bool = False, version_override: str = None
@@ -125,7 +125,7 @@ class RedisInsight(RedisInsightBase):
 class RedisInsightWeb(RedisInsightBase):
     """A recipe to build a redisinsight package for the web application"""
 
-    PACKAGE_NAME = "redisinsight"
+    PACKAGE_NAME = "redisinsight-web"
 
     def prepackage(
         self, binary_dir: str, ignore: bool = False, version_override: str = None
