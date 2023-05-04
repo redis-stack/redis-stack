@@ -67,6 +67,12 @@ redisinsight:
   summary: A graphical tool for visualizing data and managing Redis databases
   description: RedisInsight is an easy to use graphical tool that enables you to visualize and manage data in Redis databases.  Connect to multiple Redis servers, browse and edit data, and view operating metrics.  Use RedisInsight with open source Redis, Redis Cloud, Redis Enterprise and Amazon ElastiCache.  RedisInsight has specialized views for many Redis data types, and supports popular modules including RediSearch and RedisJSON.
 
+redis-tools:
+  product: redis-tools
+  summary: redis-tools installs the command line tools that help you manage your redis server.
+  description: |
+    Redis Tools includes command line tools such as redis-cli, to help you manage your redis server.
+
 # uid/gid
 product_user: nobody
 product_group: nobody

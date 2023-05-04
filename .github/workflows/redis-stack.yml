@@ -790,7 +790,7 @@ jobs:
        uses: actions/cache@v3
        with:
          path: |
-           /var/cache/apt/archives/**.deb
+           /var/cache/apt/archives/*.deb
            ~/.cache/pip
            ~/.cache/pypoetry
            ~/.local/share/gem
@@ -863,12 +863,13 @@ jobs:
          virtualenvs-in-project: true
          virtualenvs-create: true
          installer-parallel: true
+
      - name: get package version
        id: get_version
        run: |
          poetry install
          source .venv/bin/activate
-         realversion=`invoke version -p ${{ matrix.package }} -d true`
+         realversion=`invoke version -p redis-stack-server -d true`
          echo "VERSION=$realversion" >> $GITHUB_OUTPUT
 
      - name: determine if in fork

@@ -124,7 +124,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: |
-          /var/cache/apt/archives/**.deb
+          /var/cache/apt/archives/*.deb
           /var/cache/yum
         key: cache-${{hashFiles('.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.testplatform}}-${{inputs.arch}}-build
     - name: make
@@ -166,6 +166,166 @@ jobs:
           redis/src/redis-benchmark
           redis/src/redis-cli
 
+   package-redis-tools:
+    name: package redis-tools ${{inputs.platform}} (${{inputs.arch}})
+    env:
+      pythonversion: "${{inputs.pythonversion}}"
+      fpmversion: ${{inputs.fpmversion}}
+      rubyversion: ${{inputs.rubyversion}}
+      platform: ${{inputs.platform}}
+      osname: ${{inputs.osname}}
+      osnick: ${{inputs.osnick}}
+      arch: ${{inputs.arch}}
+      target: ${{inputs.target}}
+    runs-on: ubuntu-latest
+    needs: [build-redis]
+    strategy:
+      matrix:
+        package: ['redis-tools'] # easiest copypasta
+
+    steps:
+      - name: determine if in fork
+        id: iamafork
+        run: |
+          amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
+          echo "am I fork: ${amfork}"
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+
+      - uses: actions/checkout@v3
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            /var/cache/apt/archives/*.deb
+            /var/cache/yum
+            ~/.cache/pip
+            ~/.cache/pypoetry
+            ~/.local/share/gem
+          key: pypoetry-${{hashFiles('pyproject.toml', '.github/workflows/*.yml')}}-${{env.platform}}-${{env.testplatform}}-${{env.arch}}-package
+
+      - uses: ruby/setup-ruby@v1
+      - name: install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "${{env.pythonversion}}"
+      - name: install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-in-project: true
+          virtualenvs-create: true
+          installer-parallel: true
+
+      - name: install packaging and testing tools
+        run: |
+          sudo apt-get update && sudo apt-get install -y unzip curl rpm dpkg-sig gpg gnupg2 tar
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install vagrant virtualbox
+          poetry install
+
+      - run: gem install fpm -v ${{env.fpmversion}}
+
+      - name: display structure
+        run: ls -R
+
+      - name: build ${{matrix.package}}
+        run: |
+          source .venv/bin/activate
+          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t ${{env.target}} -p ${{ matrix.package }}
+
+      - name: build downloadable tarball
+        run: |
+          source .venv/bin/activate
+          invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t tar -p ${{ matrix.package }}
+
+      - name: install gpg key
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
+        run: |
+          cat <(echo -e "${{ secrets.GPG_KEY }}") | gpg --batch --import
+
+      - name: get gpg id from key
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
+        id: get_gpg_id
+        run: |
+          gpg_id=`gpg --list-keys|sed -n 4p|awk '{print $1}'`
+          echo "GPG_ID=$gpg_id" >> $GITHUB_OUTPUT
+
+      - name: get gpg email address
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
+        id: get_gpg_email
+        run: |
+          gpg_email=`gpg -k|grep uid|cut -d '<' -f 2-2|cut -d '>' -f 1-1`
+          echo "GPG_EMAIL=$gpg_email" >> $GITHUB_OUTPUT
+
+      - name: get gpg_keygrip
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
+        id: get_gpg_keygrip
+        run: |
+          keygrip=`gpg -k --with-keygrip |sed -n 5p|cut -d '=' -f 2-2`
+          echo "GPG_KEYGRIP=$keygrip" >> $GITHUB_OUTPUT
+
+      - name: gpg sign deb package
+        if: steps.iamafork.outputs.IAMAFORK == 'false' && inputs.target == 'deb'
+        run: |
+          echo '${{secrets.GPG_PASSWORD}}' > .passfile
+          dpkg-sig -g '--pinentry-mode loopback --passphrase-file .passfile --batch' -s redis -k ${{steps.get_gpg_id.outputs.GPG_ID}} *.deb
+          rm -f .passfile
+
+      - name: gpg sign rpm package
+        if: steps.iamafork.outputs.IAMAFORK == 'false' && inputs.target == 'rpm'
+        run: |
+            gpg --export -a '${{ steps.get_gpg_email.outputs.GPG_EMAIL }}' > key
+            rpm --import key
+            echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
+            gpg-connect-agent reloadagent /bye
+            /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ steps.get_gpg_keygrip.outputs.GPG_KEYGRIP }}
+            rpmsign --addsign --key-id ${{ steps.get_gpg_id.outputs.GPG_ID}} *.rpm
+            rm key
+
+      - name: gpg sign tarball
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
+        run: |
+            echo allow-preset-passphrase > ~/.gnupg/gpg-agent.conf
+            gpg-connect-agent reloadagent /bye
+            /usr/lib/gnupg/gpg-preset-passphrase -P '${{ secrets.GPG_PASSWORD }}' -c --preset ${{ steps.get_gpg_keygrip.outputs.GPG_KEYGRIP }}
+            gpg --detach-sign --armor *.tar.gz
+
+      - name: persist ${{env.target}} package
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
+          path: |
+            ${{ matrix.package }}*.${{env.target}}
+
+      - name: persist tarball
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.tar.gz
+          path: |
+            ${{ matrix.package }}*.tar.gz
+
+      - name: gather packages for s3 upload
+        continue-on-error: true
+        run: |
+          mkdir -p s3uploads
+          cp *.${{env.target}} *.tar.gz *.asc s3uploads
+          cd s3uploads
+          for i in `ls`; do
+            sha256sum $i |awk '{print $1}' > $i.sha256
+          done
+      - uses: s3-actions/s3cmd@v1.2.0
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
+        with:
+          provider: aws
+          region: us-east-1
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: upload snapshots
+        if: startsWith(github.ref, 'refs/tags/') != true && steps.iamafork.outputs.IAMAFORK == 'false'
+        run: |
+          s3cmd put -P s3uploads/* s3://redismodules/redis-tools/snapshots/
+
    package:
     name: Package ${{inputs.platform}} (${{inputs.arch}}) ${{matrix.package}}
     env:
@@ -200,7 +360,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            /var/cache/apt/archives/**.deb
+            /var/cache/apt/archives/*.deb
             /var/cache/yum
             ~/.cache/pip
             ~/.cache/pypoetry

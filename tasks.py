@@ -257,7 +257,7 @@ def dockergen(c, product="redis-stack", arch="x86_64"):
         "redis_bin": "path to pre-build redis binaries",
         "target": "target package type to build (eg: deb)",
         "arch": "architecture (eg: x86_64)",
-        "package": "package to build {redis-stack|redis-stack-server|redisinsight|redisinsight-web}",
+        "package": "package to build {redis-stack-server|redisinsight-web|redis-tools}",
         "skip": "[Optional] set to fetch or package to determine which step to skip",
         "redismodule_version": "[Optional] set to use a single, specified version for all redis modules",
     }
@@ -314,5 +314,6 @@ def version(c, package="redis-stack-server", docker=None):
 @task
 def linters(c):
     """Run linters against the codebase"""
-    run("flake8 --ignore E501 stack tests")
+    run("flake8 stack tests")
     run("black --target-version py39 --check --diff stack tests")
+    run("isort --check-only --diff stack tests")

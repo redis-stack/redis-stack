@@ -1,7 +1,8 @@
 import requests
+from loguru import logger
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
-from loguru import logger
+
 
 def get_stream_and_store(url: str, destfile: str):
     """Fetch a URL from a known location, and right to file,

@@ -5,6 +5,7 @@
 #
 import os
 import shutil
+
 # import zipfile
 import tarfile
 import urllib
@@ -62,7 +63,7 @@ class RedisInsightBase(object):
 
     def prepare(self, version: Union[str, None] = None):
         if version is None:
-            version = self.C.get_key("versions")["redisinsight"]
+            version = self.C.get_key("versions")[f"redisinsight-{self.APPTYPE}"]
         logger.info("Fetching redisinsight")
         url = self.generate_url(version)
         destfile = os.path.join(

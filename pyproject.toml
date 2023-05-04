@@ -10,6 +10,7 @@ python = ">=3.8,<4.0"
 PyYAML = "^6.0"
 isort = "^5.10.1"
 Fabric = "^2.7.0"
+flake8-pyproject = "^1.2.3"
 
 [tool.poetry.dev-dependencies]
 invoke = "^1.7.3"
@@ -19,8 +20,13 @@ Jinja2 = "^3.0.3"
 redis = "^4.3.4"
 pytest = "^7.1.3"
 docker = "^6.0.0"
-flake8 = "^4.0.1"
+flake8 = "^5.0.0"
 black = "^22.10.0"
+
+[tool.flake8]
+ignore = ['E501']
+max-line-length = 88
+count = true
 
 [tool.pytest.ini_options]
 markers = [

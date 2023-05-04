@@ -48,7 +48,7 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: |
-            /var/cache/apt/archives/**.deb
+            /var/cache/apt/archives/*.deb
             /var/cache/yum
             ~/.cache/pip
             ~/.cache/pypoetry
@@ -74,12 +74,14 @@ jobs:
       - name: display structure
         run: ls -R
 
+      # we have one version - so getting the value from config is
+      # cleaner
       - name: get package version
         id: get_version
         run: |
           poetry install
           source .venv/bin/activate
-          realversion=`invoke version -p ${{ matrix.package }} -d true`
+          realversion=`invoke version -p redis-stack-server -d true`
           echo "VERSION=$realversion" >> $GITHUB_OUTPUT
 
       - uses: docker/setup-qemu-action@v2
