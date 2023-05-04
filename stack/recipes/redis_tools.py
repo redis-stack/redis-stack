@@ -78,3 +78,18 @@ class RedisTools(AbstractRecipe):
         ]:
             fname = os.path.join(self.__PATHS__.BINDIR, i)
             os.unlink(fname)
+
+    @property
+    def version(self):
+        r = subprocess.run(
+            ["git", "branch", "--show-current"], stdout=subprocess.PIPE, text=True
+        )
+        branch = r.stdout.strip()
+        if branch in ["master", "main"]:
+            return "99.99.99"
+
+        # get the current tag
+        config = Config()
+        return config.get_key("versions")["packagedredisversion"]
+
+
