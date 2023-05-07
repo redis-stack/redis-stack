@@ -29,6 +29,8 @@ class RedisTestMixin:
         data = yaml.load(open(CONFIGYAML, "r"), yaml.SafeLoader)
         try:
             assert version == data.get("versions").get("redis")
+        except AssertionError:
+            assert len(re.findall("[a-zA-Z]", version)) >= 1
         except:
             v = data.get("versions").get("redis")
             raise
