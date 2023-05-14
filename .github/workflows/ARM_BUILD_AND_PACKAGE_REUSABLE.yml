@@ -289,7 +289,7 @@ jobs:
          install: ${{inputs.build_deps}}
          shell: /bin/bash
          dockerRunArgs: |
-          --volume "${PWD}:/build"
+          --volume "${PWD}:/build" --push
          run: |
            ls
 
