@@ -287,8 +287,15 @@ jobs:
          arch: aarch64
          distro: ${{inputs.osnick}}
          install: ${{inputs.build_deps}}
+         shell: /bin/bash
+         dockerRunArgs: |
+          --volume "${PWD}:/build"
+
          run: |
-           source .venv/bin/activate
+           cd /build
+           ls
+           pip3 install poetry
+           poetry install
            mkdir redis-stack
            cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
            cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}

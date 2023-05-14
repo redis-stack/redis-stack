@@ -17,7 +17,7 @@ class ARMDEBTestBase(QEMUTestBase):
     def __precommands__(self):
         return ["apt update -yq",
             "apt install -yq gdebi-core",
-            "gdebi -n redis-stack/redis-stack-server.deb",
+            "gdebi -n /build/redis-stack/redis-stack-server.deb",
         ]
         
     def uninstall(self):
@@ -28,8 +28,8 @@ class ARMTarTestBase(QEMUTestBase):
     def __precommands__(self):
         return ["apt update -yq",
             "apt-get install -yq libssl-dev libgomp1",
-            "tar -zxpf redis-stack/redis-stack-server.tar.gz",
-            "mv redis-stack/redis-stack* /opt/redis-stack"
+            "tar -zxpf /build/redis-stack/redis-stack-server.tar.gz",
+            "mv /build/redis-stack/redis-stack* /opt/redis-stack"
         ] 
     
     def uninstall(self):
