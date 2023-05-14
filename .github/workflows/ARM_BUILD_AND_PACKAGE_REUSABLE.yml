@@ -286,10 +286,10 @@ jobs:
        with:
          arch: aarch64
          distro: ${{inputs.osnick}}
-         install: ${{inputs.build_deps}}
+         install: ${{inputs.build_deps}} --push
          shell: /bin/bash
          dockerRunArgs: |
-          --volume "${PWD}:/build" --push
+          --volume "${PWD}:/build"
          run: |
            ls
 
