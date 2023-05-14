@@ -286,12 +286,13 @@ jobs:
        with:
          arch: aarch64
          distro: ${{inputs.osnick}}
+         install: ${{inputs.build_deps}}
          run: |
            source .venv/bin/activate
            mkdir redis-stack
            cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
            cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
-           invoke test -m ${{env.platform}} -m arm -n physical
+           invoke test -m ${{env.platform}} -m arm -m qemu
 
      - name: perist ${{env.target}} package
        uses: actions/upload-artifact@v3
