@@ -290,16 +290,8 @@ jobs:
          shell: /bin/bash
          dockerRunArgs: |
           --volume "${PWD}:/build"
-
          run: |
-           cd /build
            ls
-           pip3 install poetry
-           poetry install
-           mkdir redis-stack
-           cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
-           cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
-           invoke test -m ${{env.platform}} -m arm -m qemu
 
      - name: perist ${{env.target}} package
        uses: actions/upload-artifact@v3
