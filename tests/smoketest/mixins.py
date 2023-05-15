@@ -23,7 +23,6 @@ class RedisInsightTestMixin:
 
 
 class RedisTestMixin:
-
     def test_basic_redis(self, r):
         stack_dockloader(self)
         r.flushdb()
@@ -79,6 +78,7 @@ class RedisTestMixin:
         assert "doc2" in docs
         assert "doc1" in docs
 
+
 #    def test_versions_match(self, r):
 #        stack_dockloader(r)
 #        modmap = {
@@ -114,6 +114,7 @@ class RedisTestMixin:
 #            remoteversion = modules.get(v)
 #            assert str(version) == str(remoteversion)
 #
+
 
 class RedisPackagingMixin:
     @property

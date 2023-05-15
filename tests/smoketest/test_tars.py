@@ -121,7 +121,7 @@ class TestXenial(TARTestBase):
     def __precommands__(self):
         return [
             "apt-get update -yq",
-            "apt-get install -yq libssl-dev"m
+            "apt-get install -yq libssl-dev",
         ]
 
 
