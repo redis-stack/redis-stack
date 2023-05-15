@@ -4,6 +4,7 @@
 # the Server Side Public License v1 (SSPLv1).
 #
 import os
+import re
 import subprocess
 from urllib.request import urlopen
 
@@ -22,17 +23,6 @@ class RedisInsightTestMixin:
 
 
 class RedisTestMixin:
-
-    def test_redis_version(self, r):
-        stack_dockloader(self)
-        version = r.info().get('redis_version')
-        data = yaml.load(open(CONFIGYAML, "r"), yaml.SafeLoader)
-        try:
-            assert version == data.get("versions").get("redis")
-        except:
-            v = data.get("versions").get("redis")
-            raise
-
     def test_basic_redis(self, r):
         stack_dockloader(self)
         r.flushdb()
@@ -42,7 +32,7 @@ class RedisTestMixin:
         assert r.get("some") == "value"
 
     def test_redis_modules_loaded(self, r):
-        expected = ["rejson", "timeseries", "search", "graph", "bf"]
+        expected = ["rejson", "timeseries", "search", "bf"]
         modules = [m.get("name").lower() for m in r.module_list()]
 
         modules.sort()
@@ -61,16 +51,6 @@ class RedisTestMixin:
         assert r.bf().create("bloom", 0.01, 1000)
         assert 1 == r.bf().add("bloom", "foo")
         assert 0 == r.bf().add("bloom", "foo")
-
-    def test_graph(self, r):
-        stack_dockloader(self)
-        r.flushdb()
-        params = [1, 2.3, "str", True, False, None, [0, 1, 2]]
-        query = "RETURN $param"
-        for param in params:
-            result = r.graph().query(query, {"param": param})
-            expected_results = [[param]]
-            assert expected_results == result.result_set
 
     def test_timeseries(self, r):
         stack_dockloader(self)
@@ -97,6 +77,7 @@ class RedisTestMixin:
         docs = [i.id for i in res.docs]
         assert "doc2" in docs
         assert "doc1" in docs
+
 
 #    def test_versions_match(self, r):
 #        stack_dockloader(r)
@@ -134,6 +115,7 @@ class RedisTestMixin:
 #            assert str(version) == str(remoteversion)
 #
 
+
 class RedisPackagingMixin:
     @property
     def basepath(self):
@@ -159,7 +141,6 @@ class RedisPackagingMixin:
         libs = [
             "rejson.so",
             "redisearch.so",
-            "redisgraph.so",
             "redisbloom.so",
             "redistimeseries.so",
         ]

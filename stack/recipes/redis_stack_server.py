@@ -49,7 +49,6 @@ class RedisStackServer(Recipe):
         m = Modules(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
         for i in [
             m.redisearch,
-            m.redisgraph,
             m.redistimeseries,
             m.rejson,
             m.redisbloom,

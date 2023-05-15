@@ -22,6 +22,10 @@ docker = "^6.0.0"
 flake8 = "^4.0.1"
 black = "^22.10.0"
 
+# https://github.com/ionrock/cachecontrol/issues/292
+# only an issue on M1
+urllib3 = "1.26.15"
+
 [tool.pytest.ini_options]
 markers = [
     "xenial: ubuntu xenial tests",
