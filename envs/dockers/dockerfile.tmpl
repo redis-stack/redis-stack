@@ -3,7 +3,7 @@ FROM ubuntu:focal
 RUN apt-get update -qqy
 RUN apt-get upgrade -qqy
 RUN apt-get install dumb-init
-RUN apt-get install -y libssl-dev libgomp1
+RUN apt-get install -y libssl-dev
 ADD ./redis-stack /var/cache/apt/redis-stack/
 RUN mkdir -p /data/redis /data/redisinsight
 RUN touch /.dockerenv
@@ -36,7 +36,6 @@ ENV REDISBLOOM_ARGS ""
 ENV REDISEARCH_ARGS ""
 ENV REDISJSON_ARGS ""
 ENV REDISTIMESERIES_ARGS ""
-ENV REDISGRAPH_ARGS ""
 ENV REDIS_ARGS ""
 
 CMD ["/entrypoint.sh"]

@@ -47,7 +47,7 @@ class AppImageTestBase(DockerTestEnv, RedisTestMixin, object):
     def __precommands__(self):
         return [
             "apt-get update -yq",
-            "apt-get install -yq libssl-dev libgomp1",
+            "apt-get install -yq libssl-dev",
         ]
 
 

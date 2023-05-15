@@ -140,7 +140,6 @@ class RedisPackagingMixin:
         libs = [
             "rejson.so",
             "redisearch.so",
-            "redisgraph.so",
             "redisbloom.so",
             "redistimeseries.so",
         ]
