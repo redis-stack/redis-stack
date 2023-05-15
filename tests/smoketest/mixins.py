@@ -33,7 +33,7 @@ class RedisTestMixin:
         assert r.get("some") == "value"
 
     def test_redis_modules_loaded(self, r):
-        expected = ["rejson", "timeseries", "search", "graph", "bf"]
+        expected = ["rejson", "timeseries", "search", "bf"]
         modules = [m.get("name").lower() for m in r.module_list()]
 
         modules.sort()
@@ -52,16 +52,6 @@ class RedisTestMixin:
         assert r.bf().create("bloom", 0.01, 1000)
         assert 1 == r.bf().add("bloom", "foo")
         assert 0 == r.bf().add("bloom", "foo")
-
-    def test_graph(self, r):
-        stack_dockloader(self)
-        r.flushdb()
-        params = [1, 2.3, "str", True, False, None, [0, 1, 2]]
-        query = "RETURN $param"
-        for param in params:
-            result = r.graph().query(query, {"param": param})
-            expected_results = [[param]]
-            assert expected_results == result.result_set
 
     def test_timeseries(self, r):
         stack_dockloader(self)
