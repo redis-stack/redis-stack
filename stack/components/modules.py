@@ -9,11 +9,11 @@ import urllib
 import zipfile
 from typing import Union
 
-import requests
 from loguru import logger
 
 from ..config import Config
 from ..paths import Paths
+from .get import get_stream_and_store
 
 
 class Modules(object):
@@ -26,7 +26,7 @@ class Modules(object):
     ):
         self.OSNICK = osnick
         self.OSNAME = osname
-        if self.OSNAME == "Linux" and arch == "arm64":
+        if self.OSNAME in ["Linux", "macos"] and arch == "arm64":
             self.ARCH = "arm64v8"
         else:
             self.ARCH = arch
@@ -53,11 +53,11 @@ class Modules(object):
             )
 
         # FIXME mac M1 temporary hack until it moves
-        if self.ARCH == "arm64" and self.OSNAME != "Linux":
-            return urllib.parse.urljoin(
-                f"https://{self.AWS_S3_BUCKET}",
-                f"lab/23-macos-m1/{module}.{self.OSNAME}-{self.OSNICK}-arm64v8.{version}.zip",
-            )
+#        if self.ARCH == "arm64" and self.OSNAME != "Linux":
+#            return urllib.parse.urljoin(
+#                f"https://{self.AWS_S3_BUCKET}",
+#                f"lab/23-macos-m1/{module}.{self.OSNAME}-{self.OSNICK}-arm64v8.{version}.zip",
+#            )
 
         # by default, fetch releaes
         # but if a specific versoin (i.e 99.99.99) has been specified, we're
@@ -141,11 +141,7 @@ class Modules(object):
         if os.path.isfile(destfile):
             return
 
-        r = requests.get(url, stream=True)
-        if r.status_code > 204:
-            logger.error(f"{url} could not be retrieved")
-            raise requests.HTTPError
-        open(destfile, "wb").write(r.content)
+        get_stream_and_store(url, destfile)
 
         if custom_dest is None:
             dest = self.__PATHS__.DESTDIR

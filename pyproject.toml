@@ -22,6 +22,10 @@ docker = "^6.0.0"
 flake8 = "^4.0.1"
 black = "^22.10.0"
 
+# https://github.com/ionrock/cachecontrol/issues/292
+# only an issue on M1
+urllib3 = "1.26.15"
+
 [tool.pytest.ini_options]
 markers = [
     "xenial: ubuntu xenial tests",
@@ -30,7 +34,7 @@ markers = [
     "jammy: ubuntu jammy tests",
     "bullseye: bullseye tests",
     "archlinux: archlinux tests",
-    "amazonlinux2: amazonlinux2 (centos7 in reality) tests",
+    "amzn2: amazonlinux2 tests",
     "appimage: appimage tests",
     "rhel7: RedHat 7 (rhel7) tests",
     "rhel8: RedHat 8 (rhel8) tests",
@@ -41,7 +45,6 @@ markers = [
     "snaps: test the snapcraft snaps",
     "arm: tests that run only on arm"
 ]
-
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

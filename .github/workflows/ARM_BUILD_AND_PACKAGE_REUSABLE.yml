@@ -37,8 +37,11 @@ on:
       fpmversion:
         required: false
         type: string
-        default: 1.14.2
+        default: 1.15.1
       moduleoverride:
+        required: false
+        type: string
+      redislinkflags:
         required: false
         type: string
     secrets:
@@ -104,7 +107,7 @@ jobs:
       uses: uraimo/run-on-arch-action@v2
       with:
         arch: aarch64
-        distro: ubuntu18.04
+        distro: ${{inputs.osnick}}
         install: ${{inputs.build_deps}}
         run: |
           make -C redis/src all BUILD_TLS=yes MALLOC=libc
@@ -206,8 +209,12 @@ jobs:
      - name: install qemu
        uses: docker/setup-qemu-action@v2
 
+     # https://github.com/docker/buildx/issues/1509
      - name: set up buildx
        uses: docker/setup-buildx-action@v2
+       with:
+         install: true
+         version: v0.9.1
 
      - run: gem install fpm -v ${{env.fpmversion}}
      - name: display structure
