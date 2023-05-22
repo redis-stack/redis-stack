@@ -29,6 +29,7 @@ fi
 ${CMD} \
 ${CONFFILE} \
 --dir ${REDIS_DATA_DIR} \
+--save "" \
 --protected-mode no \
 --daemonize no \
 --loadmodule /opt/redis-stack/lib/redisearch.so ${REDISEARCH_ARGS} \

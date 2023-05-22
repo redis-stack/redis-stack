@@ -67,6 +67,7 @@ echo "Starting redis-stack-server, database path ${REDIS_DATA_DIR}"
 ${CMD} \
 ${CONFFILE} \
 --dir ${REDIS_DATA_DIR} \
+--save "" \
 --protected-mode no \
 --daemonize no \
 --loadmodule ${MODULEDIR}/redisearch.so ${REDISEARCH_ARGS} \
