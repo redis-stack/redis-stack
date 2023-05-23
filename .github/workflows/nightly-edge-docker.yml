@@ -14,13 +14,13 @@ env:
 jobs:
 
 ##### arm ####
- arm64-focal:
+ arm64-redis-stack-server:
    uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
    with:
-     image_name: ubuntu:focal
-     platform: focal
+     image_name: ubuntu:jammy
+     platform: jammy
      osname: Linux
-     osnick: ubuntu20.04
+     osnick: ubuntu22.04
      arch: arm64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
@@ -32,12 +32,12 @@ jobs:
      GPG_KEY: ${{ secrets.GPG_KEY }}
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
- arm64-focal-redisinsight-web:
+ arm64-redisinsight-web:
    uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
    with:
-     platform: focal
+     platform: jammy
      osname: Linux
-     osnick: ubuntu20.04
+     osnick: ubuntu22.04
      arch: arm64
      target: deb
      pythonversion: "3.10"
@@ -49,22 +49,22 @@ jobs:
 
  arm64-docker:
    uses: ./.github/workflows/DOCKER_REUSABLE.yml
-   needs: [arm64-focal, arm64-focal-redisinsight-web]
+   needs: [arm64-redis-stack-server, arm64-redisinsight-web]
    with:
      pythonversion: "3.10"
      arch: arm64
-     platform: focal
+     platform: jammy
    secrets:
      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
 
 #### x86_64 JOBS ####
- x86_64-focal-redisinsight-web:
+ x86_64-redisinsight-web:
    uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
    with:
-     platform: focal
+     platform: jammy
      osname: Linux
-     osnick: ubuntu20.04
+     osnick: ubuntu22.04
      target: deb
      pythonversion: "3.10"
    secrets:
@@ -73,13 +73,13 @@ jobs:
      GPG_KEY: ${{ secrets.GPG_KEY }}
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
- x86_64-focal:
+ x86_64-redis-stack-server:
    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
    with:
-     image_name: ubuntu:focal
-     platform: focal
+     image_name: ubuntu:jammy
+     platform: jammy
      osname: Linux
-     osnick: ubuntu20.04
+     osnick: ubuntu22.04
      arch: x86_64
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
@@ -93,11 +93,11 @@ jobs:
 
  x86_64-docker:
    uses: ./.github/workflows/DOCKER_REUSABLE.yml
-   needs: [x86_64-focal, x86_64-focal-redisinsight-web]
+   needs: [x86_64-redis-stack-server, x86_64-redisinsight-web]
    with:
      pythonversion: "3.10"
      arch: x86_64
-     platform: focal
+     platform: jammy
    secrets:
      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
