@@ -16,9 +16,6 @@ on:
 
   workflow_dispatch:
 
-  schedule:
-    - cron: "0 1 * * *"
-
 jobs:
 
 ###################### ARM JOBS #########################
@@ -879,11 +876,11 @@ jobs:
          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
      - name: Log in to DockerHub
-       if: steps.iamafork.outputs.IAMAFORK == 'false'
        uses: docker/login-action@v2
        with:
          username: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
          password: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
+
      - name: create the manifest
        run: |
          docker manifest create redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} \
