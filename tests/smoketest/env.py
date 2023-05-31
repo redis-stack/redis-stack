@@ -35,7 +35,7 @@ class DockerTestEnv:
         except Exception:
             pass
 
-        portmap = getattr(cls, "PORTMAP", {"6379/tcp": 6379})
+        portmap = getattr(cls, "PORTMAP", {"6379/tcp": 9379})
 
         m = docker.types.Mount("/build", ROOT, read_only=True, type="bind")
         container = cls.env.containers.run(

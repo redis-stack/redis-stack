@@ -31,7 +31,7 @@ class DockerComposeBase(RedisTestMixin, object):
         while c < 10:
             import redis
 
-            r = redis.Redis()
+            r = redis.Redis(port=9379)
             try:
                 assert r.ping()
                 return
@@ -62,7 +62,7 @@ services:
     container_name: {self.DOCKER_IMAGE}-dockercompose
     image: "redisfab/{self.DOCKER_IMAGE}:{self.VERSION}"
     ports:
-      - 6379:6379
+      - 9379:6379
 """
         return content
 
@@ -80,7 +80,7 @@ services:
     container_name: {self.DOCKER_IMAGE}-dockercompose
     image: "redisfab/{self.DOCKER_IMAGE}:{self.VERSION}"
     ports:
-      - 6379:6379
+      - 9379:6379
     environment:
         REDIS_ARGS: "--maxmemory 100mb"
 """
@@ -100,7 +100,7 @@ services:
     container_name: {self.DOCKER_IMAGE}-dockercompose
     image: "redisfab/{self.DOCKER_IMAGE}:{self.VERSION}"
     ports:
-      - 6379:6379
+      - 9379:6379
     environment:
         REDIS_ARGS: "--maxmemory 100mb"
 """
@@ -120,7 +120,7 @@ services:
     container_name: {self.DOCKER_IMAGE}-dockercompose
     image: "redisfab/{self.DOCKER_IMAGE}:{self.VERSION}"
     ports:
-      - 6379:6379
+      - 9379:6379
       - 8001:8001
 """
         return content

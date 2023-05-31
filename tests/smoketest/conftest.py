@@ -9,4 +9,4 @@ import redis
 
 @pytest.fixture
 def r():
-    return redis.Redis(decode_responses=True)
+    return redis.Redis(decode_responses=True, port=9379)
