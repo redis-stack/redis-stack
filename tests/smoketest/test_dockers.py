@@ -17,7 +17,7 @@ class TestRedisStack(RedisInsightTestMixin, RedisTestMixin, DockerTestEnv):
     VERSION = os.getenv("VERSION", "edge")
     CONTAINER_NAME = "redis-stack"
     DOCKER_NAME = f"redisfab/{CONTAINER_NAME}:{VERSION}"
-    PORTMAP = {"6379/tcp": 6379, "8001/tcp": 8001}
+    PORTMAP = {"6379/tcp": 9379, "8001/tcp": 8001}
     PLATFORM = "linux/amd64"
 
 
@@ -27,7 +27,7 @@ class TestRedisStackServer(RedisTestMixin, DockerTestEnv):
     VERSION = os.getenv("VERSION", "edge")
     CONTAINER_NAME = "redis-stack-server"
     DOCKER_NAME = f"redisfab/{CONTAINER_NAME}:{VERSION}"
-    PORTMAP = {"6379/tcp": 6379, "8001/tcp": 8001}
+    PORTMAP = {"6379/tcp": 9379, "8001/tcp": 8001}
     PLATFORM = "linux/amd64"
 
     def test_no_redisinsight(self):
