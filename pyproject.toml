@@ -9,10 +9,11 @@ license = "MIT"
 python = ">=3.8,<4.0"
 PyYAML = "^6.0"
 isort = "^5.10.1"
-Fabric = "^2.7.0"
+Fabric2 = "^3.0.0"
+invoke = "^2.1.2"
 
 [tool.poetry.dev-dependencies]
-invoke = "^1.7.3"
+invoke = "^2.1.0"
 requests = "^2.28.1"
 loguru = "^0.6.0"
 Jinja2 = "^3.0.3"
