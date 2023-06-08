@@ -13,6 +13,7 @@ This repository builds redis, and downloads various components (modules, RedisIn
 [Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
 [Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
 [Docker images](https://hub.docker.com/r/redis/redis-stack) |
+[Cloud images](https://github.com/redis-stack/redis-stack-cloudimages) |
 [Other downloads](https://redis.io/download/#redis-stack-downloads)
 
 ---
