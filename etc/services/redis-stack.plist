@@ -24,6 +24,9 @@
             <string>/opt/redis-stack/lib/rejson.so</string>
             <string>loadmodule</string>
             <string>/opt/redis-stack/lib/redisbloom.so</string>
+            <string>loadmodule</string>
+            <string>/opt/redis-stack/lib/redisgears.so</string>
+            <string>/opt/redis-stack/lib/gears_v8.tgz</string>
         </array>
 
         <key>WorkingDirectory</key>
