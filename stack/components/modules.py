@@ -5,6 +5,7 @@
 #
 import os
 import shutil
+import tarfile
 import urllib
 import zipfile
 from typing import Union
@@ -103,11 +104,12 @@ class Modules(object):
             os.path.join(self.__PATHS__.LIBDIR, f"{modulename}.so"),
         )
         os.chmod(os.path.join(self.__PATHS__.LIBDIR, f"{modulename}.so"), mode=0o755)
-        shutil.copyfile(
-            os.path.join(self.__PATHS__.DESTDIR, "deps", f"gears_v8.tgz"),
-            os.path.join(self.__PATHS__.LIBDIR, "gears_v8.tgz")
-        )
-        os.chmod(os.path.join(self.__PATHS__.LIBDIR, f"gears_v8.tgz"), mode=0o755)
+        
+        tar = tarfile.open(os.path.join(self.__PATHS__.DESTDIR, "deps", f"gears_v8.tgz"), "r:gz")
+        tar.extract("libredisgears_v8_plugin.so", path=self.__PATHS__.LIBDIR)
+        tar.extractall()
+        tar.close()
+        os.chmod(os.path.join(self.__PATHS__.LIBDIR, f"libredisgears_v8_plugin.so"), mode=0o755)
 
 
     def redisgraph(self, version: Union[str, None] = None):
