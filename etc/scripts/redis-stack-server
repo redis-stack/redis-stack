@@ -74,4 +74,5 @@ ${CONFFILE} \
 --loadmodule ${MODULEDIR}/redistimeseries.so ${REDISTIMESERIES_ARGS} \
 --loadmodule ${MODULEDIR}/rejson.so ${REDISJSON_ARGS} \
 --loadmodule ${MODULEDIR}/redisbloom.so ${REDISBLOOM_ARGS} \
+--loadmodule /opt/redis-stack/lib/redisgears.so v8-plugin-path /opt/redis-stack/lib/libredisgears_v8_plugin.so  ${REDISGEARS_ARGS} \
 $*

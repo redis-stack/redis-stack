@@ -9,6 +9,7 @@ versions:
   redisearch: 2.8.2
   redisgraph: 2.10.10
   redisbloom: 2.6.0
+  redisgears: 2.0.2
   nodejs: v16.15.1
 
   # the redis repository tag

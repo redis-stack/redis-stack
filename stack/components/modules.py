@@ -5,6 +5,7 @@
 #
 import os
 import shutil
+import tarfile
 import urllib
 import zipfile
 from typing import Union
@@ -81,6 +82,35 @@ class Modules(object):
         else:
             override = True
         self._run("rejson", version, override)
+
+    def redisgears(self, version: Union[str, None] = None):
+        """redisgears specific fetch"""
+        if version is None:
+            version = self.C.get_key("versions")["redisgears"]
+            override = False
+        else:
+            override = True
+        
+        modulename = "redisgears"
+        url = self.generate_url(modulename, version, override)
+        logger.info(f"Fetching {modulename}")
+        destfile = os.path.join(
+            self.__PATHS__.EXTERNAL,
+            f"{modulename}-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip",
+        )
+        self._fetch_and_unzip(url, destfile)
+        shutil.copyfile(
+            os.path.join(self.__PATHS__.DESTDIR, f"lib{modulename}.so"),
+            os.path.join(self.__PATHS__.LIBDIR, f"{modulename}.so"),
+        )
+        os.chmod(os.path.join(self.__PATHS__.LIBDIR, f"{modulename}.so"), mode=0o755)
+        
+        tar = tarfile.open(os.path.join(self.__PATHS__.DESTDIR, "deps", f"gears_v8.tgz"), "r:gz")
+        tar.extract("libredisgears_v8_plugin.so", path=self.__PATHS__.LIBDIR)
+        tar.extractall()
+        tar.close()
+        os.chmod(os.path.join(self.__PATHS__.LIBDIR, f"libredisgears_v8_plugin.so"), mode=0o755)
+
 
     def redisgraph(self, version: Union[str, None] = None):
         """redisgraph specific fetch"""
