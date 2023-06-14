@@ -52,7 +52,7 @@ class RedisStackServer(Recipe):
             m.redisgraph,
             m.redistimeseries,
             m.rejson,
-            m.redisgears,
+            #m.redisgears,
             m.redisbloom,
         ]:
             try:

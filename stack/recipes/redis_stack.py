@@ -55,9 +55,8 @@ class RedisStack(Recipe):
             m.redisgraph,
             m.redistimeseries,
             m.rejson,
-            m.redisgears,
+           # m.redisgears,
             m.redisbloom,
-            # self.redisgears, self.redisai
         ]:
             try:
                 if version_override is None:
