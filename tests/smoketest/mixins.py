@@ -52,10 +52,10 @@ class RedisTestMixin:
         assert 1 == r.bf().add("bloom", "foo")
         assert 0 == r.bf().add("bloom", "foo")
 
-#    def test_gears(self, r):
-#        stack_dockloader(self)
-#        r.flushdb()
-#        r.execute_command("TFUNCTION LIST")
+    def test_gears(self, r):
+        stack_dockloader(self)
+        r.flushdb()
+        r.execute_command("TFUNCTION LIST")
 
     def test_graph(self, r):
         stack_dockloader(self)
