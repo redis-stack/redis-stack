@@ -54,6 +54,7 @@ class RedisStack(Recipe):
             m.redisearch,
             m.redistimeseries,
             m.rejson,
+            m.redisgears,
             m.redisbloom,
             # self.redisgears, self.redisai
         ]:

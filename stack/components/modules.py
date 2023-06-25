@@ -6,6 +6,7 @@
 import os
 import shutil
 import urllib
+import tarfile
 import zipfile
 from typing import Union
 
@@ -43,21 +44,23 @@ class Modules(object):
         if module == "rejson":
             module = "rejson-oss"
 
+        # one day, get the version like others, into gears
+        mod_url_part = f"{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip"
+        if module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "x86_64":
+            mod_url_part = f"{module}.Macos-mac_os11.4.0-{self.ARCH}.{version}.zip"
+        elif (
+            module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "arm64v8"
+        ):
+            mod_url_part = f"{module}.Macos-mac_os12.6.3-{self.ARCH}.{version}.zip"
+
         # eg: if rejson-url-override is set, fetch from that location
         # this solves someone's testing need
         url_base_override = self.C.get_key(f"{module}-url-override")
         if url_base_override is not None:
             return urllib.parse.urljoin(
                 f"{url_base_override}",
-                f"{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip",
+                mod_url_part,
             )
-
-        # FIXME mac M1 temporary hack until it moves
-#        if self.ARCH == "arm64" and self.OSNAME != "Linux":
-#            return urllib.parse.urljoin(
-#                f"https://{self.AWS_S3_BUCKET}",
-#                f"lab/23-macos-m1/{module}.{self.OSNAME}-{self.OSNICK}-arm64v8.{version}.zip",
-#            )
 
         # by default, fetch releaes
         # but if a specific versoin (i.e 99.99.99) has been specified, we're
@@ -65,12 +68,12 @@ class Modules(object):
         if override:
             return urllib.parse.urljoin(
                 f"https://{self.AWS_S3_BUCKET}",
-                f"{module}/snapshots/{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip",
+                f"{module}/snapshots/{mod_url_part}",
             )
         else:
             return urllib.parse.urljoin(
                 f"https://{self.AWS_S3_BUCKET}",
-                f"{module}/{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip",
+                f"{module}/{mod_url_part}",
             )
 
     def rejson(self, version: Union[str, None] = None):
@@ -81,6 +84,50 @@ class Modules(object):
         else:
             override = True
         self._run("rejson", version, override)
+
+    def redisgears(self, version: Union[str, None] = None):
+        """redisgears specific fetch"""
+        if version is None:
+            version = self.C.get_key("versions")["redisgears"]
+            override = False
+        else:
+            override = True
+
+        modulename = "redisgears"
+        url = self.generate_url(modulename, version, override)
+        logger.info(f"Fetching {modulename}")
+        destfile = os.path.join(
+            self.__PATHS__.EXTERNAL,
+            f"{modulename}-{self.OSNAME}-{self.OSNICK}-{self.ARCH}.zip",
+        )
+        self._fetch_and_unzip(url, destfile)
+        if self.OSNAME == "macos":
+            suffix = "dylib"
+        else:
+            suffix = "so"
+        shutil.copyfile(
+            os.path.join(self.__PATHS__.DESTDIR, f"lib{modulename}.{suffix}"),
+            os.path.join(self.__PATHS__.LIBDIR, f"{modulename}.so"),
+        )
+        os.chmod(os.path.join(self.__PATHS__.LIBDIR, f"{modulename}.so"), mode=0o755)
+
+        tar = tarfile.open(
+            os.path.join(self.__PATHS__.DESTDIR, "deps", f"gears_v8.tgz"), "r:gz"
+        )
+        tar.extract(f"libredisgears_v8_plugin.{suffix}", path=self.__PATHS__.LIBDIR)
+        tar.extractall()
+        tar.close()
+        if self.OSNAME == "macos":
+            shutil.move(
+                os.path.join(
+                    self.__PATHS__.LIBDIR, f"libredisgears_v8_plugin.{suffix}"
+                ),
+                os.path.join(self.__PATHS__.LIBDIR, f"libredisgears_v8_plugin.so"),
+            )
+        os.chmod(
+            os.path.join(self.__PATHS__.LIBDIR, f"libredisgears_v8_plugin.so"),
+            mode=0o755,
+        )
 
     def redisgraph(self, version: Union[str, None] = None):
         """redisgraph specific fetch"""
