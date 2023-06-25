@@ -4,6 +4,7 @@
 # the Server Side Public License v1 (SSPLv1).
 #
 import os
+import pytest
 import subprocess
 from urllib.request import urlopen
 
