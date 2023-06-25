@@ -6,6 +6,7 @@
 import os
 import shutil
 import urllib
+import tarfile
 import zipfile
 from typing import Union
 
