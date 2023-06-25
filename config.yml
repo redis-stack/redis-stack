@@ -4,11 +4,10 @@ islatest: no
 
 # module versions
 versions:
-  rejson: 2.6.1
-  redistimeseries: 1.10.0
-  redisearch: 2.8.2
-  redisgraph: 2.10.10
-  redisbloom: 2.6.0
+  rejson: 2.6.2
+  redistimeseries: 1.10.1
+  redisearch: 2.8.3
+  redisbloom: 2.6.1
   redisgears: 2.0.6
   nodejs: v16.15.1
 
