@@ -23,7 +23,7 @@ class OSXTestBase(RedisPackagingMixin, RedisTestMixin, object):
 
         rss_binary = f"{cls.BASEPATH}/bin/redis-stack-server"
         r = subprocess.Popen(
-            [rss_binary, "--port", "9379"],
+            [rss_binary],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
