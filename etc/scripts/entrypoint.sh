@@ -31,4 +31,5 @@ ${CONFFILE} \
 --loadmodule /opt/redis-stack/lib/redistimeseries.so ${REDISTIMESERIES_ARGS} \
 --loadmodule /opt/redis-stack/lib/rejson.so ${REDISJSON_ARGS} \
 --loadmodule /opt/redis-stack/lib/redisbloom.so ${REDISBLOOM_ARGS} \
+--loadmodule /opt/redis-stack/lib/redisgears.so v8-plugin-path /opt/redis-stack/lib/libredisgears_v8_plugin.so  ${REDISGEARS_ARGS} \
 ${REDIS_ARGS}

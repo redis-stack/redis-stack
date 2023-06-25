@@ -51,6 +51,7 @@ class RedisStackServer(Recipe):
             m.redisearch,
             m.redistimeseries,
             m.rejson,
+            m.redisgears,
             m.redisbloom,
         ]:
             try:
