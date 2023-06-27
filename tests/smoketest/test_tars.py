@@ -152,6 +152,19 @@ class TestCentos8(TARTestBase):
             "yum install -y openssl-devel jemalloc-devel libgomp",
         ]
 
+@pytest.mark.rhel9
+class TestRocky9(TARTestBase):
+
+    DOCKER_NAME = "rockylinux:9"
+    CONTAINER_NAME = "redis-stack-rocky9"
+    PLATFORM = "linux/amd64"
+
+    def __precommands__(self):
+        return [
+            "yum install -y epel-release tar",
+            "yum install -y openssl-devel jemalloc-devel libgomp",
+        ]
+
 
 @pytest.mark.archlinux
 class TestArchLinux(TARTestBase):

@@ -112,3 +112,9 @@ class TestCentos7(RPMVagrant):
 class TestCentos8(RPMVagrant):
 
     OSNICK = "centos8"
+
+@pytest.mark.rhel9
+@pytest.mark.physical
+class TestCentos8(RPMVagrant):
+
+    OSNICK = "rocky9"
