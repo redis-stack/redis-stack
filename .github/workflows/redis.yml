@@ -878,7 +878,6 @@ jobs:
          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
      - name: Log in to DockerHub
-       if: steps.iamafork.outputs.IAMAFORK == 'false'
        uses: docker/login-action@v2
        with:
          username: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
@@ -889,6 +888,5 @@ jobs:
            redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-x86_64 \
            redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-arm64
      - name: push the manifest
-       if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
          docker manifest push redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}
