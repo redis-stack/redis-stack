@@ -98,4 +98,5 @@ class RedisStack(Recipe):
                 os.path.join(self.__PATHS__.SCRIPTDIR, "conf"),
                 self.__PATHS__.ETCDIR,
                 dirs_exist_ok=True,
+                symlinks=True,
             )

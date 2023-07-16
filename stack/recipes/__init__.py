@@ -193,7 +193,7 @@ class Recipe(object):
         tartree = f"{self.__PATHS__.WORKDIR}-tar"
         tarbase = os.path.join(tartree, f"{self.PACKAGE_NAME}-{self.version}")
         shutil.rmtree(tartree, ignore_errors=True)
-        shutil.copytree(self.__PATHS__.BASEDIR, tarbase)
+        shutil.copytree(self.__PATHS__.BASEDIR, tarbase, symlinks=True)
         fpmargs.append(f"-C {tartree}")
 
         return fpmargs

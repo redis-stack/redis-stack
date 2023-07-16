@@ -75,4 +75,4 @@ class NodeJS(object):
         destdir = os.path.join(self.__PATHS__.BASEDIR, "nodejs")
         if os.path.isdir(destdir):
             return
-        shutil.copytree(node_base, destdir)
+        shutil.copytree(node_base, destdir, symlinks=True)
