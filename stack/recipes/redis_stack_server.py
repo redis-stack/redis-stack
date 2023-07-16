@@ -107,6 +107,7 @@ class RedisStackServer(Recipe):
             os.path.join(self.__PATHS__.SCRIPTDIR, "conf"),
             self.__PATHS__.ETCDIR,
             dirs_exist_ok=True,
+            symlinks=True,
         )
 
         # license files
@@ -114,4 +115,5 @@ class RedisStackServer(Recipe):
             os.path.join(self.__PATHS__.SCRIPTDIR, "licenses"),
             os.path.join(self.__PATHS__.SHAREDIR),
             dirs_exist_ok=True,
+            symlinks=True,
         )
