@@ -74,7 +74,7 @@ class RedisInsightBase(object):
         pkg_unzip_dest = os.path.join(self.__PATHS__.DESTDIR, "redisinsight")
         self._fetch_and_unzip(url, destfile)  # , pkg_unzip_dest)
         shutil.copytree(
-            pkg_unzip_dest, os.path.join(self.__PATHS__.SHAREDIR, "redisinsight" , symlinks=True)
+            pkg_unzip_dest, os.path.join(self.__PATHS__.SHAREDIR, "redisinsight" ) , symlinks=True
         )
 
 
