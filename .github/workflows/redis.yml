@@ -38,8 +38,8 @@ jobs:
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+     GPG_KEY: ${{ secrets.GPG_KEY_TEST }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD_TEST }}
 
 
  arm64-focal:
@@ -56,8 +56,8 @@ jobs:
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+     GPG_KEY: ${{ secrets.GPG_KEY_TEST }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD_TEST }}
 
  arm64-jammy:
    uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
@@ -73,8 +73,8 @@ jobs:
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+     GPG_KEY: ${{ secrets.GPG_KEY_TEST }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD_TEST }}
 
  arm64-redisinsight-web:
    uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
@@ -88,8 +88,8 @@ jobs:
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+     GPG_KEY: ${{ secrets.GPG_KEY_TEST }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD_TEST }}
 
  arm64-docker:
    uses: ./.github/workflows/DOCKER_REUSABLE.yml
@@ -127,8 +127,8 @@ jobs:
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+     GPG_KEY: ${{ secrets.GPG_KEY_TEST }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD_TEST }}
 
  x86_64-focal:
    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
@@ -144,8 +144,8 @@ jobs:
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+     GPG_KEY: ${{ secrets.GPG_KEY_TEST }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD_TEST }}
 
  x86_64-jammy:
    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
@@ -161,8 +161,8 @@ jobs:
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+     GPG_KEY: ${{ secrets.GPG_KEY_TEST }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD_TEST }}
 
  x86_64-docker:
    uses: ./.github/workflows/DOCKER_REUSABLE.yml
@@ -213,8 +213,8 @@ jobs:
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+     GPG_KEY: ${{ secrets.GPG_KEY_TEST }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD_TEST }}
 
 #  # uses precompiled ubuntu binaries, hence the testplatform override
 # x86_64-archlinux:
@@ -232,8 +232,8 @@ jobs:
 #   secrets:
 #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
 #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#     GPG_KEY: ${{ secrets.GPG_KEY }}
-#     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+#     GPG_KEY: ${{ secrets.GPG_KEY_TEST }}
+#     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD_TEST }}
 
  bullseye:
    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
@@ -249,8 +249,8 @@ jobs:
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+     GPG_KEY: ${{ secrets.GPG_KEY_TEST }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD_TEST }}
 
  x86_64-rhel7:
    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
@@ -268,8 +268,8 @@ jobs:
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+     GPG_KEY: ${{ secrets.GPG_KEY_TEST }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD_TEST }}
 
  x86_64-amazonlinux2:
    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
@@ -287,8 +287,8 @@ jobs:
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+     GPG_KEY: ${{ secrets.GPG_KEY_TEST }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD_TEST }}
 
  x86-64_rhel8:
    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
@@ -306,8 +306,8 @@ jobs:
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+     GPG_KEY: ${{ secrets.GPG_KEY_TEST }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD_TEST }}
 
 ##################### OSX JOBS #########################
 
