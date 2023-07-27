@@ -57,7 +57,7 @@ on:
 jobs:
 
   build-redis:
-    name: Build ${{inputs.platform}} (${{inputs.arch}})
+    name: Build Redis ${{inputs.platform}} (${{inputs.arch}})
 
     env:
       pythonversion: ${{inputs.pythonversion}}
@@ -149,6 +149,7 @@ jobs:
 
   package:
     name: Package ${{inputs.platform}} (${{inputs.arch}}) ${{matrix.package}}
+    timeout-minutes: 10
     env:
       pythonversion: "${{inputs.pythonversion}}"
       fpmversion: ${{inputs.fpmversion}}

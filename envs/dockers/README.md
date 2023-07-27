@@ -36,8 +36,6 @@ Example, with the current directory containing something called data which hosts
 docker run -v `pwd`/data/redisinsight:/redisinsight -v `pwd`/redis:/data -p 6379:6379 -p 8001:8001 redis/redis-stack:edge
 ```
 
-```
-
 ### Run redis stack with ports 6379 (redis) and 8001 (redisinsight) tunneled back to your machine
 ```
 docker run -p 6379:6379 -p 8001:8001 redis/redis-stack:edge
