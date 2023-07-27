@@ -34,7 +34,7 @@ class RedisTestMixin:
         assert r.get("some") == "value"
 
     def test_redis_modules_loaded(self, r):
-        expected = ["rejson", "timeseries", "search", "graph", "redisgears_2", "bf"]
+        expected = ["rejson", "graph", "timeseries", "search", "redisgears_2", "bf"]
         modules = [m.get("name").lower() for m in r.module_list()]
 
         modules.sort()

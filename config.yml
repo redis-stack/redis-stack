@@ -4,20 +4,20 @@ islatest: no
 
 # module versions
 versions:
-  rejson: 2.6.1
-  redistimeseries: 1.10.0
-  redisearch: 2.8.2
-  redisgraph: 2.10.10
-  redisbloom: 2.6.0
+  rejson: 2.6.2
+  redistimeseries: 1.10.1
+  redisearch: 2.8.3
+  redisbloom: 2.6.1
   redisgears: 2.0.6
+  redisgraph: 2.10.12
   nodejs: v16.15.1
 
   # the redis repository tag
-  redis: 7.2-rc2
+  redis: 7.2-rc3
 
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
-  packagedredisversion: 7.2-rc2
+  packagedredisversion: 7.2-rc3
   redis-stack: 99.99.99
   redis-stack-server: 99.99.99
   redisinsight: 2.26.0
