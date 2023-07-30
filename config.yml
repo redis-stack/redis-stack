@@ -17,8 +17,8 @@ versions:
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
   packagedredisversion: 7.2-rc3
-  redis-stack: 7.2.0-0
-  redis-stack-server: 7.2.0-0
+  redis-stack: 7.2.0-v0
+  redis-stack-server: 7.2.0-v0
   redisinsight: 2.26.0
   redisinsight-web: 2.30.0
 
