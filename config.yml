@@ -12,14 +12,14 @@ versions:
   nodejs: v16.15.1
 
   # the redis repository tag
-  redis: 7.2-rc3
+  redis: 7.2.0
 
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
-  packagedredisversion: 7.2-rc3
+  packagedredisversion: 7.2.0-1
   redis-stack: 7.2.0-v0
   redis-stack-server: 7.2.0-v0
-  redisinsight: 2.26.0
+  redisinsight: 2.30.0
   redisinsight-web: 2.30.0
 
 # common package variables
