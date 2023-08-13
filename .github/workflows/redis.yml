@@ -25,7 +25,7 @@ jobs:
 
 ###################### ARM JOBS #########################
  arm64-bionic:
-   uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_ARM64.yml
    with:
      image_name: ubuntu:bionic
      platform: bionic
@@ -43,7 +43,7 @@ jobs:
 
 
  arm64-focal:
-   uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_ARM64.yml
    with:
      image_name: ubuntu:focal
      platform: focal
@@ -60,7 +60,7 @@ jobs:
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
  arm64-jammy:
-   uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_ARM64.yml
    with:
      image_name: ubuntu:jammy
      platform: jammy
@@ -77,7 +77,7 @@ jobs:
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
  arm64-redisinsight-web:
-   uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_REDISINSIGHT.yml
    with:
      platform: jammy
      osname: Linux
@@ -92,7 +92,7 @@ jobs:
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
  arm64-docker:
-   uses: ./.github/workflows/DOCKER_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_DOCKER.yml
    needs: [arm64-jammy, arm64-redisinsight-web]
    with:
      pythonversion: "3.10"
@@ -103,7 +103,7 @@ jobs:
      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
 
  arm64-snap:
-   uses: ./.github/workflows/SNAP_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_SNAP.yml
    needs: [arm64-bionic]
    with:
      arch: arm64
@@ -117,7 +117,7 @@ jobs:
 
 # ##################### x86_64 JOBS #########################
  x86_64-redisinsight-web:
-   uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_REDISINSIGHT.yml
    with:
      platform: jammy
      osname: Linux
@@ -131,7 +131,7 @@ jobs:
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
  x86_64-focal:
-   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_X64.yml
    with:
      image_name: ubuntu:focal
      platform: focal
@@ -148,7 +148,7 @@ jobs:
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
  x86_64-jammy:
-   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_X64.yml
    with:
      image_name: ubuntu:jammy
      platform: jammy
@@ -165,7 +165,7 @@ jobs:
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
  x86_64-docker:
-   uses: ./.github/workflows/DOCKER_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_DOCKER.yml
    needs: [x86_64-jammy, x86_64-redisinsight-web]
    with:
      pythonversion: "3.10"
@@ -176,7 +176,7 @@ jobs:
      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
 
  x86_64-snap:
-   uses: ./.github/workflows/SNAP_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_SNAP.yml
    needs: [x86_64-focal]
    with:
      arch: x86_64
@@ -188,7 +188,7 @@ jobs:
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
  x86_64-appimage:
-   uses: ./.github/workflows/APPIMAGE_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_APPIMAGE.yml
    needs: [x86_64-bionic]
    with:
      arch: x86_64
@@ -200,7 +200,7 @@ jobs:
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
  x86_64-bionic:
-   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_X64.yml
    with:
      image_name: ubuntu:bionic
      platform: bionic
@@ -218,7 +218,7 @@ jobs:
 
 #  # uses precompiled ubuntu binaries, hence the testplatform override
 # x86_64-archlinux:
-#   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+#   uses: ./.github/workflows/REUSABLE_X64.yml
 #   with:
 #     image_name: archlinux:latest
 #     platform: focal
@@ -236,7 +236,7 @@ jobs:
 #     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
  bullseye:
-   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_X64.yml
    with:
      image_name: debian:bullseye-slim
      platform: bullseye
@@ -253,7 +253,7 @@ jobs:
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
  x86_64-rhel7:
-   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_X64.yml
    with:
      image_name: centos:7
      platform: rhel7
@@ -272,7 +272,7 @@ jobs:
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
  x86_64-amazonlinux2:
-   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_X64.yml
    with:
      image_name: centos:7
      platform: amzn2
@@ -291,7 +291,7 @@ jobs:
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
  x86-64_rhel8:
-   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+   uses: ./.github/workflows/REUSABLE_X64.yml
    with:
      image_name: oraclelinux:8
      platform: rhel8
