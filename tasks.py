@@ -66,7 +66,7 @@ def test(c, marker=[], notmarker=[], filter="", version=None):
     """Run unit tests"""
     markstr = markhandler(marker, notmarker)
     cmd = f"pytest -m '{markstr}' {filter} --junit-xml=results.xml -s"
-    if version is not None:
+    if version is not None and version != '':
         cmd = f"VERSION={version} {cmd}"
     sys.stderr.write(f"Running: {cmd}\n")
     run(cmd)
@@ -265,8 +265,8 @@ def dockergen(c, product="redis-stack", arch="x86_64"):
 def package(
     c,
     osname="Linux",
-    osnick="",
-    dist="",
+    osnick="ubuntu22.04",
+    dist="jammy",
     redis_bin="../redis",
     target="deb",
     arch="x86_64",

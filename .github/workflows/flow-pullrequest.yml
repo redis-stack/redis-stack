@@ -1,0 +1,38 @@
+name: CI
+
+on:
+
+  pull_request:
+    branches-ignore:
+      - '*docs*'
+      - '*noci'
+
+jobs:
+
+  bionic:
+    uses: ./.github/workflows/platform-bionic.yml
+    secrets: inherit
+
+  focal:
+    uses: ./.github/workflows/platform-focal.yml
+    secrets: inherit
+
+  jammy:
+    uses: ./.github/workflows/platform-jammy.yml
+    secrets: inherit
+
+  rhel7:
+    uses: ./.github/workflows/platform-rhel7.yml
+    secrets: inherit
+
+  rhel8:
+    uses: ./.github/workflows/platform-rhel8.yml
+    secrets: inherit
+
+  amazonlinux2:
+    uses: ./.github/workflows/platform-amazonlinux2.yml
+    secrets: inherit
+
+  macos:
+    uses: ./.github/workflows/platform-macos.yml
+    secrets: inherit

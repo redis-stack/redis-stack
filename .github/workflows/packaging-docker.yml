@@ -1,0 +1,106 @@
+name: Docker
+
+on:
+  workflow_call:
+
+  workflow_run:
+    workflows: ["Jammy"]
+    types:
+      - completed
+
+concurrency:
+  group: docker-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+ arm64-redisinsight-web:
+   uses: ./.github/workflows/REUSABLE_REDISINSIGHT.yml
+   with:
+     platform: jammy
+     osname: Linux
+     osnick: ubuntu22.04
+     arch: arm64
+     target: deb
+     pythonversion: "3.10"
+   secrets: inherit
+
+ x86_64-redisinsight-web:
+   uses: ./.github/workflows/REUSABLE_REDISINSIGHT.yml
+   with:
+     platform: jammy
+     osname: Linux
+     osnick: ubuntu22.04
+     target: deb
+     pythonversion: "3.10"
+   secrets: inherit
+
+ arm64-docker:
+   uses: ./.github/workflows/REUSABLE_DOCKER.yml
+   needs: [arm64-redisinsight-web]
+   with:
+     pythonversion: "3.10"
+     arch: arm64
+     platform: jammy
+   secrets: inherit
+
+ x86_64-docker:
+   uses: ./.github/workflows/REUSABLE_DOCKER.yml
+   needs: [x86_64-redisinsight-web]
+   with:
+     pythonversion: "3.10"
+     arch: x86_64
+     platform: jammy
+   secrets: inherit
+
+ docker-push:
+   needs: [x86_64-docker, arm64-docker]
+   name: Push ${{matrix.package}} manifest
+   strategy:
+     matrix:
+       package: ['redis-stack-server', 'redis-stack']
+   env:
+     pythonversion: "3.10"
+   runs-on: ubuntu-latest
+   steps:
+     - uses: actions/checkout@v3
+     - name: install python
+       uses: actions/setup-python@v4
+       with:
+         python-version: "${{env.pythonversion}}"
+     - name: install poetry
+       uses: snok/install-poetry@v1
+       with:
+         version: latest
+         virtualenvs-in-project: true
+         virtualenvs-create: true
+         installer-parallel: true
+     - name: get package version
+       id: get_version
+       run: |
+         poetry install
+         source .venv/bin/activate
+         realversion=`invoke version -p ${{ matrix.package }} -d true`
+         echo "VERSION=$realversion" >> $GITHUB_OUTPUT
+
+     - name: determine if in fork
+       id: iamafork
+       run: |
+         amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
+         echo "am I fork: ${amfork}"
+         echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+
+     - name: Log in to DockerHub
+       uses: docker/login-action@v2
+       with:
+         username: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
+         password: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
+
+     - name: create the manifest
+       run: |
+         docker manifest create redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} \
+           redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-x86_64 \
+           redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-arm64
+     - name: push the manifest
+       run: |
+         docker manifest push redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}
