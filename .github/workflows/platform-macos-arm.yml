@@ -95,7 +95,7 @@ jobs:
      run: |
        tar -czvf redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
            redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
-   - uses: s3-actions/s3cmd@v1.2.0
+   - uses: s3-actions/s3cmd@v1.5.0
      with:
        provider: aws
        region: us-east-1
@@ -176,7 +176,7 @@ jobs:
        cd build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
        sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
 
-   - uses: s3-actions/s3cmd@v1.2.0
+   - uses: s3-actions/s3cmd@v1.5.0
      if: steps.iamafork.outputs.IAMAFORK == 'false'
      with:
        provider: aws

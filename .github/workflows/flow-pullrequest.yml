@@ -67,12 +67,12 @@ jobs:
 
   snap:
     name: Snap
-    uses: ./.github/workflows/packaging-appimage.yml
+    uses: ./.github/workflows/packaging-snap.yml
     needs: ['bionic', 'focal']
     secrets: inherit
 
   docker:
     name: Docker
-    uses: ./.github/workflows/packaging-appimage.yml
+    uses: ./.github/workflows/packaging-docker.yml
     needs: ['jammy']
     secrets: inherit
