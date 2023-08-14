@@ -1,10 +1,7 @@
 name: Docker
 
 on:
-  workflow_run:
-    workflows: ["Bionic"]
-    types:
-      - completed
+  workflow_call:
 
 concurrency:
   group: appimage-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
