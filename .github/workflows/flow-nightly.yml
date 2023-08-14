@@ -17,6 +17,7 @@ jobs:
 
   docker:
     uses: ./.github/workflows/packaging-docker.yml
+    needs: jammy
     secrets: inherit
 
   docker-push-nightly:

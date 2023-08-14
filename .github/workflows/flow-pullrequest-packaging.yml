@@ -1,6 +1,8 @@
 name: Distribution Package CI
 
 on:
+  workflow_dispatch:
+
   push:
     branches:
       - 'master'
@@ -16,8 +18,18 @@ concurrency:
 
 jobs:
 
+  jammy:
+    uses: ./.github/workflows/platform-jammy.yml
+    secrets: inherit
+
+  bionic:
+    name: Bionic
+    uses: ./.github/workflows/platform-bionic.yml
+    secrets: inherit
+
   appimage:
     name: AppImage
+    needs: bionic
     uses: ./.github/workflows/packaging-appimage.yml
     secrets: inherit
 
@@ -28,5 +40,6 @@ jobs:
 
   docker:
     name: Docker
+    needs: jammy
     uses: ./.github/workflows/packaging-docker.yml
     secrets: inherit

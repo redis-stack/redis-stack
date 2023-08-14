@@ -1,6 +1,8 @@
 name: Platform Package CI
 
 on:
+  workflow_dispatch:
+
   push:
     branches:
       - 'master'
