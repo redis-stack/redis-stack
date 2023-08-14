@@ -59,20 +59,20 @@ jobs:
     uses: ./.github/workflows/platform-macos-arm.yml
     secrets: inherit
 
-  appimage:
-    name: AppImage
-    uses: ./.github/workflows/packaging-appimage.yml
-    needs: ['bionic']
-    secrets: inherit
+  # appimage:
+  #   name: AppImage
+  #   uses: ./.github/workflows/packaging-appimage.yml
+  #   needs: ['bionic']
+  #   secrets: inherit
 
-  snap:
-    name: Snap
-    uses: ./.github/workflows/packaging-snap.yml
-    needs: ['bionic', 'focal']
-    secrets: inherit
+  # snap:
+  #   name: Snap
+  #   uses: ./.github/workflows/packaging-snap.yml
+  #   needs: ['bionic', 'focal']
+  #   secrets: inherit
 
-  docker:
-    name: Docker
-    uses: ./.github/workflows/packaging-docker.yml
-    needs: ['jammy']
-    secrets: inherit
+  # docker:
+  #   name: Docker
+  #   uses: ./.github/workflows/packaging-docker.yml
+  #   needs: ['jammy']
+  #   secrets: inherit

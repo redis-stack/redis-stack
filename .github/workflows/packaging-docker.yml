@@ -3,6 +3,17 @@ name: Docker
 on:
   workflow_call:
 
+
+  workflow_run:
+    workflows: ["Jammy"]
+    types:
+      - completed
+
+
+concurrency:
+  group: docker-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
 
  arm64-redisinsight-web:
