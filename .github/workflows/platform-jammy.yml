@@ -13,6 +13,7 @@ jobs:
 
  arm64-jammy:
    uses: ./.github/workflows/REUSABLE_ARM64.yml
+   name: Jammy [Arm64]
    with:
      image_name: ubuntu:jammy
      platform: jammy
@@ -26,6 +27,7 @@ jobs:
 
  x86_64-jammy:
    uses: ./.github/workflows/REUSABLE_X64.yml
+   name: Jammy [x86_64]
    with:
      image_name: ubuntu:jammy
      platform: jammy

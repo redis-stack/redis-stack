@@ -33,11 +33,11 @@ jobs:
 #     uses: ./.github/workflows/platform-amazonlinux2.yml
 #     secrets: inherit
 
-#   macos:
-#     uses: ./.github/workflows/platform-macos.yml
+#   macos-intel:
+#     uses: ./.github/workflows/platform-macos-intel.yml
 #     secrets: inherit
 
 
     macos-m1:
-     uses: ./.github/workflows/platform-m1.yml
+     uses: ./.github/workflows/platform-macos-arm.yml
      secrets: inherit

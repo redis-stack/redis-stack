@@ -3,8 +3,6 @@ name: RHEL8
 on:
   workflow_call:
 
-  pull_request:
-
   workflow_dispatch:
 
 concurrency:
@@ -15,6 +13,7 @@ jobs:
 
  x86-64_rhel8:
    uses: ./.github/workflows/REUSABLE_X64.yml
+   name: RHEL8
    with:
      image_name: oraclelinux:8
      platform: rhel8

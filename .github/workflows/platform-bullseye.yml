@@ -14,6 +14,7 @@ jobs:
 
   bullseye:
    uses: ./.github/workflows/REUSABLE_X64.yml
+   name: Debian Bullseye
    with:
      image_name: debian:bullseye-slim
      platform: bullseye

@@ -11,6 +11,7 @@ jobs:
 
  arm64-bionic:
    uses: ./.github/workflows/REUSABLE_ARM64.yml
+   name: Bionic [Arm64]
    with:
      image_name: ubuntu:bionic
      platform: bionic
@@ -24,6 +25,7 @@ jobs:
 
  x86_64-bionic:
    uses: ./.github/workflows/REUSABLE_X64.yml
+   name: Bionic [x86_64]
    with:
      image_name: ubuntu:bionic
      platform: bionic

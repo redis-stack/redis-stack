@@ -13,6 +13,7 @@ jobs:
 
  arm64-focal:
    uses: ./.github/workflows/REUSABLE_ARM64.yml
+   name: Focal [Arm64]
    with:
      image_name: ubuntu:focal
      platform: focal
@@ -26,6 +27,7 @@ jobs:
 
  x86_64-focal:
    uses: ./.github/workflows/REUSABLE_X64.yml
+   name: Focal [x86_64]
    with:
      image_name: ubuntu:focal
      platform: focal

@@ -13,6 +13,7 @@ jobs:
 
  x86_64-rhel7:
    uses: ./.github/workflows/REUSABLE_X64.yml
+   name: RHEL7
    with:
      image_name: centos:7
      platform: rhel7
