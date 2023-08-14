@@ -1,0 +1,56 @@
+name: MacOS M1
+
+on:
+
+  workflow_call:
+
+  workflow_dispatch:
+
+jobs:
+
+  build-m1:
+    name: M1 Build
+    env:
+        arch: arm64
+        osnick: monterey
+        target: zip
+        platform: monterey
+        osname: macos
+        pythonversion: "3.10"
+        fpmversion: 1.15.1
+        rubyversion: 2.7.2
+    runs-on: osx-arm64
+
+    steps:
+    - name: checkout sources
+      uses: actions/checkout@v3
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{env.rubyversion}}
+    - name: install python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "${{ env.pythonversion }}"
+    - name: install dependencies
+      run: |
+        brew install coreutils
+    - name: install poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-in-project: true
+        virtualenvs-create: true
+        installer-parallel: true
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+            /var/cache/apt/archives/**.deb
+            ~/.cache/pip
+            ~/.cache/pypoetry
+            ~/.local/share/gem
+        key: pypoetry-${{hashFiles('**/pyproject.toml')}}-${{env.platform}}-${{env.arch}}-package
+    - name: install packaging tools
+      run: |
+        gem install fpm -v ${{env.fpmversion}}
+        poetry install

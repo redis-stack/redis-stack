@@ -125,7 +125,7 @@ jobs:
           path: |
             out/${{ matrix.package }}*.AppImage
 
-      - uses: s3-actions/s3cmd@v1.2.0
+      - uses: s3-actions/s3cmd@v1.5.0
         if: steps.iamafork.outputs.IAMAFORK == 'false'
         with:
           provider: aws

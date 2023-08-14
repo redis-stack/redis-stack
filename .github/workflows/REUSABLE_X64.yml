@@ -297,16 +297,6 @@ jobs:
             invoke test -m ${{env.testplatform}} -n physical -n arm
           fi
 
-      - uses: dorny/test-reporter@v1
-        if: success() || failure()
-        with:
-          name: Test Results ${{env.platform}} ${{env.osnick}} ${{env.arch}}
-          path: '*.xml'
-          reporter: java-junit
-          list-suites: all
-          list-tests: all
-          max-annotations: 10
-
       - name: persist ${{env.target}} package
         uses: actions/upload-artifact@v3
         if: env.testplatform == ''
@@ -344,7 +334,7 @@ jobs:
           for i in `ls`; do
             sha256sum $i |awk '{print $1}' > $i.sha256
           done
-      - uses: s3-actions/s3cmd@v1.2.0
+      - uses: s3-actions/s3cmd@v1.5.0
         if: steps.iamafork.outputs.IAMAFORK == 'false'
         with:
           provider: aws
@@ -388,7 +378,7 @@ jobs:
 #          virtualenvs-in-project: true
 #          virtualenvs-create: true
 #          installer-parallel: true
-#      - uses: s3-actions/s3cmd@v1.2.0
+#      - uses: s3-actions/s3cmd@v1.5.0
 #        with:
 #          provider: aws
 #          region: us-east-1
@@ -405,7 +395,7 @@ jobs:
 #          source .venv/bin/activate
 #          realversion=`invoke version`
 #          echo "VERSION=$realversion" >> $GITHUB_OUTPUT
-#      - uses: s3-actions/s3cmd@v1.2.0
+#      - uses: s3-actions/s3cmd@v1.5.0
 #        with:
 #          provider: aws
 #          region: us-east-1

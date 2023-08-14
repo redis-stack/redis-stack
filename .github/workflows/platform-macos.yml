@@ -101,7 +101,7 @@ jobs:
        tar -czvf redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
            redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
 
-   - uses: s3-actions/s3cmd@v1.2.0
+   - uses: s3-actions/s3cmd@v1.5.0
      with:
        provider: aws
        region: us-east-1
@@ -225,15 +225,6 @@ jobs:
    - name: run osx tests
      run: |
        .venv/bin/pytest -m macos --junit-xml=results.xml
-   - uses: dorny/test-reporter@v1
-     if: success() || failure()
-     with:
-       name: Test Results ${{env.platform}} ${{env.osnick}} ${{env.arch}}
-       path: '*.xml'
-       reporter: java-junit
-       list-suites: all
-       list-tests: all
-       max-annotations: 10
 
    - name: get package version
      id: get_version
@@ -243,7 +234,7 @@ jobs:
        realversion=`invoke version`
        echo "VERSION=$realversion" >> $GITHUB_OUTPUT
 
-   - uses: s3-actions/s3cmd@v1.2.0
+   - uses: s3-actions/s3cmd@v1.5.0
      if: steps.iamafork.outputs.IAMAFORK == 'false'
      with:
        provider: aws
@@ -349,7 +340,7 @@ jobs:
      run: |
        tar -czvf redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
            redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
-   - uses: s3-actions/s3cmd@v1.2.0
+   - uses: s3-actions/s3cmd@v1.5.0
      with:
        provider: aws
        region: us-east-1
@@ -437,7 +428,7 @@ jobs:
        cd build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
        sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
 
-   - uses: s3-actions/s3cmd@v1.2.0
+   - uses: s3-actions/s3cmd@v1.5.0
      if: steps.iamafork.outputs.IAMAFORK == 'false'
      with:
        provider: aws

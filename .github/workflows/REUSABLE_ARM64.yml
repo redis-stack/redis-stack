@@ -304,7 +304,7 @@ jobs:
          for i in `ls`; do
            sha256sum $i |awk '{print $1}' > $i.sha256
          done
-     - uses: s3-actions/s3cmd@v1.2.0
+     - uses: s3-actions/s3cmd@v1.5.0
        if: steps.iamafork.outputs.IAMAFORK == 'false'
        with:
          provider: aws
