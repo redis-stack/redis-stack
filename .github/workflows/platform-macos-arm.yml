@@ -32,7 +32,7 @@ jobs:
        python-version: "${{ env.pythonversion }}"
    - name: install dependencies
      run: |
-       brew install coreutils
+       brew install coreutils openssl@3
    - name: install poetry
      uses: snok/install-poetry@v1
      with:
