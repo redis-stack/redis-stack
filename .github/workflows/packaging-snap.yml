@@ -3,16 +3,6 @@ name: Snap
 on:
   workflow_call:
 
-
-  workflow_run:
-    workflows: ["Bionic", "Focal"]
-    types:
-      - completed
-
-concurrency:
-  group: snap-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
 
  arm64-snap:

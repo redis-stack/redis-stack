@@ -1,0 +1,32 @@
+name: Distribution Package CI
+
+on:
+  push:
+    branches:
+      - 'master'
+      - '[0-9].[0-9]'
+  pull_request:
+    branches-ignore:
+      - '*docs*'
+      - '*noci'
+
+concurrency:
+  group: packaging-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  appimage:
+    name: AppImage
+    uses: ./.github/workflows/packaging-appimage.yml
+    secrets: inherit
+
+  snap:
+    name: Snap
+    uses: ./.github/workflows/packaging-snap.yml
+    secrets: inherit
+
+  docker:
+    name: Docker
+    uses: ./.github/workflows/packaging-docker.yml
+    secrets: inherit

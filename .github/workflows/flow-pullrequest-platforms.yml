@@ -1,13 +1,10 @@
-name: CI
+name: Platform Package CI
 
 on:
   push:
-    paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
-      - '*.md'
-      - '.github/workflows/release.yml'
-      - '.github/workflows/flow-nightly.yml'
+    branches:
+      - 'master'
+      - '[0-9].[0-9]'
   pull_request:
     branches-ignore:
       - '*docs*'
