@@ -4,11 +4,11 @@ islatest: yes
 
 # module versions
 versions:
-  rejson: 2.6.6
-  redistimeseries: 1.10.4
-  redisearch: 2.8.4
+  rejson: 2.6.7
+  redistimeseries: 1.10.6
+  redisearch: 2.8.5
   redisbloom: 2.6.3
-  redisgears: 2.0.11
+  redisgears: 2.0.12
   nodejs: v16.15.1
 
   # the redis repository tag
@@ -20,8 +20,8 @@ versions:
   redis-stack: 7.2.0-v0
   redis-stack-server: 7.2.0-v0
 
-  redisinsight: 2.30.0
-  redisinsight-web: 2.30.0
+  redisinsight: 2.32.0
+  redisinsight-web: 2.32.0
 
 # common package variables
 email: Redis OSS <oss@redislabs.com>
