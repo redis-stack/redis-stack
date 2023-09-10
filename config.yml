@@ -29,6 +29,7 @@ license: Redis Source Available License
 vendor: Redis Inc
 url: "https://redis.io"
 
+
 redis-stack:
   product: redis-stack
   summary: redis-stack installs a Redis server with additional database capabilities and the visualisation tool RedisInsight.
