@@ -1,0 +1,77 @@
+name: Platform Package CI
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - 'master'
+      - '[0-9].[0-9]'
+  pull_request:
+    branches-ignore:
+      - '*docs*'
+      - '*noci'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  bionic:
+    name: Bionic
+    uses: ./.github/workflows/platform-bionic.yml
+    secrets: inherit
+
+  focal:
+    name: Focal
+    uses: ./.github/workflows/platform-focal.yml
+    secrets: inherit
+
+  jammy:
+    name: Jammy
+    uses: ./.github/workflows/platform-jammy.yml
+    secrets: inherit
+
+  rhel7:
+    name: RHEL7
+    uses: ./.github/workflows/platform-rhel7.yml
+    secrets: inherit
+
+  rhel8:
+    name: RHEL8
+    uses: ./.github/workflows/platform-rhel8.yml
+    secrets: inherit
+
+  amazonlinux2:
+    name: Amazonlinux2
+    uses: ./.github/workflows/platform-amazonlinux2.yml
+    secrets: inherit
+
+  macos-intel:
+    name: OSX [Intel]
+    uses: ./.github/workflows/platform-macos-intel.yml
+    secrets: inherit
+
+  macos-m1:
+    name: OSX [Arm64]
+    uses: ./.github/workflows/platform-macos-arm.yml
+    secrets: inherit
+
+  # appimage:
+  #   name: AppImage
+  #   uses: ./.github/workflows/packaging-appimage.yml
+  #   needs: ['bionic']
+  #   secrets: inherit
+
+  # snap:
+  #   name: Snap
+  #   uses: ./.github/workflows/packaging-snap.yml
+  #   needs: ['bionic', 'focal']
+  #   secrets: inherit
+
+  # docker:
+  #   name: Docker
+  #   uses: ./.github/workflows/packaging-docker.yml
+  #   needs: ['jammy']
+  #   secrets: inherit

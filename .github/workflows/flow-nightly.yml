@@ -1,0 +1,58 @@
+name: Edge Docker
+
+on:
+
+  push:
+    branches:
+      - master
+
+  schedule:
+    - cron: "0 5 * * *"
+
+jobs:
+
+  jammy:
+    uses: ./.github/workflows/platform-jammy.yml
+    secrets: inherit
+
+  docker:
+    uses: ./.github/workflows/packaging-docker.yml
+    needs: jammy
+    secrets: inherit
+
+  docker-push-nightly:
+    needs: docker
+    runs-on: ubuntu-latest
+    name: Push ${{matrix.package}}
+    env:
+      version: edge
+    strategy:
+      matrix:
+        package: ['redis-stack-server', 'redis-stack']
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
+
+      - name: pull, retag, push x86
+        run: |
+          docker pull redisfab/${{matrix.package}}:${{env.version}}-x86_64
+          docker tag redisfab/${{matrix.package}}:${{env.version}}-x86_64 redis/${{matrix.package}}:${{env.version}}-x86_64
+          docker push redis/${{matrix.package}}:${{env.version}}-x86_64
+
+      - name: pull, retag, push arm64
+        run: |
+          docker pull redisfab/${{matrix.package}}:${{env.version}}-arm64 --platform arm64
+          docker tag redisfab/${{matrix.package}}:${{env.version}}-arm64 redis/${{matrix.package}}:${{env.version}}-arm64
+          docker push redis/${{matrix.package}}:${{env.version}}-arm64
+
+      - name: create and push the manifest
+        run: |
+          docker manifest create redis/${{ matrix.package }}:${{ env.version }} \
+            redis/${{ matrix.package }}:${{ env.version }}-x86_64 \
+            redis/${{ matrix.package }}:${{ env.version }}-arm64
+          docker manifest push redis/${{matrix.package}}:${{ env.version }}

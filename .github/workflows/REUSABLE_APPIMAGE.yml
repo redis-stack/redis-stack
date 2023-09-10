@@ -25,19 +25,14 @@ on:
         required: false
         type: string
         default: 2.7.2
-      pkg2appimageversioN:
+      pkg2appimageversion:
         required: false
         type: string
-        default: 1807
+        default: "1807"
       fpmversion:
         required: false
         type: string
         default: 1.15.1
-    secrets:
-      AWS_ACCESS_KEY_ID:
-        required: true
-      AWS_SECRET_ACCESS_KEY:
-        required: true
 
 jobs:
   appimage:
@@ -130,7 +125,7 @@ jobs:
           path: |
             out/${{ matrix.package }}*.AppImage
 
-      - uses: s3-actions/s3cmd@v1.2.0
+      - uses: s3-actions/s3cmd@v1.5.0
         if: steps.iamafork.outputs.IAMAFORK == 'false'
         with:
           provider: aws

@@ -29,11 +29,6 @@ on:
         required: false
         type: string
         default: 1.15.1
-    secrets:
-      AWS_ACCESS_KEY_ID:
-        required: true
-      AWS_SECRET_ACCESS_KEY:
-        required: true
 
 jobs:
   snap:
@@ -93,7 +88,7 @@ jobs:
 #          cp *.snap redis-stack/${{ matrix.package }}.${{ env.target }}
 #          sudo invoke test -m snaps
 
-      - uses: s3-actions/s3cmd@v1.2.0
+      - uses: s3-actions/s3cmd@v1.5.0
         if: steps.iamafork.outputs.IAMAFORK == 'false'
         with:
           provider: aws

@@ -1,0 +1,16 @@
+name: Docker
+
+on:
+  workflow_call:
+
+jobs:
+
+
+ x86_64-appimage:
+   uses: ./.github/workflows/REUSABLE_APPIMAGE.yml
+   with:
+     arch: x86_64
+     platform: bionic
+     osnick: ubuntu18.04
+     pythonversion: "3.10"
+   secrets: inherit
