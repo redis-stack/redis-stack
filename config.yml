@@ -8,7 +8,7 @@ versions:
   redistimeseries: 1.10.6
   redisearch: 2.8.4
   redisbloom: 2.6.3
-  redisgears: 2.0.13
+  redisgears: 2.0.12
   nodejs: v16.15.1
 
   # the redis repository tag
