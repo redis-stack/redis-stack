@@ -90,7 +90,7 @@ jobs:
           poetry install
       - name: fetch dependencies
         run: |
-          wget -q https://github.com/AppImage/pkg2appimage/releases/download/continuous/pkg2appimage-${{inputs.pkg2appimageversion}}-${{inputs.arch}}.AppImage -O pkg2appimage.AppImage
+          wget -c $(wget -q https://api.github.com/repos/AppImageCommunity/pkg2appimage/releases -O - | grep "pkg2appimage-.*-${{inputs.arch}}.AppImage" | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
           chmod a+x *.AppImage
       - name: fetch artifacts
         uses: actions/download-artifact@v3
