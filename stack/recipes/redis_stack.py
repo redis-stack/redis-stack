@@ -56,6 +56,7 @@ class RedisStack(Recipe):
             m.rejson,
             m.redisgears,
             m.redisbloom,
+            m.rediscompat,
             # self.redisgears, self.redisai
         ]:
             try:
