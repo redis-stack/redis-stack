@@ -34,7 +34,7 @@ class RedisTestMixin:
         assert r.get("some") == "value"
 
     def test_redis_modules_loaded(self, r):
-        expected = ["rejson", "timeseries", "search", "redisgears_2", "bf"]
+        expected = ["rejson", "timeseries", "search", "redisgears_2", "bf", "rediscompat"]
         modules = [m.get("name").lower() for m in r.module_list()]
 
         modules.sort()
@@ -123,6 +123,7 @@ class RedisPackagingMixin:
             "redisearch.so",
             "redisbloom.so",
             "redistimeseries.so",
+            "rediscompat.so",
         ]
         for i in libs:
             assert_path_exists(self, os.path.join(self.basepath, "lib", i))
