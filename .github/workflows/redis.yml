@@ -317,9 +317,9 @@ jobs:
    name: Mac (x86_64) Build
    env:
      arch: x86_64
-     osnick: catalina
+     osnick: monterey
      target: zip
-     platform: catalina
+     platform: monterey
      osname: macos
      pythonversion: "3.10"
      fpmversion: 1.15.1
@@ -480,9 +480,9 @@ jobs:
    runs-on: macos-latest
    env:
      arch: x86_64
-     osnick: catalina
+     osnick: monterey
      target: zip
-     platform: catalina
+     platform: monterey
      osname: macos
      pythonversion: "3.10"
 
