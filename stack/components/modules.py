@@ -42,7 +42,7 @@ class Modules(object):
         # HACK FIXME
         # until the monterey/catalina issue can be resolved upstream, we're going to handle it in packaging
         # in order to get the release out
-        if module in ["redisearch"] and self.ARCH == "x86_64" and self.OSNAKE == 'macos':
+        if module in ["redisearch"] and self.ARCH == "x86_64" and self.OSNAME == 'macos':
             osnick = "monterey"
             logger.warning(
                 f"HACK: OVERRIDING with {osnick} until this can be fixed in the modules"
