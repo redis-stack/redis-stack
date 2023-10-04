@@ -69,7 +69,7 @@ invoke package -o Linux -p redis-stack-server -s ubuntu16.04 -t deb -d xenial
 
 *To build a macos (x86_64) zip, prior to homebrew*
 ```
-invoke package -o macos -p redis-stack-server -s monterey -t zip -d monterey
+invoke package -o macos -p redis-stack-server -s catalina -t zip -d catalina
 ```
 
 *To build a macos (m1) zip, prior to homebrew*
