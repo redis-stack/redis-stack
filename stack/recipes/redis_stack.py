@@ -51,12 +51,12 @@ class RedisStack(Recipe):
 
         m = Modules(self.PACKAGE_NAME, self.OSNICK, self.ARCH, self.OSNAME)
         for i in [
+            m.rediscompat,
             m.redisearch,
             m.redistimeseries,
             m.rejson,
             m.redisgears,
             m.redisbloom,
-            m.rediscompat,
             # self.redisgears, self.redisai
         ]:
             try:
