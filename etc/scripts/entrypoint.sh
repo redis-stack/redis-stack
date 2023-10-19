@@ -27,6 +27,7 @@ ${CONFFILE} \
 --dir ${REDIS_DATA_DIR} \
 --protected-mode no \
 --daemonize no \
+--loadmodule /opt/redis-stack/lib/rediscompat.so \
 --loadmodule /opt/redis-stack/lib/redisearch.so ${REDISEARCH_ARGS} \
 --loadmodule /opt/redis-stack/lib/redistimeseries.so ${REDISTIMESERIES_ARGS} \
 --loadmodule /opt/redis-stack/lib/rejson.so ${REDISJSON_ARGS} \

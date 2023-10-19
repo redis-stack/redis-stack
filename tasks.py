@@ -265,8 +265,8 @@ def dockergen(c, product="redis-stack", arch="x86_64"):
 def package(
     c,
     osname="Linux",
-    osnick="",
-    dist="",
+    osnick="ubuntu18.04",
+    dist="bionic",
     redis_bin="../redis",
     target="deb",
     arch="x86_64",
