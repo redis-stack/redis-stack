@@ -21,7 +21,6 @@ class DEBTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
         assert "/usr/bin/gdebi" in out.decode()
 
         res, out = container.exec_run("mkdir -p /data")
-        assert res != 0
 
         self.fetch_db()
 

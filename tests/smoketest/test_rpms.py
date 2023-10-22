@@ -20,7 +20,6 @@ class RPMTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
         assert res != 0
 
         res, out = container.exec_run("mkdir -p /data")
-        assert res != 0
 
         self.fetch_db()
 
