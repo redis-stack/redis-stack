@@ -20,11 +20,11 @@ class DEBTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
         res, out = container.exec_run("ls /usr/bin/gdebi")
         assert "/usr/bin/gdebi" in out.decode()
 
-        res, out = container.exec_run("mkdir /data")
+        res, out = container.exec_run("mkdir -p /data")
         assert res != 0
-        
+
         self.fetch_db()
-        
+
         # validate we properly get bad outputs as bad
         res, out = container.exec_run("iamnotarealcommand")
         assert res != 0

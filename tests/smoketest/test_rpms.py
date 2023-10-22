@@ -18,19 +18,19 @@ class RPMTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
         # validate we properly get bad outputs as bad
         res, out = container.exec_run("iamnotarealcommand")
         assert res != 0
-        
-        res, out = container.exec_run("mkdir /data")
+
+        res, out = container.exec_run("mkdir -p /data")
         assert res != 0
-        
+
         self.fetch_db()
-        
+
         # now, install our package
         res, out = container.exec_run(
             "yum install -y /build/redis-stack/redis-stack-server.rpm"
         )
         if res != 0:
             raise IOError(out)
-        
+
         # fetch the rdb testdata
 
     def uninstall(self, container):
@@ -62,7 +62,7 @@ class TestAmazonLinux2(RPMTestBase):
     PLATFORM = "linux/amd64"
 
     def install(self, container):
-        
+
         res, out = container.exec_run("yum install -y wget")
         assert res == 0
 
