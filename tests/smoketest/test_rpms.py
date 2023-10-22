@@ -12,19 +12,26 @@ class RPMTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
     """Tests for RPM packages"""
 
     def install(self, container):
-        res, out = container.exec_run("yum install -y epel-release tar")
+        res, out = container.exec_run("yum install -y epel-release tar wget")
         assert res == 0
 
         # validate we properly get bad outputs as bad
         res, out = container.exec_run("iamnotarealcommand")
         assert res != 0
-
+        
+        res, out = container.exec_run("mkdir /data")
+        assert res != 0
+        
+        self.fetch_db()
+        
         # now, install our package
         res, out = container.exec_run(
             "yum install -y /build/redis-stack/redis-stack-server.rpm"
         )
         if res != 0:
             raise IOError(out)
+        
+        # fetch the rdb testdata
 
     def uninstall(self, container):
         res, out = container.exec_run("yum remove -y redis-stack-server")
@@ -55,6 +62,9 @@ class TestAmazonLinux2(RPMTestBase):
     PLATFORM = "linux/amd64"
 
     def install(self, container):
+        
+        res, out = container.exec_run("yum install -y wget")
+        assert res == 0
 
         res, out = container.exec_run("amazon-linux-extras install epel -y")
         assert res == 0
