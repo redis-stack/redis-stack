@@ -129,7 +129,7 @@ jobs:
         key: cache-${{hashFiles('.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.testplatform}}-${{inputs.arch}}-build
     - name: make
       if: steps.redis-already-built.outcome != 'success'
-      run: make -C redis/src all BUILD_TLS=yes
+      run: JEMALLOC_CONFIGURE_OPTS="--with-lg-page=16" make -C redis/src all BUILD_TLS=yes
     - name: package redis for s3
       if: steps.redis-already-built.outcome != 'success'
       run: |
