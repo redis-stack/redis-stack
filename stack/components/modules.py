@@ -27,8 +27,8 @@ class Modules(object):
     ):
         self.OSNICK = osnick
         self.OSNAME = osname
-        if self.OSNAME in ["Linux", "macos"] and arch == "arm64":
-            self.ARCH = "arm64v8"
+        if self.OSNAME in ["Linux", "macos"] and arch in ["arm64", "arm64v8", "aarch64"]:
+            self.ARCH = "aarch64"
         else:
             self.ARCH = arch
         self.__PATHS__ = Paths(package, osnick, arch, osname)
