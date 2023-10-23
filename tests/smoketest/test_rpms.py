@@ -26,8 +26,6 @@ class RPMTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
         assert res != 0
         res, out = container.exec_run("mkdir -p /data")
 
-        self.fetch_db(self)
-
         # now, install our package
         res, out = container.exec_run(
             "yum install -y /build/redis-stack/redis-stack-server.rpm"
