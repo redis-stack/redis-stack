@@ -22,7 +22,7 @@ class DEBTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
 
         res, out = container.exec_run("mkdir -p /data")
 
-        self.fetch_db()
+        self.fetch_db(self)
 
         # validate we properly get bad outputs as bad
         res, out = container.exec_run("iamnotarealcommand")

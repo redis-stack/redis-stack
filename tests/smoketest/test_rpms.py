@@ -21,7 +21,7 @@ class RPMTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
 
         res, out = container.exec_run("mkdir -p /data")
 
-        self.fetch_db()
+        self.fetch_db(self)
 
         # now, install our package
         res, out = container.exec_run(
