@@ -67,16 +67,6 @@ class DockerTestEnv:
     def container(self):
         return self.__CONTAINER__
 
-    # This function fetches a test database from s3 - one that contains
-    # nothing useful, just existing types
-    # It is used to test the graph type, that was replaced by compat
-    def fetch_db(self):
-        target = "/var/lib/redis-stack/dumb.rdb"
-        cmd = f"wget -q https://redismodules.s3.amazonaws.com/redis-stack/testdata/dump-with-graph.rdb -O {target}"
-        res, _ = self.container.exec_run(cmd)
-        assert res != 0
-        return cmd
-
 class VagrantTestEnv:
     """Environments provisioned using Vagrant"""
 

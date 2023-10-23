@@ -19,6 +19,11 @@ class RPMTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
         res, out = container.exec_run("iamnotarealcommand")
         assert res != 0
 
+        # fetch the rdb
+        target = "/var/lib/redis-stack/dumb.rdb"
+        cmd = f"wget -q https://redismodules.s3.amazonaws.com/redis-stack/testdata/dump-with-graph.rdb -O {target}"
+        res, _ = container.exec_run(cmd)
+        assert res != 0
         res, out = container.exec_run("mkdir -p /data")
 
         self.fetch_db(self)
