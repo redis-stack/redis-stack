@@ -135,12 +135,6 @@ def test_over_ssh(c, ip="", user="", ssh_key_path="", version="", binary="", git
     c.run(f"cd {tests} && .venv/bin/python -m poetry install")
     c.run(f"cd {tests} && .venv/bin/pytest -m macos")
 
-@task
-def build_redis(c, redis_repo_path="redis", build_args="all build_tls=yes"):
-    """compile redis"""
-    redispath = os.path.join(os.getcwd(), redis_repo_path, "src")
-    run(f"make -C {redispath} -j `nproc` {build_args}")
-
 @task(
     help={
         "ip": "IP address of the server",
