@@ -16,6 +16,7 @@ on:
 
   workflow_dispatch:
 
+
 jobs:
 
 ###################### ARM JOBS #########################
@@ -312,9 +313,9 @@ jobs:
    name: Mac (x86_64) Build
    env:
      arch: x86_64
-     osnick: monterey
+     osnick: catalina
      target: zip
-     platform: monterey
+     platform: catalina
      osname: macos
      pythonversion: "3.10"
      fpmversion: 1.15.1
@@ -475,9 +476,9 @@ jobs:
    runs-on: macos-latest
    env:
      arch: x86_64
-     osnick: monterey
+     osnick: catalina
      target: zip
-     platform: monterey
+     platform: catalina
      osname: macos
      pythonversion: "3.10"
 
@@ -869,7 +870,6 @@ jobs:
          docker manifest create redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} \
            redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-x86_64 \
            redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-arm64
-
      - name: push the manifest
        run: |
          docker manifest push redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}
