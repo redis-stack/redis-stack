@@ -18,6 +18,20 @@ This repository builds redis, and downloads various components (modules, RedisIn
 
 ---
 
+## How do I Redis?
+
+[Learn for free at Redis University](https://university.redis.com/)
+
+[Build faster with the Redis Launchpad](https://launchpad.redis.com/)
+
+[Try the Redis Cloud](https://redis.com/try-free/)
+
+[Dive in developer tutorials](https://developer.redis.com/)
+
+[Join the Redis community](https://redis.com/community/)
+
+[Work at Redis](https://redis.com/company/careers/jobs/)
+
 ## Quick start
 
 In the default configuration, Redis does not require a password to authenticate clients.  To provide basic security for your Redis Stack server, it is recommended to set a password using the requirepass directive. Configure this using an environment variable when starting the container:
