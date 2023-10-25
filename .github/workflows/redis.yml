@@ -16,6 +16,7 @@ on:
 
   workflow_dispatch:
 
+
 jobs:
 
 ###################### ARM JOBS #########################
@@ -581,7 +582,7 @@ jobs:
        python-version: "${{ env.pythonversion }}"
    - name: install dependencies
      run: |
-       brew install coreutils
+       brew install coreutils wget
    - name: install poetry
      uses: snok/install-poetry@v1
      with:
@@ -869,7 +870,6 @@ jobs:
          docker manifest create redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} \
            redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-x86_64 \
            redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-arm64
-
      - name: push the manifest
        run: |
          docker manifest push redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}

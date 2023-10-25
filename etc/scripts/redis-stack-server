@@ -65,6 +65,7 @@ ${CONFFILE} \
 --dir ${REDIS_DATA_DIR} \
 --protected-mode no \
 --daemonize no \
+--loadmodule ${MODULEDIR}/rediscompat.so \
 --loadmodule ${MODULEDIR}/redisearch.so ${REDISEARCH_ARGS} \
 --loadmodule ${MODULEDIR}/redistimeseries.so ${REDISTIMESERIES_ARGS} \
 --loadmodule ${MODULEDIR}/rejson.so ${REDISJSON_ARGS} \
