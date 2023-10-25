@@ -120,7 +120,6 @@ class RedisPackagingMixin:
     def test_modules_present(self):
         libs = [
             "rejson.so",
-            "rediscompat.so",
             "redisearch.so",
             "redisbloom.so",
             "redistimeseries.so",

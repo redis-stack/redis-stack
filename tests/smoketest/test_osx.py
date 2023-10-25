@@ -16,7 +16,7 @@ from mixins import RedisPackagingMixin, RedisTestMixin
 # OSX tests assume a wget is installed
 class OSXTestBase(RedisPackagingMixin, RedisTestMixin, object):
     """Tests for OSX"""
-    
+
     _stacktrees = ["/opt/homebrew/redis-stack/var/db/redis-stack", "/usr/local/var/db/redis-stack"]
 
     @classmethod
@@ -24,15 +24,11 @@ class OSXTestBase(RedisPackagingMixin, RedisTestMixin, object):
         for i in cls._stacktrees:
             if os.path.isfile(f"{i}/dump.rdb"):
                 os.unlink(f"{i}/redis-stack/dump.rdb")
-                
+
         if platform.machine().lower().find("x86") != -1 or platform.machine().lower().find("amd") != -1:
             os.makedirs("/usr/local/var/db/redis-stack", exist_ok=True)
         else:
             os.makedirs("/opt/homebrew/redis-stack/var/db/redis-stack", exist_ok=True)
-            
-        target = "dump.rdb"
-        cmd = f"wget -q https://redismodules.s3.amazonaws.com/redis-stack/testdata/dump-with-graph.rdb -O {target}"
-        subprocess.run(cmd, check=True, shell=True)
 
         rss_binary = f"{cls.BASEPATH}/bin/redis-stack-server"
         r = subprocess.Popen(
