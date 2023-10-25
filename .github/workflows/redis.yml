@@ -305,6 +305,25 @@ jobs:
      GPG_KEY: ${{ secrets.GPG_KEY }}
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
+ x86-64_rhel9:
+   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
+   with:
+     image_name: rockylinux:9
+     platform: rhel9
+     osname: Linux
+     osnick: rhel9
+     arch: x86_64
+     target: rpm
+     pythonversion: "3.10"
+     build_deps: |
+       dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+       dnf install -y gcc make jemalloc-devel openssl-devel tar git python3 python3-pip jq wget
+   secrets:
+     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+     GPG_KEY: ${{ secrets.GPG_KEY }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+
 ##################### OSX JOBS #########################
 
 # osx is the only one of these that is really
