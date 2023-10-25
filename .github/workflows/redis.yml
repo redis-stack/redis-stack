@@ -582,7 +582,7 @@ jobs:
        python-version: "${{ env.pythonversion }}"
    - name: install dependencies
      run: |
-       brew install coreutils
+       brew install coreutils wget
    - name: install poetry
      uses: snok/install-poetry@v1
      with:
