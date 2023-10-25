@@ -38,17 +38,6 @@ class Modules(object):
         """Assuming the module follows the standard, return the URL from
         which to grab it"""
 
-        # HACK FIXME
-        # until the monterey/catalina issue can be resolved upstream, we're going to handle it in packaging
-        # in order to get the release out
-        if module in ["redisearch"] and self.ARCH == "x86_64" and self.OSNAME == 'macos':
-            osnick = "monterey"
-            logger.warning(
-                f"HACK: OVERRIDING with {osnick} until this can be fixed in the modules"
-            )
-        else:
-            osnick = self.OSNICK
-
         if module == "redisearch":
             module = "redisearch-oss"
 
@@ -56,11 +45,11 @@ class Modules(object):
             module = "rejson-oss"
 
         # one day, get the version like others, into gears
-        mod_url_part = f"{module}.{self.OSNAME}-{osnick}-{self.ARCH}.{version}.zip"
+        mod_url_part = f"{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip"
         if module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "x86_64":
             mod_url_part = f"{module}.Macos-mac_os11.4.0-{self.ARCH}.{version}.zip"
         elif (
-            module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "arm64v8"
+            module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "aarch64"
         ):
             mod_url_part = f"{module}.Macos-mac_os12.6.3-{self.ARCH}.{version}.zip"
 
