@@ -44,7 +44,7 @@ class Modules(object):
         if module == "rejson":
             module = "rejson-oss"
 
-        if module == "rediscompat":
+        if module == "rediscompat" and self.OSNAME == "macos":
             osnick = "monterey"
         else:
             osnick = self.OSNICK
