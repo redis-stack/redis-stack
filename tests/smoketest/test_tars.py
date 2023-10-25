@@ -176,3 +176,15 @@ class TestAmazonLinuxTar(TARTestBase):
             "amazon-linux-extras install epel -y",
             "yum install -y openssl-devel jemalloc-devel libgomp tar gzip",
         ]
+@pytest.mark.rhel9
+class TestRocky9(TARTestBase):
+
+    DOCKER_NAME = "rockylinux:9"
+    CONTAINER_NAME = "redis-stack-rocky9"
+    PLATFORM = "linux/amd64"
+
+    def __precommands__(self):
+        return [
+            "dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm",
+            "dnf install -y gcc make jemalloc-devel openssl-devel tar git python3 python3-pip jq wget",
+        ]
