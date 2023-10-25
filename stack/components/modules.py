@@ -44,8 +44,13 @@ class Modules(object):
         if module == "rejson":
             module = "rejson-oss"
 
+        if module == "rediscompat":
+            osnick = "monterey"
+        else:
+            osnick = self.OSNICK
+
         # one day, get the version like others, into gears
-        mod_url_part = f"{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip"
+        mod_url_part = f"{module}.{self.OSNAME}-{osnick}-{self.ARCH}.{version}.zip"
         if module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "x86_64":
             mod_url_part = f"{module}.Macos-mac_os11.4.0-{self.ARCH}.{version}.zip"
         elif (
