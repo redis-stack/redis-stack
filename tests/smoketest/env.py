@@ -78,7 +78,7 @@ class VagrantTestEnv:
     def setup_class(cls):
         cls.workdir = os.path.join(cls.VAGRANT_BASEDIR, cls.OSNICK)
         try:
-            cls.teardown_class()
+            cls.teardown_class(cls)
         except Exception:
             pass
 
@@ -103,3 +103,22 @@ class VagrantTestEnv:
         cmd = ["vagrant", "destroy", "-f"]
         res = subprocess.run(cmd, cwd=cls.workdir)
         assert res.returncode == 0
+
+
+class PhysicalBaseEnv:
+    """Environments that are bare-metal like, and do not run in a vagrant.
+    ex: QEmu"""
+    
+    HOST_TYPE = "physical"
+
+    @classmethod
+    def setup_class(cls):
+        try:
+            cls.teardown_class(cls)
+        except Exception:
+            pass
+        cls.install(cls)
+    
+    @classmethod
+    def teardown_class(cls):
+        cls.uninstall(cls)

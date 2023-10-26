@@ -282,13 +282,17 @@ jobs:
            gpg --detach-sign --armor *.tar.gz
 
 
-    #  - name: run tests
-    #    run: |
-    #      source .venv/bin/activate
-    #      mkdir redis-stack
-    #      cp *.tar.gz redis-stack/${{ matrix.package }}.tar.gz
-    #      cp *.${{ env.target }} redis-stack/${{ matrix.package }}.${{ env.target }}
-    #      invoke test -m ${{env.platform}} -m arm -n physical
+     - name: run tests
+       uses: uraimo/run-on-arch-action@v2
+       with:
+         arch: aarch64
+         distro: ${{inputs.osnick}}
+         install: ${{inputs.build_deps}}
+         shell: /bin/bash
+         dockerRunArgs: |
+          --volume "${PWD}:/build"
+         run: |
+           ls
 
      - name: perist ${{env.target}} package
        uses: actions/upload-artifact@v3

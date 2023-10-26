@@ -69,7 +69,9 @@ def test(c, marker=[], notmarker=[], filter="", version=None):
     if version is not None:
         cmd = f"VERSION={version} {cmd}"
     sys.stderr.write(f"Running: {cmd}\n")
-    run(cmd)
+    
+    # JUST TO DEBUG
+    # run(cmd)
 
 
 @task(

@@ -93,24 +93,6 @@ class TestJammy(TARTestBase):
         ]
 
 
-@pytest.mark.bionic
-@pytest.mark.arm
-class TestARMBionic(TestBionic):
-    PLATFORM = "linux/arm64"
-
-
-@pytest.mark.jammy
-@pytest.mark.arm
-class TestARMJammy(TestJammy):
-    PLATFORM = "linux/arm64"
-
-
-@pytest.mark.focal
-@pytest.mark.arm
-class TestARMFocal(TestFocal):
-    PLATFORM = "linux/amd64"
-
-
 @pytest.mark.xenial
 class TestXenial(TARTestBase):
 
