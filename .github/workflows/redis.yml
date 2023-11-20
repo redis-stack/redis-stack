@@ -451,7 +451,6 @@ jobs:
      if: steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
        cd redis-stack
-       sudo ntpdate -u time.apple.com
        echo ${{secrets.MACOS_CERTIFICATE}} | base64 --decode > certificate.p12
        security create-keychain -p ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
        security default-keychain -s build.keychain
@@ -706,7 +705,6 @@ jobs:
    - name: codesign all binaries
      if: steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
-       sudo ntpdate -u time.apple.com
        echo ${{secrets.MACOS_CERTIFICATE}} | base64 --decode > certificate.p12
        security create-keychain -p ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
        security default-keychain -s build.keychain
