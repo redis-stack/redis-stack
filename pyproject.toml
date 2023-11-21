@@ -39,6 +39,7 @@ markers = [
     "appimage: appimage tests",
     "rhel7: RedHat 7 (rhel7) tests",
     "rhel8: RedHat 8 (rhel8) tests",
+    "rhel9: RedHat 9 (rhel9) tests",
     "physical: run tests only within a vagrant image",
     "dockers_redis_stack: test the redis_stack docker",
     "dockers_redis_stack_server: test the redis_stack_server docker",
