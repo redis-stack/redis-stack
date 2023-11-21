@@ -46,10 +46,12 @@ class Modules(object):
             module = "rejson-oss"
         
         if module == "redisgraph" and self.ARCH == "aarch64":
-            self.ARCH = "arm64v8"
+            arch = "arm64v8"
+        else:
+            arch = self.ARCH
 
         # one day, get the version like others, into gears
-        mod_url_part = f"{module}.{self.OSNAME}-{self.OSNICK}-{self.ARCH}.{version}.zip"
+        mod_url_part = f"{module}.{self.OSNAME}-{self.OSNICK}-{arch}.{version}.zip"
         if module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "x86_64":
             mod_url_part = f"{module}.Macos-mac_os11.4.0-{self.ARCH}.{version}.zip"
         elif (
