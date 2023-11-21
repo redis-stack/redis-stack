@@ -309,7 +309,8 @@ jobs:
      GPG_KEY: ${{ secrets.GPG_KEY }}
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
-# Commented out as RedisGraph is not compatible with RHEL9
+# Commented out as RedisGraph is not compatible with RHEL9. 
+# The merge of rediscompat was not carried out due to client side support for redisgraph, during the deprecation phase.
 #  x86-64_rhel9:
 #    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
 #    with:
