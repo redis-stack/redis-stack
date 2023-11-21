@@ -113,8 +113,9 @@ class TestCentos8(RPMVagrant):
 
     OSNICK = "centos8"
 
-@pytest.mark.rhel9
-@pytest.mark.physical
-class TestCentos9(RPMVagrant):
+# Commented out as RedisGraph is not compatible with RHEL9
+# @pytest.mark.rhel9
+# @pytest.mark.physical
+# class TestCentos9(RPMVagrant):
 
-    OSNICK = "centos9"
+#     OSNICK = "centos9"
