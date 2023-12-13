@@ -309,7 +309,7 @@ jobs:
      GPG_KEY: ${{ secrets.GPG_KEY }}
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
-# Commented out as RedisGraph is not compatible with RHEL9. 
+# Commented out as RedisGraph is not compatible with RHEL9.
 # The merge of rediscompat was not carried out due to client side support for redisgraph, during the deprecation phase.
 #  x86-64_rhel9:
 #    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
@@ -401,7 +401,7 @@ jobs:
        brew install openssl@3
        gem install fpm -v ${{env.fpmversion}}
        cd redis-stack
-       poetry install
+       poetry install --no-root
    - name: build redis from source
      if: steps.redis-already-built.outcome != 'success'
      run: |
@@ -531,7 +531,7 @@ jobs:
    - name: install dependencies
      run: |
        brew install libomp openssl coreutils
-       poetry install
+       poetry install --no-root
    - name: gather artifacts
      uses: actions/download-artifact@v3
      with:
@@ -559,7 +559,7 @@ jobs:
    - name: get package version
      id: get_version
      run: |
-       poetry install
+       poetry install --no-root
        source .venv/bin/activate
        realversion=`invoke version`
        echo "VERSION=$realversion" >> $GITHUB_OUTPUT
@@ -627,7 +627,7 @@ jobs:
    - name: install packaging tools
      run: |
        gem install fpm -v ${{env.fpmversion}}
-       poetry install
+       poetry install --no-root
 
    - name: determine if in fork
      id: iamafork
@@ -827,7 +827,7 @@ jobs:
      - name: get package version
        id: get_version
        run: |
-         poetry install
+         poetry install --no-root
          source .venv/bin/activate
          realversion=`invoke version`
          echo "VERSION=$realversion" >> $GITHUB_OUTPUT
@@ -872,7 +872,7 @@ jobs:
      - name: get package version
        id: get_version
        run: |
-         poetry install
+         poetry install --no-root
          source .venv/bin/activate
          realversion=`invoke version -p ${{ matrix.package }} -d true`
          echo "VERSION=$realversion" >> $GITHUB_OUTPUT
