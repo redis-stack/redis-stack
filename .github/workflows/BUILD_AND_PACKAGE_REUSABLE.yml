@@ -227,7 +227,7 @@ jobs:
           curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
           sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
           sudo apt-get update && sudo apt-get install vagrant virtualbox
-          poetry install
+          poetry install --no-root
 
       - run: gem install fpm -v ${{env.fpmversion}}
 
@@ -409,7 +409,7 @@ jobs:
 #        run: |
 #          python -m venv .venv
 #          source .venv/bin/activate
-#          poetry install
+#          poetry install --no-root
 #      - name: get package version
 #        id: get_version
 #        run: |

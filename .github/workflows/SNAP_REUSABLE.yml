@@ -78,7 +78,7 @@ jobs:
       - name: install packaging tools
         run: |
           gem install fpm -v ${{inputs.fpmversion}}
-          poetry install
+          poetry install --no-root
       - name: build snap
         run: |
           source .venv/bin/activate
