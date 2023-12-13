@@ -74,6 +74,12 @@ class TestAmazonLinux2(RPMTestBase):
         res, out = container.exec_run("iamnotarealcommand")
         assert res != 0
 
+        res, out = container.exec_run(
+            "yum install -y openssl11-libs",
+        )
+        if res != 0:
+            raise IOError(out)
+
         # now, install our package
         res, out = container.exec_run(
             "yum install -y /build/redis-stack/redis-stack-server.rpm"
