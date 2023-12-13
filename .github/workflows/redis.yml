@@ -395,7 +395,7 @@ jobs:
        brew install openssl@3
        gem install fpm -v ${{env.fpmversion}}
        cd redis-stack
-       poetry install
+       poetry install --no-root
    - name: build redis from source
      if: steps.redis-already-built.outcome != 'success'
      run: |
@@ -525,7 +525,7 @@ jobs:
    - name: install dependencies
      run: |
        brew install libomp openssl coreutils
-       poetry install
+       poetry install --no-root
    - name: gather artifacts
      uses: actions/download-artifact@v3
      with:
@@ -553,7 +553,7 @@ jobs:
    - name: get package version
      id: get_version
      run: |
-       poetry install
+       poetry install --no-root
        source .venv/bin/activate
        realversion=`invoke version`
        echo "VERSION=$realversion" >> $GITHUB_OUTPUT
@@ -621,7 +621,7 @@ jobs:
    - name: install packaging tools
      run: |
        gem install fpm -v ${{env.fpmversion}}
-       poetry install
+       poetry install --no-root
 
    - name: determine if in fork
      id: iamafork
@@ -821,7 +821,7 @@ jobs:
      - name: get package version
        id: get_version
        run: |
-         poetry install
+         poetry install --no-root
          source .venv/bin/activate
          realversion=`invoke version`
          echo "VERSION=$realversion" >> $GITHUB_OUTPUT
@@ -866,7 +866,7 @@ jobs:
      - name: get package version
        id: get_version
        run: |
-         poetry install
+         poetry install --no-root
          source .venv/bin/activate
          realversion=`invoke version -p ${{ matrix.package }} -d true`
          echo "VERSION=$realversion" >> $GITHUB_OUTPUT

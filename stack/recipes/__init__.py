@@ -89,6 +89,8 @@ class Recipe(object):
     def rpm(self, fpmargs, distribution):
         fpmargs.append("--depends openssl-devel")
         fpmargs.append("--depends jemalloc-devel")
+        if self.OSNICK == "amzn2":
+            fpmargs.append("--depends openssl11-libs")
         fpmargs.append(
             f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.{self.ARCH}.rpm"
         )
