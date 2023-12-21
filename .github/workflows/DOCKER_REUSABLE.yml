@@ -14,11 +14,6 @@ on:
       platform:
         required: true
         type: string
-    secrets:
-      DOCKERHUB_TOKEN:
-        required: true
-      DOCKERHUB_USERNAME:
-        required: true
 
 jobs:
 

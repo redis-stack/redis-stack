@@ -29,11 +29,6 @@ on:
         required: false
         type: string
         default: 1.15.1
-    secrets:
-      AWS_ACCESS_KEY_ID:
-        required: true
-      AWS_SECRET_ACCESS_KEY:
-        required: true
 
 jobs:
   snap:

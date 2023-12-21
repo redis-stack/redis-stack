@@ -44,15 +44,6 @@ on:
       redislinkflags:
         required: false
         type: string
-    secrets:
-      AWS_ACCESS_KEY_ID:
-        required: true
-      AWS_SECRET_ACCESS_KEY:
-        required: true
-      GPG_KEY:
-        required: true
-      GPG_PASSWORD:
-        required: true
 
 jobs:
 
