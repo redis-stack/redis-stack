@@ -82,7 +82,7 @@ jobs:
       - name: install packaging tools
         run: |
           gem install fpm -v ${{inputs.fpmversion}}
-          poetry install
+          poetry install --no-root
       - name: fetch dependencies
         run: |
           wget -c $(wget -q https://api.github.com/repos/AppImageCommunity/pkg2appimage/releases -O - | grep "pkg2appimage-.*-${{inputs.arch}}.AppImage" | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
@@ -96,7 +96,7 @@ jobs:
       - name: get package version
         id: get_version
         run: |
-          poetry install
+          poetry install --no-root
           source .venv/bin/activate
           realversion=`invoke version -p redis-stack-server`
           echo "VERSION=$realversion" >> $GITHUB_OUTPUT

@@ -75,7 +75,7 @@ jobs:
        run: |
          sudo apt-get update
          sudo apt-get install unzip libterm-readkey-perl dpkg-sig
-         poetry install
+         poetry install --no-root
      - run: gem install fpm -v ${{env.fpmversion}}
      - name: build redisinsight-web
        run: |
