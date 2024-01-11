@@ -13,11 +13,11 @@ versions:
   nodejs: v18.18.0
 
   # the redis repository tag
-  redis: 7.2.3
+  redis: 7.2.4
 
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
-  packagedredisversion: 7.2.3-1
+  packagedredisversion: 7.2.4-1
   redis-stack: 99.99.99
   redis-stack-server: 99.99.99
   redisinsight: 2.36.0
