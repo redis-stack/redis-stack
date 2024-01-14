@@ -56,7 +56,7 @@ class Modules(object):
         elif (
             module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "aarch64"
         ):
-            mod_url_part = f"{module}.Macos-mac_os12.6.3-{self.ARCH}.{version}.zip"
+            mod_url_part = f"{module}.Macos-mac_os12.6.3-arm64v8.{version}.zip"
 
         # eg: if rejson-url-override is set, fetch from that location
         # this solves someone's testing need
