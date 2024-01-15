@@ -54,7 +54,7 @@ class Modules(object):
         if module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "x86_64":
             mod_url_part = f"{module}.Macos-mac_os11.4.0-{self.ARCH}.{version}.zip"
         elif (
-            module == "redisgears" and self.OSNAME == "macos" and self.ARCH != "x86_64"
+            module == "redisgears" and and self.ARCH in ["aarch64", "arm64v8"]
         ):
             mod_url_part = f"{module}.Macos-mac_os12.6.3-arm64v8.{version}.zip"
 
