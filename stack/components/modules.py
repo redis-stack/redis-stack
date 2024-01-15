@@ -37,20 +37,17 @@ class Modules(object):
     def generate_url(self, module: str, version: str, override: bool = False):
         """Assuming the module follows the standard, return the URL from
         which to grab it"""
+        
 
+        osnick = self.OSNICK
         if module == "redisearch":
             module = "redisearch-oss"
-
-        if module == "rejson":
+        elif module == "rejson":
             module = "rejson-oss"
-
-        if module == "rediscompat" and self.OSNAME == "macos":
+        elif module in ["redistimeseries", "rediscompat"] and self.OSNAME == "macos":
             osnick = "monterey"
-        else:
-            osnick = self.OSNICK
 
-        # one day, get the version like others, into gears
-        mod_url_part = f"{module}.{self.OSNAME}-{osnick}-{self.ARCH}.{version}.zip"
+        # TODO remove for gears pending https://github.com/RedisGears/RedisGears/pull/1044
         if module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "x86_64":
             mod_url_part = f"{module}.Macos-mac_os11.4.0-{self.ARCH}.{version}.zip"
         elif (
@@ -61,7 +58,9 @@ class Modules(object):
             module == "redisgears" and self.OSNAME == "Linux" and self.ARCH in ["aarch64", "arm64v8"]
         ):
             mod_url_part = f"{module}.{self.OSNAME}-{osnick}-arm64v8.{version}.zip"
-
+        else:
+            mod_url_part = f"{module}.{self.OSNAME}-{osnick}-{self.ARCH}.{version}.zip"
+            
         # eg: if rejson-url-override is set, fetch from that location
         # this solves someone's testing need
         url_base_override = self.C.get_key(f"{module}-url-override")
