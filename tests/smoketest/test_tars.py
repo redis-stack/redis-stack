@@ -174,7 +174,7 @@ class TestAmazonLinuxTar(TARTestBase):
 
         return [
             "amazon-linux-extras install epel -y",
-            "yum install -y openssl-devel jemalloc-devel tar gzip",
+            "yum install -y openssl-devel openssl11-libs jemalloc-devel tar gzip",
         ]
 @pytest.mark.rhel9
 class TestRocky9(TARTestBase):
