@@ -149,7 +149,7 @@ class TestCentos8(TARTestBase):
     def __precommands__(self):
         return [
             "yum install -y epel-release tar",
-            "yum install -y openssl-devel openssl11-libs jemalloc-devel libgomp",
+            "yum install -y openssl-devel jemalloc-devel libgomp",
         ]
 
 
@@ -174,5 +174,5 @@ class TestAmazonLinuxTar(TARTestBase):
 
         return [
             "amazon-linux-extras install epel -y",
-            "yum install -y openssl-devel jemalloc-devel libgomp tar gzip",
+            "yum install -y openssl-devel openssl11-libs jemalloc-devel libgomp tar gzip",
         ]
