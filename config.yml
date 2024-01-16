@@ -9,7 +9,7 @@ versions:
   redisearch: 2.6.15
   redisgraph: 2.10.12
   redisbloom: 2.4.7
-  nodejs: v16.15.1
+  nodejs: v18.18.1
 
   # the redis repository tag
   redis: 6.2.14
@@ -23,8 +23,8 @@ versions:
 
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
-  redisinsight: 2.28.0
-  redisinsight-web: 2.28.0
+  redisinsight: 2.40.0
+  redisinsight-web: 2.40.0
 
 # common package variables
 email: Redis OSS <oss@redislabs.com>
