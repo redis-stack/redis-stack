@@ -10,7 +10,7 @@ versions:
   redisbloom: 2.6.10
   rediscompat: 1.0.0
   redisgears: 2.0.17
-  nodejs: v18.18.0
+  nodejs: v18.18.1
 
   # the redis repository tag
   redis: 7.2.4
@@ -20,8 +20,8 @@ versions:
   redis-stack: 7.2.0-v7
   redis-stack-server: 7.2.0-v7
   packagedredisversion: 7.2.4-1
-  redisinsight: 2.36.0
-  redisinsight-web: 2.36.0
+  redisinsight: 2.40.0
+  redisinsight-web: 2.40.0
 
 # common package variables
 email: Redis OSS <oss@redislabs.com>
