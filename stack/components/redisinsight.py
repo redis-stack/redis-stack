@@ -43,10 +43,10 @@ class RedisInsightBase(object):
         if url_base_override is not None:
             return urllib.parse.urljoin(
                 f"{url_base_override}",
-                f"RedisInsight-v2-{self.APPTYPE}.{osname}-{arch}.tar.gz",
+                f"RedisInsight-{self.APPTYPE}.{osname}-{arch}.tar.gz",
             )
 
-        return f"https://s3.amazonaws.com/redisinsight.download/public/releases/{version}/redisstack/RedisInsight-v2-{self.APPTYPE}-{osname}.{arch}.tar.gz"
+        return f"https://s3.amazonaws.com/redisinsight.download/public/releases/{version}/redisstack/RedisInsight-{self.APPTYPE}-{osname}.{arch}.tar.gz"
 
     def _fetch_and_unzip(self, url: str, destfile: str):
         logger.debug(f"Package URL: {url}")

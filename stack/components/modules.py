@@ -39,26 +39,33 @@ class Modules(object):
         """Assuming the module follows the standard, return the URL from
         which to grab it"""
 
+        osnick = self.OSNICK
         if module == "redisearch":
             module = "redisearch-oss"
 
-        if module == "rejson":
+        elif module == "rejson":
             module = "rejson-oss"
-        
-        if module == "redisgraph" and self.ARCH == "aarch64":
+        elif module in ["redistimeseries", "rediscompat"] and self.OSNAME == "macos":
+            osnick = "monterey"
+
+        if module == "redisgraph" and self.ARCH != "x86_64":
             arch = "arm64v8"
         else:
             arch = self.ARCH
 
-        # one day, get the version like others, into gears
-        mod_url_part = f"{module}.{self.OSNAME}-{self.OSNICK}-{arch}.{version}.zip"
+        # TODO remove for gears pending https://github.com/RedisGears/RedisGears/pull/1044
         if module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "x86_64":
-            mod_url_part = f"{module}.Macos-mac_os11.4.0-{self.ARCH}.{version}.zip"
+            mod_url_part = f"{module}.Macos-mac_os11.4.0-{arch}.{version}.zip"
         elif (
-            module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "aarch64"
+            module == "redisgears" and self.OSNAME == "macos" and arch in ["aarch64", "arm64v8"]
         ):
-            mod_url_part = f"{module}.Macos-mac_os12.6.3-{self.ARCH}.{version}.zip"
-
+            mod_url_part = f"{module}.Macos-mac_os12.6.3-arm64v8.{version}.zip"
+        elif (
+            module == "redisgears" and self.OSNAME == "Linux" and arch in ["aarch64", "arm64v8"]
+        ):
+            mod_url_part = f"{module}.{self.OSNAME}-{osnick}-arm64v8.{version}.zip"
+        else:
+            mod_url_part = f"{module}.{self.OSNAME}-{osnick}-{arch}.{version}.zip"
         # eg: if rejson-url-override is set, fetch from that location
         # this solves someone's testing need
         url_base_override = self.C.get_key(f"{module}-url-override")
