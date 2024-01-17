@@ -10,6 +10,7 @@ versions:
   redisbloom: 2.6.10
   rediscompat: 1.0.0
   redisgears: 2.0.17
+  redisgraph: 2.10.12
   nodejs: v18.18.1
 
   # the redis repository tag
