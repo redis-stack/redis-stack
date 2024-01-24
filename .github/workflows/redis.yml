@@ -409,8 +409,8 @@ jobs:
        cd redis-stack
        poetry install --no-root
    - name: build redis from source
-     if: steps.redis-already-built.outcome != 'success'
-     run: bash redis-builder/scripts/build-osx.sh
+     working-directory: redis-builder/
+     run: bash scripts/build-osx.sh
 
    - name: package redis for s3
      if: steps.redis-already-built.outcome != 'success'
