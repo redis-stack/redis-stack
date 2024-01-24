@@ -396,6 +396,12 @@ jobs:
        path: redis
        ref: ${{steps.get_config_versions.outputs.REDISVERSION}}
 
+   - name: clone redis-builder
+     uses: actions/checkout@v3
+     with:
+       repository: redis-stack/redis-builder
+       path: redis-builder
+
    - name: install dependencies
      run: |
        brew install openssl@3
@@ -404,9 +410,7 @@ jobs:
        poetry install --no-root
    - name: build redis from source
      if: steps.redis-already-built.outcome != 'success'
-     run: |
-       cd redis
-       make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a"
+     run: bash redis-builder/scripts/build-osx.sh
 
    - name: package redis for s3
      if: steps.redis-already-built.outcome != 'success'
