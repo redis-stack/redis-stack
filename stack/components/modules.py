@@ -48,7 +48,7 @@ class Modules(object):
         elif module in ["redistimeseries", "rediscompat"] and self.OSNAME == "macos":
             osnick = "monterey"
 
-        if module in ["redisgraph", "redisearch"] and self.ARCH != "x86_64":
+        if self.ARCH != "x86_64":
             arch = "arm64v8"
         else:
             arch = self.ARCH
