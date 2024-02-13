@@ -39,6 +39,9 @@ In the default configuration, Redis does not require a password to authenticate 
 *Start a docker*
  ```docker run -e REDIS_ARGS="--requirepass mypassword" redis/redis-stack:latest```
 
+*Start a docker with docker-compose and .env for REDIS_PASSWORD
+ ```docker-compose up```
+
 *Start a docker with both custom redis arguments and a search configuration*
 ```docker run -e REDIS_ARGS="--requirepass foo" -e REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis/redis-stack:latest```
 
