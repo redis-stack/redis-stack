@@ -344,7 +344,7 @@ jobs:
      osname: macos
      pythonversion: "3.10"
      fpmversion: 1.15.1
-     rubyversion: 2.7.2
+     rubyversion: 3.1.4
 
    runs-on: macos-latest
 
@@ -593,7 +593,7 @@ jobs:
      osname: macos
      pythonversion: "3.10"
      fpmversion: 1.15.1
-     rubyversion: 2.7.2
+     rubyversion: 3.1.4
    runs-on: macos-latest
    steps:
    - name: checkout sources
