@@ -15,8 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: dorny/test-reporter@v1
+        if: success() || failure()
         with:
-          artifact: test-report
-          name: JEST Tests
+          artifact: /test-report-(.*)/
+          name: 'Test Results $1'
           path: '*.xml'
-          reporter: jest-junit
+          reporter: java-junit
+          list-suites: all
+          list-tests: all
+          max-annotations: 10
