@@ -546,15 +546,22 @@ jobs:
    - name: run osx tests
      run: |
        .venv/bin/pytest -m macos --junit-xml=results.xml
-   - uses: dorny/test-reporter@v1
+#   - uses: dorny/test-reporter@v1
+#     if: success() || failure()
+#     with:
+#       name: Test Results ${{env.platform}} ${{env.osnick}} ${{env.arch}}
+#       path: '*.xml'
+#       reporter: java-junit
+#       list-suites: all
+#       list-tests: all
+#       max-annotations: 10
+
+   - name: Upload test report
+     uses: actions/upload-artifact@v3
      if: success() || failure()
      with:
-       name: Test Results ${{env.platform}} ${{env.osnick}} ${{env.arch}}
+       name: test-report-${{env.platform}}-${{env.osnick}}-${{env.arch}}
        path: '*.xml'
-       reporter: java-junit
-       list-suites: all
-       list-tests: all
-       max-annotations: 10
 
    - name: get package version
      id: get_version
