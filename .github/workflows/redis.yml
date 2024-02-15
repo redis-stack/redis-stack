@@ -890,10 +890,12 @@ jobs:
          password: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
 
      - name: create the manifest
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
          docker manifest create redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} \
            redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-x86_64 \
            redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-arm64
      - name: push the manifest
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
          docker manifest push redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}
