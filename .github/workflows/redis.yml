@@ -883,6 +883,7 @@ jobs:
          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
      - name: Log in to DockerHub
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
        uses: docker/login-action@v2
        with:
          username: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}

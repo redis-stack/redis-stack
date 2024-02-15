@@ -40,12 +40,14 @@ jobs:
           echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
       - uses: actions/checkout@v3
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
       - name: install python
         uses: actions/setup-python@v4
         with:
           python-version: "${{inputs.pythonversion}}"
 
       - uses: actions/cache@v3
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         with:
           path: |
             /var/cache/apt/archives/**.deb
@@ -56,6 +58,7 @@ jobs:
           key: pypoetry-${{hashFiles('**/pyproject.toml', '.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.arch}}-package
 
       - name: install poetry
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         uses: snok/install-poetry@v1
         with:
           version: latest
@@ -64,17 +67,21 @@ jobs:
           installer-parallel: true
 
       - uses: actions/download-artifact@v3
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         with:
           name: redis-stack-server-${{inputs.platform}}-${{inputs.arch}}.deb
           path: redis-stack
       - uses: actions/download-artifact@v3
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         with:
           name: redisinsight-web-${{inputs.platform}}-${{inputs.arch}}.deb
           path: redis-stack
       - name: display structure
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         run: ls -R
 
       - name: get package version
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         id: get_version
         run: |
           poetry install --no-root
@@ -83,31 +90,36 @@ jobs:
           echo "VERSION=$realversion" >> $GITHUB_OUTPUT
 
       - uses: docker/setup-qemu-action@v2
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
 
       # https://github.com/docker/buildx/issues/1509
       - uses: docker/setup-buildx-action@v2
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         with:
           install: true
           version: v0.9.1
 
       - name: generate docker file
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         run: |
           source .venv/bin/activate
           invoke dockergen -p ${{ matrix.package }}
 
       - name: Log in to DockerHub
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: build and publish docker
+        if: steps.iamafork.outputs.IAMAFORK == 'false'
         run: |
           source .venv/bin/activate
           invoke dockerbuild -a ${{inputs.arch}} -d envs/dockers/Dockerfile.${{ matrix.package }} -t redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}-${{inputs.arch}} -r . -b
 
       - name: test docker build
-        if: ${{ inputs.arch != 'arm64' }}
+        if: ${{ inputs.arch != 'arm64' }} && steps.iamafork.outputs.IAMAFORK == 'false'
         run: |
           source .venv/bin/activate
           invoke test-ci-dockers -d ${{matrix.package}} -a ${{inputs.arch}} -v ${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}
