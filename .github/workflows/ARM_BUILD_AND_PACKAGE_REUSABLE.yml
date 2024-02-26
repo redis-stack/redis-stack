@@ -41,9 +41,15 @@ on:
       moduleoverride:
         required: false
         type: string
-      redislinkflags:
+
+      # if set to true, then replace the redis version, and ignore if built
+      # this is used by the master nightly, to bring us a redis unstable edge
+      forcebuildredis:
         required: false
-        type: string
+        type: boolean
+        default: false
+
+
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -89,7 +95,7 @@ jobs:
       run: |
         wget -q https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
     - uses: actions/checkout@v3
-      if: steps.redis-already-built.outcome != 'success'
+      if: steps.redis-already-built.outcome != 'success' || ${{inputs.forcebuildredis}}
       with:
         repository: redis/redis
         path: redis
@@ -103,7 +109,7 @@ jobs:
           /var/cache/yum
         key: cache-${{hashFiles('.github/workflows/redis.yml')}}-${{inputs.platform}}-${{inputs.arch}}-build
     - name: make
-      if: steps.redis-already-built.outcome != 'success'
+      if: steps.redis-already-built.outcome != 'success' || ${{inputs.forcebuildredis}}
       uses: uraimo/run-on-arch-action@v2
       with:
         arch: aarch64
@@ -112,7 +118,7 @@ jobs:
         run: |
           make -C redis/src all BUILD_TLS=yes MALLOC=libc
     - name: package redis for s3
-      if: steps.redis-already-built.outcome != 'success'
+      if: steps.redis-already-built.outcome != 'success' || ${{inputs.forcebuildredis}}
       run: |
         mkdir redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
         cp redis/src/redis-server \
@@ -125,18 +131,18 @@ jobs:
         tar -czvf redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
            redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
     - name: install s3cmd
-      if: steps.redis-already-built.outcome != 'success'
+      if: steps.redis-already-built.outcome != 'success' || ${{inputs.forcebuildredis}}
       run: |
         pip3 install s3cmd
     - name: persist redis to s3
-      if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
+      if: (steps.redis-already-built.outcome != 'success' || ${{inputs.forcebuildredis}}) && steps.iamafork.outputs.IAMAFORK == 'false'
       run: |
         s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
           s3://redismodules/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
 
     - name: perist redis
       uses: actions/upload-artifact@v3
-      if: steps.redis-already-built.outcome != 'success'
+      if: steps.redis-already-built.outcome != 'success' || ${{inputs.forcebuildredis}}
       with:
         name: redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.platform}}-${{inputs.arch}}
         path: |
