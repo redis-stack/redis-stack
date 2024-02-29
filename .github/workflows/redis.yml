@@ -540,15 +540,6 @@ jobs:
    - name: run osx tests
      run: |
        .venv/bin/pytest -m macos --junit-xml=results.xml
-   - uses: dorny/test-reporter@v1
-     if: success() || failure()
-     with:
-       name: Test Results ${{env.platform}} ${{env.osnick}} ${{env.arch}}
-       path: '*.xml'
-       reporter: java-junit
-       list-suites: all
-       list-tests: all
-       max-annotations: 10
 
    - name: get package version
      id: get_version
@@ -879,15 +870,18 @@ jobs:
          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
      - name: Log in to DockerHub
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
        uses: docker/login-action@v2
        with:
          username: ${{ secrets.DOCKERHUB_REDISFAB_USERNAME }}
          password: ${{ secrets.DOCKERHUB_REDISFAB_TOKEN }}
      - name: create the manifest
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
          docker manifest create redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}} \
            redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-x86_64 \
            redisfab/${{ matrix.package }}:${{steps.get_version.outputs.VERSION}}-arm64
      - name: push the manifest
+       if: steps.iamafork.outputs.IAMAFORK == 'false'
        run: |
          docker manifest push redisfab/${{matrix.package}}:${{steps.get_version.outputs.VERSION}}
