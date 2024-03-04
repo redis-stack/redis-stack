@@ -20,7 +20,7 @@ from .get import get_stream_and_store
 
 class RedisInsightBase(object):
     def __init__(
-        self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux"
+        self, package: str, osnick: str, arch: str = "x86_64", osname: str = "Linux", env: str = "web"
     ):
 
         self.OSNICK = osnick
@@ -46,7 +46,7 @@ class RedisInsightBase(object):
                 f"RedisInsight-{self.APPTYPE}.{osname}-{arch}.tar.gz",
             )
 
-        return f"https://s3.amazonaws.com/redisinsight.download/public/releases/{version}/web/RedisInsight-{self.APPTYPE}-{osname}.{arch}.tar.gz"
+        return f"https://s3.amazonaws.com/redisinsight.download/public/releases/{version}/{env}/RedisInsight-{self.APPTYPE}-{osname}.{arch}.tar.gz"
 
     def _fetch_and_unzip(self, url: str, destfile: str):
         logger.debug(f"Package URL: {url}")
