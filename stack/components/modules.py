@@ -53,7 +53,7 @@ class Modules(object):
         elif (
             module == "redisgears" and self.OSNAME == "macos" and self.ARCH in ["aarch64", "arm64v8"]
         ):
-            mod_url_part = f"{module}.Macos-mac_os12.6.3-arm64v8.{version}.zip"
+            mod_url_part = f"{module}.Macos-mac_os12.6.3-aarch64.{version}.zip"
         elif (
             module == "redisgears" and self.OSNAME == "Linux" and self.ARCH in ["aarch64", "arm64v8"]
         ):
