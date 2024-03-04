@@ -57,7 +57,7 @@ class Modules(object):
         elif (
             module == "redisgears" and self.OSNAME == "Linux" and self.ARCH in ["aarch64", "arm64v8"]
         ):
-            mod_url_part = f"{module}.{self.OSNAME}-{osnick}-arm64v8.{version}.zip"
+            mod_url_part = f"{module}.{self.OSNAME}-{osnick}-aarch64.{version}.zip"
         else:
             mod_url_part = f"{module}.{self.OSNAME}-{osnick}-{self.ARCH}.{version}.zip"
             
