@@ -9,7 +9,7 @@ on:
 
 env:
   pythonversion: "3.10"
-  rubyversion: 2.7.2
+  rubyversion: 3.1.4
 
   # Path to the S3 bucket containing our pre-build packages
   s3root: s3://redismodules/redis-stack
