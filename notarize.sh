@@ -16,11 +16,11 @@ if [ ! -f ${ZIPFILE} ]; then
     exit 3
 fi
 
-PACKAGE_ID=`xcrun notarytool submit ${ZIPFILE} --apple-id "${USERNAME}" --password "${PASSWORD}" --team-id "${TEAM_ID}" --wait`
+PACKAGE_ID=`xcrun notarytool submit ${ZIPFILE} --apple-id "${USERNAME}" --password "${PASSWORD}" --team-id "${TEAM_ID}" --wait|grep "id:" -m 1 | cut -d ":" -f 2-2|awk '{print $1}'`
 echo "Checking status for package ${PACKAGE_ID}"
 
 for i in `seq 1 20`; do
-    status=`xcrun notarytool info $(echo "$PACKAGE_ID" | awk '/id: / { print $2;exit; }') --apple-id "${USERNAME}" --password "${PASSWORD}" --team-id "${TEAM_ID}"|grep "Status:" | cut -d ":" -f 2-2|awk '{print $1}'`
+    status=`xcrun notarytool info ${PACKAGE_ID} --apple-id "${USERNAME}" --password "${PASSWORD}" --team-id "${TEAM_ID}"|grep "Status:" | cut -d ":" -f 2-2|awk '{print $1}'`
     echo "Status is - ${status}"
     if [ "${status}" == "invalid" ]; then
         echo "Notarization failed, exiting."
