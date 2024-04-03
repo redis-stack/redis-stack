@@ -487,7 +487,7 @@ jobs:
      if: steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
        cd redis-stack/build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack
-       sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }}
+       sh ../../../../notarize.sh notarized-${{env.platform}}-${{env.arch}}.zip com.redis.redis-stack-server ${{ secrets.MAC_NOTARIZE_USERNAME }} ${{ secrets.MAC_NOTARIZE_PASSWORD }} ${{ secrets.MAC_NOTARIZE_TEAM_ID }}
 
  test-osx-intel:
    name: Mac (x86_64) Tests
