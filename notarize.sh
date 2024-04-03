@@ -20,14 +20,14 @@ PACKAGE_ID=`xcrun notarytool submit ${ZIPFILE} --apple-id "${USERNAME}" --passwo
 echo "Checking status for package ${PACKAGE_ID}"
 
 for i in `seq 1 20`; do
-    status=`xcrun notarytool info ${PACKAGE_ID} --apple-id "${USERNAME}" --password "${PASSWORD}" --team-id "${TEAM_ID}"|grep "Status:" | cut -d ":" -f 2-2|awk '{print $1}'`
+    status=`xcrun notarytool info ${PACKAGE_ID} --apple-id "${USERNAME}" --password "${PASSWORD}" --team-id "${TEAM_ID}"|grep "status:" | head -1 | cut -d ":" -f 2-2|awk '{print $1}'`
     echo "Status is - ${status}"
-    if [ "${status}" == "invalid" ]; then
-        echo "Notarization failed, exiting."
-        exit 1
-    elif [ "${status}" == "success" ]; then
+    if [ "${status}" == "Accepted" ]; then
         echo "Notarization succeeded!"
         exit 0
+    else
+        echo "Notarization failed, exiting."
+        exit 1
     fi
     echo "Sleeping one minute between notarization checks".
     sleep 60
