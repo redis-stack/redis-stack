@@ -9,24 +9,25 @@ ZIPFILE=$1  # path to zipfile
 BUNDLE=$2   # eg com.redis.redis-stack-server
 USERNAME=$3
 PASSWORD=$4
+TEAM_ID=$5
 
 if [ ! -f ${ZIPFILE} ]; then
     echo "${ZIPFILE} is not a file, exiting."
     exit 3
 fi
 
-PACKAGE_ID=`xcrun altool --notarize-app --primary-bundle-id ${BUNDLE} --username "${USERNAME}" --password "${PASSWORD}" --file ${ZIPFILE}|grep RequestUUID|cut -d "=" -f 2-2`
+PACKAGE_ID=`xcrun notarytool submit ${ZIPFILE} --apple-id "${USERNAME}" --password "${PASSWORD}" --team-id "${TEAM_ID}" --wait|grep "id:" | head -1 | cut -d ":" -f 2-2|awk '{print $1}'`
 echo "Checking status for package ${PACKAGE_ID}"
 
 for i in `seq 1 20`; do
-    status=`xcrun altool --notarization-info ${PACKAGE_ID} --username "${USERNAME}" --password "${PASSWORD}"|grep "Status:" | cut -d ":" -f 2-2|awk '{print $1}'`
+    status=`xcrun notarytool info ${PACKAGE_ID} --apple-id "${USERNAME}" --password "${PASSWORD}" --team-id "${TEAM_ID}"|grep "status:" | head -1 | cut -d ":" -f 2-2|awk '{print $1}'`
     echo "Status is - ${status}"
-    if [ "${status}" == "invalid" ]; then
-        echo "Notarization failed, exiting."
-        exit 1
-    elif [ "${status}" == "success" ]; then
+    if [ "${status}" == "Accepted" ]; then
         echo "Notarization succeeded!"
         exit 0
+    else
+        echo "Notarization failed, exiting."
+        exit 1
     fi
     echo "Sleeping one minute between notarization checks".
     sleep 60
