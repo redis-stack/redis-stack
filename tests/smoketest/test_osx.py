@@ -37,7 +37,7 @@ class OSXTestBase(RedisPackagingMixin, RedisTestMixin, object):
             stderr=subprocess.PIPE,
         )
         cls.PROC = r.pid
-        time.sleep(2)
+        time.sleep(5)
         assert cls.PROC > 0
 
     @classmethod
@@ -51,4 +51,4 @@ class OSXTestBase(RedisPackagingMixin, RedisTestMixin, object):
 @pytest.mark.macos
 class TestOSXZip(OSXTestBase):
 
-    BASEPATH = os.path.abspath(os.path.join(ROOT, "redis-stack", "redis-stack-server"))
+    BASEPATH = os.path.abspath(os.path.join(ROOT, "redis-stack"))
