@@ -34,7 +34,7 @@ class RedisTestMixin:
         assert r.get("some") == "value"
 
     def test_redis_modules_loaded(self, r):
-        expected = ["rejson", "graph", "timeseries", "search", "redisgears_2", "bf"]
+        expected = ["rejson", "timeseries", "search", "redisgears_2", "bf", "rediscompat"]
         modules = [m.get("name").lower() for m in r.module_list()]
 
         modules.sort()
@@ -59,15 +59,15 @@ class RedisTestMixin:
         r.flushdb()
         r.execute_command("TFUNCTION LIST")
 
-    def test_graph(self, r):
-        stack_dockloader(self)
-        r.flushdb()
-        params = [1, 2.3, "str", True, False, None, [0, 1, 2]]
-        query = "RETURN $param"
-        for param in params:
-            result = r.graph().query(query, {"param": param})
-            expected_results = [[param]]
-            assert expected_results == result.result_set
+    # def test_graph(self, r):
+    #     stack_dockloader(self)
+    #     r.flushdb()
+    #     params = [1, 2.3, "str", True, False, None, [0, 1, 2]]
+    #     query = "RETURN $param"
+    #     for param in params:
+    #         result = r.graph().query(query, {"param": param})
+    #         expected_results = [[param]]
+    #         assert expected_results == result.result_set
 
     def test_timeseries(self, r):
         stack_dockloader(self)
@@ -121,9 +121,9 @@ class RedisPackagingMixin:
         libs = [
             "rejson.so",
             "redisearch.so",
-            "redisgraph.so",
             "redisbloom.so",
             "redistimeseries.so",
+            "rediscompat.so",
         ]
         for i in libs:
             assert_path_exists(self, os.path.join(self.basepath, "lib", i))

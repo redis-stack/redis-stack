@@ -67,7 +67,6 @@ class DockerTestEnv:
     def container(self):
         return self.__CONTAINER__
 
-
 class VagrantTestEnv:
     """Environments provisioned using Vagrant"""
 

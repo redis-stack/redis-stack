@@ -61,7 +61,7 @@ class TestBionic(TARTestBase):
     def __precommands__(self):
         return [
             "apt-get update -yq",
-            "apt-get install -yq libssl-dev libgomp1",
+            "apt-get install -yq libssl-dev",
         ]
 
 
@@ -75,7 +75,7 @@ class TestFocal(TARTestBase):
     def __precommands__(self):
         return [
             "apt-get update -yq",
-            "apt-get install -yq libssl-dev libgomp1",
+            "apt-get install -yq libssl-dev",
         ]
 
 
@@ -89,7 +89,7 @@ class TestJammy(TARTestBase):
     def __precommands__(self):
         return [
             "apt-get update -yq",
-            "apt-get install -yq libssl-dev libgomp1",
+            "apt-get install -yq libssl-dev",
         ]
 
 
@@ -121,7 +121,7 @@ class TestXenial(TARTestBase):
     def __precommands__(self):
         return [
             "apt-get update -yq",
-            "apt-get install -yq libssl-dev libgomp1",
+            "apt-get install -yq libssl-dev",
         ]
 
 
@@ -135,7 +135,7 @@ class TestCentos7(TARTestBase):
     def __precommands__(self):
         return [
             "yum install -y epel-release",
-            "yum install -y openssl-devel jemalloc-devel libgomp",
+            "yum install -y openssl-devel jemalloc-devel",
         ]
 
 
@@ -149,7 +149,7 @@ class TestCentos8(TARTestBase):
     def __precommands__(self):
         return [
             "yum install -y epel-release tar",
-            "yum install -y openssl-devel jemalloc-devel libgomp",
+            "yum install -y openssl-devel jemalloc-devel",
         ]
 
 
@@ -174,7 +174,7 @@ class TestAmazonLinuxTar(TARTestBase):
 
         return [
             "amazon-linux-extras install epel -y",
-            "yum install -y openssl-devel openssl11-libs jemalloc-devel tar gzip libgomp",
+            "yum install -y openssl-devel openssl11-libs jemalloc-devel tar gzip",
         ]
 @pytest.mark.rhel9
 class TestRocky9(TARTestBase):

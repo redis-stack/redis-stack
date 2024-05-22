@@ -1,16 +1,15 @@
 ---
 
-islatest: no
+islatest: yes
 
 # module versions
 versions:
-  rejson: 2.6.9
-  redistimeseries: 1.10.11
-  redisearch: 2.8.11
-  redisbloom: 2.6.11
+  rejson: 2.6.10
+  redistimeseries: 1.10.12
+  redisearch: 2.8.13
+  redisbloom: 2.6.12
   rediscompat: 1.0.0
-  redisgears: 2.0.17
-  redisgraph: 2.10.12
+  redisgears: 2.0.20
   nodejs: v18.18.1
 
   # the redis repository tag
@@ -18,19 +17,17 @@ versions:
 
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
+  redis-stack: 7.2.0-v10
+  redis-stack-server: 7.2.0-v10
   packagedredisversion: 7.2.4-1
-  redis-stack: 99.99.99
-  redis-stack-server: 99.99.99
-  redisinsight: 2.40.0
-  redisinsight-web: 2.40.0
-
+  redisinsight: 2.44.0
+  redisinsight-web: 2.44.0
 
 # common package variables
 email: Redis OSS <oss@redislabs.com>
 license: Redis Source Available License
 vendor: Redis Inc
 url: "https://redis.io"
-
 
 redis-stack:
   product: redis-stack

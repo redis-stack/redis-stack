@@ -15,9 +15,9 @@
             <string>port</string>
             <string>6379</string>
             <string>loadmodule</string>
-            <string>/opt/redis-stack/lib/redisearch.so</string>
+            <string>/opt/redis-stack/lib/rediscompat.so</string>
             <string>loadmodule</string>
-            <string>/opt/redis-stack/lib/redisgraph.so</string>
+            <string>/opt/redis-stack/lib/redisearch.so</string>
             <string>loadmodule</string>
             <string>/opt/redis-stack/lib/redistimeseries.so</string>
             <string>loadmodule</string>

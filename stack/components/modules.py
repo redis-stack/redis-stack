@@ -5,7 +5,6 @@
 #
 import os
 import shutil
-import tarfile
 import urllib
 import tarfile
 import zipfile
@@ -39,33 +38,25 @@ class Modules(object):
         """Assuming the module follows the standard, return the URL from
         which to grab it"""
 
+
         osnick = self.OSNICK
         if module == "redisearch":
             module = "redisearch-oss"
-
         elif module == "rejson":
             module = "rejson-oss"
         elif module in ["redistimeseries", "rediscompat"] and self.OSNAME == "macos":
             osnick = "monterey"
 
-        if module == "redisgraph" and self.ARCH != "x86_64":
-            arch = "arm64v8"
-        else:
-            arch = self.ARCH
-
         # TODO remove for gears pending https://github.com/RedisGears/RedisGears/pull/1044
         if module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "x86_64":
-            mod_url_part = f"{module}.Macos-mac_os11.4.0-{arch}.{version}.zip"
+            mod_url_part = f"{module}.Macos-mac_os11.4.0-{self.ARCH}.{version}.zip"
         elif (
-            module == "redisgears" and self.OSNAME == "macos" and arch in ["aarch64", "arm64v8"]
+            module == "redisgears" and self.OSNAME == "macos"
         ):
-            mod_url_part = f"{module}.Macos-mac_os12.6.3-arm64v8.{version}.zip"
-        elif (
-            module == "redisgears" and self.OSNAME == "Linux" and arch in ["aarch64", "arm64v8"]
-        ):
-            mod_url_part = f"{module}.{self.OSNAME}-{osnick}-arm64v8.{version}.zip"
+            mod_url_part = f"{module}.Macos-mac_os12.6.3-{self.ARCH}.{version}.zip"
         else:
-            mod_url_part = f"{module}.{self.OSNAME}-{osnick}-{arch}.{version}.zip"
+            mod_url_part = f"{module}.{self.OSNAME}-{osnick}-{self.ARCH}.{version}.zip"
+
         # eg: if rejson-url-override is set, fetch from that location
         # this solves someone's testing need
         url_base_override = self.C.get_key(f"{module}-url-override")
@@ -97,6 +88,15 @@ class Modules(object):
         else:
             override = True
         self._run("rejson", version, override)
+
+    def rediscompat(self, version: Union[str, None] = None):
+        """rejson specific fetch"""
+        if version is None:
+            version = self.C.get_key("versions")["rediscompat"]
+            override = False
+        else:
+            override = True
+        self._run("rediscompat", version, override)
 
     def redisgears(self, version: Union[str, None] = None):
         """redisgears specific fetch"""

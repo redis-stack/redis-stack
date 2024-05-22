@@ -46,7 +46,7 @@ class RedisInsightBase(object):
                 f"RedisInsight-{self.APPTYPE}.{osname}-{arch}.tar.gz",
             )
 
-        return f"https://s3.amazonaws.com/redisinsight.download/public/releases/{version}/redisstack/RedisInsight-{self.APPTYPE}-{osname}.{arch}.tar.gz"
+        return f"https://s3.amazonaws.com/redisinsight.download/public/releases/{version}/{self.APPTYPE}/RedisInsight-{self.APPTYPE}-{osname}.{arch}.tar.gz"
 
     def _fetch_and_unzip(self, url: str, destfile: str):
         logger.debug(f"Package URL: {url}")
