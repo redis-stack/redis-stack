@@ -51,4 +51,4 @@ class OSXTestBase(RedisPackagingMixin, RedisTestMixin, object):
 @pytest.mark.macos
 class TestOSXZip(OSXTestBase):
 
-    BASEPATH = os.path.abspath(os.path.join(ROOT, "redis-stack"))
+    BASEPATH = os.path.abspath(os.path.join(ROOT, "redis-stack", "redis-stack-server"))
