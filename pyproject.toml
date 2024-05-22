@@ -14,7 +14,7 @@ invoke = "^2.1.2"
 
 [tool.poetry.dev-dependencies]
 invoke = "^2.1.0"
-requests = "^2.28.1"
+requests = "~2.31" # FIXME https://github.com/docker/docker-py/issues/3256
 loguru = "^0.6.0"
 Jinja2 = "^3.0.3"
 redis = "^5.0.0"
