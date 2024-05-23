@@ -536,6 +536,10 @@ jobs:
        ls -R
        mkdir -p redis-stack
        unzip redis-stack/redis-stack*.${{env.target}} -d redis-stack/redis-stack-server
+       sha512 redis-stack/redis-stack-server/lib/redisearch.so
+       sha512 redis-stack/redis-stack-server/lib/redistimeseries.so
+       sha512 redis-stack/redis-stack-server/lib/rejson.so
+       sha512 redis-stack/redis-stack-server/lib/redisbloom.so
 
    - name: run osx tests
      run: |
