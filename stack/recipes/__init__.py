@@ -54,7 +54,6 @@ class Recipe(object):
 
     def deb(self, fpmargs, distribution):
         fpmargs.append("--depends libssl-dev")
-        fpmargs.append("--depends libgomp1")  # redisgraph
         fpmargs.append(
             f"-p {self.C.get_key(self.PACKAGE_NAME)['product']}-{self.version}.{distribution}.{self.ARCH}.deb"
         )
@@ -90,7 +89,6 @@ class Recipe(object):
     def rpm(self, fpmargs, distribution):
         fpmargs.append("--depends openssl-devel")
         fpmargs.append("--depends jemalloc-devel")
-        fpmargs.append("--depends libgomp")
         if self.OSNICK == "amzn2":
             fpmargs.append("--depends openssl11-libs")
         fpmargs.append(

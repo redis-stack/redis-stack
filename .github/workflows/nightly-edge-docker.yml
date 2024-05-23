@@ -11,14 +11,27 @@ on:
 env:
   version: edge
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
 
 ##### arm ####
-#
+ arm64-redis-stack-server:
+   uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
+   with:
+     image_name: ubuntu:jammy
+     platform: jammy
+     osname: Linux
+     osnick: ubuntu22.04
+     arch: arm64
+     target: deb
+     build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
+     pythonversion: "3.10"
+     moduleoverride: "master"
+   secrets:
+     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+     GPG_KEY: ${{ secrets.GPG_KEY }}
+     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
+
  arm64-redisinsight-web:
    uses: ./.github/workflows/REDISINSIGHT_WEB_REUSABLE.yml
    with:
@@ -34,29 +47,9 @@ jobs:
      GPG_KEY: ${{ secrets.GPG_KEY }}
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
-
- arm64-jammy:
-   uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
-   with:
-     image_name: ubuntu:jammy
-     platform: jammy
-     osname: Linux
-     osnick: ubuntu22.04
-     arch: arm64
-     target: deb
-     build_deps: apt-get update && apt-get upgrade -y && apt-get install -y build-essential libssl-dev python3 python3-pip
-     pythonversion: "3.10"
-     moduleoverride: master
-   secrets:
-     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
-
-
  arm64-docker:
    uses: ./.github/workflows/DOCKER_REUSABLE.yml
-   needs: [arm64-jammy, arm64-redisinsight-web]
+   needs: [arm64-redis-stack-server, arm64-redisinsight-web]
    with:
      pythonversion: "3.10"
      arch: arm64
@@ -80,7 +73,7 @@ jobs:
      GPG_KEY: ${{ secrets.GPG_KEY }}
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
- x86_64-jammy:
+ x86_64-redis-stack-server:
    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
    with:
      image_name: ubuntu:jammy
@@ -91,7 +84,7 @@ jobs:
      target: deb
      build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
      pythonversion: "3.10"
-     moduleoverride: master
+     moduleoverride: "master"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -100,7 +93,7 @@ jobs:
 
  x86_64-docker:
    uses: ./.github/workflows/DOCKER_REUSABLE.yml
-   needs: [x86_64-jammy, x86_64-redisinsight-web]
+   needs: [x86_64-redis-stack-server, x86_64-redisinsight-web]
    with:
      pythonversion: "3.10"
      arch: x86_64
