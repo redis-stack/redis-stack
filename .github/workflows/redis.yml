@@ -446,6 +446,7 @@ jobs:
        cd redis-stack
        source .venv/bin/activate
        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t zip -p redis-stack-server -k package
+       brew install coreutils
        sha512sum deps/external/macos-catalina-x86_64/redisearch.so
 
    - name: codesign all binaries
