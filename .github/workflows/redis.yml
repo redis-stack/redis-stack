@@ -448,6 +448,9 @@ jobs:
        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t zip -p redis-stack-server -k package
        brew install coreutils
        sha512sum deps/external/macos-catalina-x86_64/redisearch.so
+       sha512sum deps/external/macos-catalina-x86_64/redistimeseries.so
+       sha512sum deps/external/macos-catalina-x86_64/redisbloom.so
+       sha512sum deps/external/macos-catalina-x86_64/rejson.so
 
    - name: codesign all binaries
      if: steps.iamafork.outputs.IAMAFORK == 'false'
