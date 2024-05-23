@@ -446,6 +446,7 @@ jobs:
        cd redis-stack
        source .venv/bin/activate
        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -t zip -p redis-stack-server -k package
+       sha512sum deps/external/macos-catalina-x86_64/redisearch.so
 
    - name: codesign all binaries
      if: steps.iamafork.outputs.IAMAFORK == 'false'
@@ -536,10 +537,6 @@ jobs:
        ls -R
        mkdir -p redis-stack
        unzip redis-stack/redis-stack*.${{env.target}} -d redis-stack/redis-stack-server
-       sha512sum redis-stack/redis-stack-server/lib/redisearch.so
-       sha512sum redis-stack/redis-stack-server/lib/redistimeseries.so
-       sha512sum redis-stack/redis-stack-server/lib/rejson.so
-       sha512sum redis-stack/redis-stack-server/lib/redisbloom.so
 
    - name: run osx tests
      run: |
