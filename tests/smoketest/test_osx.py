@@ -37,7 +37,7 @@ class OSXTestBase(RedisPackagingMixin, RedisTestMixin, object):
             stderr=subprocess.PIPE,
         )
         cls.PROC = r.pid
-        time.sleep(2)
+        time.sleep(5)
         assert cls.PROC > 0
 
     @classmethod

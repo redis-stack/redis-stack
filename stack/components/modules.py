@@ -37,7 +37,6 @@ class Modules(object):
     def generate_url(self, module: str, version: str, override: bool = False):
         """Assuming the module follows the standard, return the URL from
         which to grab it"""
-        
 
         osnick = self.OSNICK
         if module == "redisearch":
@@ -56,7 +55,7 @@ class Modules(object):
             mod_url_part = f"{module}.Macos-mac_os12.6.3-{self.ARCH}.{version}.zip"
         else:
             mod_url_part = f"{module}.{self.OSNAME}-{osnick}-{self.ARCH}.{version}.zip"
-            
+
         # eg: if rejson-url-override is set, fetch from that location
         # this solves someone's testing need
         url_base_override = self.C.get_key(f"{module}-url-override")

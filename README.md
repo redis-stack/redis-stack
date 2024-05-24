@@ -13,17 +13,31 @@ This repository builds redis, and downloads various components (modules, RedisIn
 [Homebrew Recipe](https://github.com/redis-stack/homebrew-redis-stack) |
 [Helm Charts](https://github.com/redis-stack/helm-redis-stack) |
 [Docker images](https://hub.docker.com/r/redis/redis-stack) |
+[Cloud images](https://github.com/redis-stack/redis-stack-cloudimages) |
 [Other downloads](https://redis.io/download/#redis-stack-downloads)
 
 ---
 
+## How do I Redis?
+
+[Learn for free at Redis University](https://university.redis.com/)
+
+[Build faster with the Redis Launchpad](https://launchpad.redis.com/)
+
+[Try the Redis Cloud](https://redis.com/try-free/)
+
+[Dive in developer tutorials](https://developer.redis.com/)
+
+[Join the Redis community](https://redis.com/community/)
+
+[Work at Redis](https://redis.com/company/careers/jobs/)
+
 ## Quick start
 
-*Start a docker*
- ```docker run redis/redis-stack:latest```
+In the default configuration, Redis does not require a password to authenticate clients.  To provide basic security for your Redis Stack server, it is recommended to set a password using the requirepass directive. Configure this using an environment variable when starting the container:
 
-*Start a docker with the custom password foo*
- ```docker run -e REDIS_ARGS="--requirepass foo" redis/redis-stack:latest```
+*Start a docker*
+ ```docker run -e REDIS_ARGS="--requirepass mypassword" redis/redis-stack:latest```
 
 *Start a docker with both custom redis arguments and a search configuration*
 ```docker run -e REDIS_ARGS="--requirepass foo" -e REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis/redis-stack:latest```
@@ -31,6 +45,8 @@ This repository builds redis, and downloads various components (modules, RedisIn
 *From a locally installed package: start a redis stack with custom search results and passwords*
 
 ```REDISEARCH_ARGS="MAXSEARCHRESULTS 5" redis-stack-server --requirepass foo```
+
+Redis Stack supports the ability to configure multiple named users, each with their own password and access control configuration.  Refer to the [Redis Access Control List documentation](https://redis.io/docs/management/security/acl/) for more information.
 
 ----
 
@@ -69,7 +85,7 @@ invoke package -o Linux -p redis-stack-server -s ubuntu16.04 -t deb -d xenial
 
 *To build a macos (x86_64) zip, prior to homebrew*
 ```
-invoke package -o macos -p redis-stack-server -s catalina -t zip -d catalina
+invoke package -o macos -p redis-stack-server -s monterey -t zip -d monterey
 ```
 
 *To build a macos (m1) zip, prior to homebrew*

@@ -492,7 +492,7 @@ jobs:
  test-osx-intel:
    name: Mac (x86_64) Tests
    needs: ['build-package-osx']
-   runs-on: macos-latest
+   runs-on: macos-12
    env:
      arch: x86_64
      osnick: catalina

@@ -57,7 +57,7 @@ on:
 jobs:
 
   build-redis:
-    name: Build ${{inputs.platform}} (${{inputs.arch}})
+    name: Build Redis ${{inputs.platform}} (${{inputs.arch}})
 
     env:
       pythonversion: ${{inputs.pythonversion}}
