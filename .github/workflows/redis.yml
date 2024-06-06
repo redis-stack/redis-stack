@@ -346,9 +346,14 @@ jobs:
    - name: determine if in fork
      id: iamafork
      run: |
-       amfork="${{ github.event.pull_request.head.repo.fork }}"
-       echo "am I fork: ${amfork}"
-       echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+          if [ -z ${{ github.event.pull_request.head.repo.fork }} ]; then
+            amfork="false"
+          else
+            amfork="${{ github.event.pull_request.head.repo.fork }}"
+          fi
+          
+          echo "am I fork: ${amfork}"
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
    - name: checkout sources
      uses: actions/checkout@v3
@@ -505,9 +510,14 @@ jobs:
    - name: determine if in fork
      id: iamafork
      run: |
-       amfork="${{ github.event.pull_request.head.repo.fork }}"
-       echo "am I fork: ${amfork}"
-       echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+          if [ -z ${{ github.event.pull_request.head.repo.fork }} ]; then
+            amfork="false"
+          else
+            amfork="${{ github.event.pull_request.head.repo.fork }}"
+          fi
+          
+          echo "am I fork: ${amfork}"
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
    - name: install python
      uses: actions/setup-python@v4
@@ -617,9 +627,14 @@ jobs:
    - name: determine if in fork
      id: iamafork
      run: |
-       amfork="${{ github.event.pull_request.head.repo.fork }}"
-       echo "am I fork: ${amfork}"
-       echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+          if [ -z ${{ github.event.pull_request.head.repo.fork }} ]; then
+            amfork="false"
+          else
+            amfork="${{ github.event.pull_request.head.repo.fork }}"
+          fi
+          
+          echo "am I fork: ${amfork}"
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
    - name: write the ssh key to a file
      if: steps.iamafork.outputs.IAMAFORK == 'false'
@@ -771,9 +786,14 @@ jobs:
      - name: determine if in fork
        id: iamafork
        run: |
-         amfork="${{ github.event.pull_request.head.repo.fork }}"
-         echo "am I fork: ${amfork}"
-         echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+          if [ -z ${{ github.event.pull_request.head.repo.fork }} ]; then
+            amfork="false"
+          else
+            amfork="${{ github.event.pull_request.head.repo.fork }}"
+          fi
+          
+          echo "am I fork: ${amfork}"
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
      - name: checkout sources
        uses: actions/checkout@v3
@@ -865,9 +885,14 @@ jobs:
      - name: determine if in fork
        id: iamafork
        run: |
-         amfork="${{ github.event.pull_request.head.repo.fork }}"
-         echo "am I fork: ${amfork}"
-         echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+          if [ -z ${{ github.event.pull_request.head.repo.fork }} ]; then
+            amfork="false"
+          else
+            amfork="${{ github.event.pull_request.head.repo.fork }}"
+          fi
+          
+          echo "am I fork: ${amfork}"
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
      - name: Log in to DockerHub
        if: steps.iamafork.outputs.IAMAFORK == 'false'
