@@ -53,7 +53,7 @@ jobs:
      - name: determine if in fork
        id: iamafork
        run: |
-          if [-z ${{ github.event.pull_request.head.repo.fork }}]; then
+          if [ -z ${{ github.event.pull_request.head.repo.fork }} ]; then
             amfork="false"
           else
             amfork="${{ github.event.pull_request.head.repo.fork }}"
