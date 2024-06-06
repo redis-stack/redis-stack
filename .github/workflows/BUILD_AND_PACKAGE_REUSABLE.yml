@@ -337,7 +337,7 @@ jobs:
         run: |
           mkdir -p s3uploads
           if [ -z ${{env.testplatform }} ]; then
-            cp *.${{env.target}} *.tar.gz *.asc s3uploads
+            cp *.${{env.target}} *.tar.gz s3uploads
           else
             cp *.${{env.target}} s3uploads
           fi
