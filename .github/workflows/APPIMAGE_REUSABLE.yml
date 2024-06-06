@@ -51,7 +51,7 @@ jobs:
       - name: determine if in fork
         id: iamafork
         run: |
-          amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
+          amfork="${{ github.event.pull_request.head.repo.fork }}"
           echo "am I fork: ${amfork}"
           echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
