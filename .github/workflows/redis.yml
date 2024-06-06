@@ -398,8 +398,7 @@ jobs:
    - name: install dependencies
      run: |
        brew install openssl@3
-       export LDFLAGS="-L/opt/homebrew/opt/curl/lib -L/opt/homebrew/opt/openssl/lib"
-       export CPPFLAGS="-I/opt/homebrew/opt/curl/include -I/user/local/opt/openssl/include"
+       brew link --force openssl@3
        gem install fpm -v ${{env.fpmversion}}
        cd redis-stack
        poetry install --no-root
@@ -537,8 +536,7 @@ jobs:
    - name: install dependencies
      run: |
        brew install libomp openssl coreutils
-       export LDFLAGS="-L/opt/homebrew/opt/curl/lib -L/opt/homebrew/opt/openssl/lib"
-       export CPPFLAGS="-I/opt/homebrew/opt/curl/include -I/user/local/opt/openssl/include"
+       brew link --force openssl@3
        poetry install --no-root
    - name: gather artifacts
      uses: actions/download-artifact@v3
