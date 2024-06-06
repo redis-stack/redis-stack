@@ -1,6 +1,6 @@
 ---
 
-islatest: yes
+islatest: no
 
 # module versions
 versions:
@@ -13,13 +13,13 @@ versions:
   nodejs: v18.18.1
 
   # the redis repository tag
-  redis: 7.2.4
+  redis: 7.4-rc1
 
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
-  redis-stack: 7.2.0-v10
-  redis-stack-server: 7.2.0-v10
-  packagedredisversion: 7.2.4-1
+  redis-stack: 7.4-rc1
+  redis-stack-server: 7.4-rc1
+  packagedredisversion: 7.4-rc1
   redisinsight: 2.44.0
   redisinsight-web: 2.44.0
 
