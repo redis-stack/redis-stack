@@ -6,7 +6,7 @@ islatest: yes
 versions:
   rejson: 2.8.2
   redistimeseries: 1.12.1
-  redisearch: 2.10.4
+  redisearch: 2.10.3
   redisbloom: 2.8.1
   rediscompat: 1.0.0
   redisgears: 2.0.20
@@ -19,7 +19,7 @@ versions:
   # as in the past
   redis-stack: 7.4.0-rc1
   redis-stack-server: 7.4.0-rc1
-  packagedredisversion: 7.4-rc1
+  packagedredisversion: 7.4.0-rc1
   redisinsight: 2.44.0
   redisinsight-web: 2.44.0
 
