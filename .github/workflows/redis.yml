@@ -397,7 +397,7 @@ jobs:
 
    - name: install dependencies
      run: |
-       brew install openssl@3
+       brew reinstall openssl@3
        gem install fpm -v ${{env.fpmversion}}
        cd redis-stack
        poetry install --no-root
