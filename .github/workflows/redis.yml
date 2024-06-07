@@ -655,7 +655,7 @@ jobs:
        wget -q https://redismodules.s3.amazonaws.com/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
 
    - name: build redis from source
-     if: steps.redis-already-built.outcome != 'success'
+     if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
        source .venv/bin/activate
        invoke build-m1-over-ssh \
