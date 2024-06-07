@@ -388,7 +388,7 @@ jobs:
        installer-parallel: true
 
    - name: clone redis
-     if: steps.redis-already-built.outcome != 'success'
+     #if: steps.redis-already-built.outcome != 'success'
      uses: actions/checkout@v3
      with:
        repository: redis/redis
