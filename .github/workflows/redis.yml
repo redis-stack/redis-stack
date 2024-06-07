@@ -405,7 +405,7 @@ jobs:
      #if: steps.redis-already-built.outcome != 'success'
      run: |
        cd redis
-       make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /opt/homebrew/Cellar/openssl@3/3.3.0/lib/libssl.a /opt/homebrew/Cellar/openssl@3/3.3.0/lib/libcrypto.a"
+       make all BUILD_TLS=yes FINAL_LIBS=FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a"
 
    - name: package redis for s3
      #if: steps.redis-already-built.outcome != 'success'
