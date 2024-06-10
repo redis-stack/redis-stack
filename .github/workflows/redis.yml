@@ -329,9 +329,14 @@ jobs:
    - name: determine if in fork
      id: iamafork
      run: |
-       amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
-       echo "am I fork: ${amfork}"
-       echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+          if [ -z ${{ github.event.pull_request.head.repo.fork }} ]; then
+            amfork="false"
+          else
+            amfork="${{ github.event.pull_request.head.repo.fork }}"
+          fi
+          
+          echo "am I fork: ${amfork}"
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
    - name: checkout sources
      uses: actions/checkout@v3
@@ -383,7 +388,7 @@ jobs:
      if: steps.redis-already-built.outcome != 'success'
      run: |
        cd redis
-       make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a"
+       make all BUILD_TLS=yes
 
    - name: package redis for s3
      if: steps.redis-already-built.outcome != 'success'
@@ -488,9 +493,14 @@ jobs:
    - name: determine if in fork
      id: iamafork
      run: |
-       amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
-       echo "am I fork: ${amfork}"
-       echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+          if [ -z ${{ github.event.pull_request.head.repo.fork }} ]; then
+            amfork="false"
+          else
+            amfork="${{ github.event.pull_request.head.repo.fork }}"
+          fi
+          
+          echo "am I fork: ${amfork}"
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
    - name: install python
      uses: actions/setup-python@v4
@@ -600,9 +610,14 @@ jobs:
    - name: determine if in fork
      id: iamafork
      run: |
-       amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
-       echo "am I fork: ${amfork}"
-       echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+          if [ -z ${{ github.event.pull_request.head.repo.fork }} ]; then
+            amfork="false"
+          else
+            amfork="${{ github.event.pull_request.head.repo.fork }}"
+          fi
+          
+          echo "am I fork: ${amfork}"
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
    - name: write the ssh key to a file
      if: steps.iamafork.outputs.IAMAFORK == 'false'
@@ -754,9 +769,14 @@ jobs:
      - name: determine if in fork
        id: iamafork
        run: |
-         amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
-         echo "am I fork: ${amfork}"
-         echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+          if [ -z ${{ github.event.pull_request.head.repo.fork }} ]; then
+            amfork="false"
+          else
+            amfork="${{ github.event.pull_request.head.repo.fork }}"
+          fi
+          
+          echo "am I fork: ${amfork}"
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
      - name: checkout sources
        uses: actions/checkout@v3
@@ -812,7 +832,7 @@ jobs:
            -s ssh.key \
            -u ${{secrets.M1_SSH_USER}} \
            -v `echo $RANDOM` \
-           -g ${{github.head_ref}}
+           -g ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
 
 ###################### COLLATE DOCKERS ##################
  docker-push:
@@ -848,9 +868,14 @@ jobs:
      - name: determine if in fork
        id: iamafork
        run: |
-         amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
-         echo "am I fork: ${amfork}"
-         echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+          if [ -z ${{ github.event.pull_request.head.repo.fork }} ]; then
+            amfork="false"
+          else
+            amfork="${{ github.event.pull_request.head.repo.fork }}"
+          fi
+          
+          echo "am I fork: ${amfork}"
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
      - name: Log in to DockerHub
        if: steps.iamafork.outputs.IAMAFORK == 'false'

@@ -68,9 +68,14 @@ jobs:
     - name: determine if in fork
       id: iamafork
       run: |
-        amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
-        echo "am I fork: ${amfork}"
-        echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+          if [ -z ${{ github.event.pull_request.head.repo.fork }} ]; then
+            amfork="false"
+          else
+            amfork="${{ github.event.pull_request.head.repo.fork }}"
+          fi
+          
+          echo "am I fork: ${amfork}"
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
     - name: check out redis-stack
       uses: actions/checkout@v3
@@ -169,9 +174,14 @@ jobs:
      - name: determine if in fork
        id: iamafork
        run: |
-         amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
-         echo "am I fork: ${amfork}"
-         echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+          if [ -z ${{ github.event.pull_request.head.repo.fork }} ]; then
+            amfork="false"
+          else
+            amfork="${{ github.event.pull_request.head.repo.fork }}"
+          fi
+          
+          echo "am I fork: ${amfork}"
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
      - uses: actions/checkout@v3
      - name: Cache dependencies
