@@ -388,7 +388,7 @@ jobs:
        installer-parallel: true
 
    - name: clone redis
-     if: steps.redis-already-built.outcome != 'success'
+     #if: steps.redis-already-built.outcome != 'success'
      uses: actions/checkout@v3
      with:
        repository: redis/redis
@@ -402,13 +402,13 @@ jobs:
        cd redis-stack
        poetry install --no-root
    - name: build redis from source
-     if: steps.redis-already-built.outcome != 'success'
+     #if: steps.redis-already-built.outcome != 'success'
      run: |
        cd redis
        make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a"
 
    - name: package redis for s3
-     if: steps.redis-already-built.outcome != 'success'
+     #if: steps.redis-already-built.outcome != 'success'
      run: |
        mkdir redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
        cp redis/src/redis-server \
@@ -428,13 +428,13 @@ jobs:
        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
    - name: persist redis to s3
-     if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
+     if: steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
        s3cmd put -P redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
        s3://redismodules/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
 
    - name: perist redis
-     if: steps.redis-already-built.outcome != 'success'
+     #if: steps.redis-already-built.outcome != 'success'
      uses: actions/upload-artifact@v3
      with:
        name: redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-osx
