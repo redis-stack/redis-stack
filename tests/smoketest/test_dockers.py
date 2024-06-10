@@ -46,12 +46,12 @@ class TestARMRedisStack(TestRedisStack):
         try:
             c = urlopen("http://localhost:8001")
             content = c.read().decode()
-            assert content.lower().find("Redis Insight") != -1
+            assert content.find("Redis Insight") != -1
         except ConnectionResetError:  # fine, qemu break case attempt
             self.container.exec_run("apt install -y curl")
             res, out = self.container.exec_run("curl http://localhost:8001")
             try:
-                assert out.decode().strip().lower().find("Redis Insight") != -1
+                assert out.decode().strip().find("Redis Insight") != -1
             except AssertionError:  # if in docker we can't, validate process runs, trust team tests
                 res, out = self.container.exec_run(
                     "ps -ef"
