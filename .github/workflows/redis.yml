@@ -340,7 +340,7 @@ jobs:
      fpmversion: 1.15.1
      rubyversion: 3.1.4
 
-   runs-on: macos-latest
+   runs-on: macos-12
 
    steps:
    - name: determine if in fork
