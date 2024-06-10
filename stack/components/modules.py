@@ -89,12 +89,9 @@ class Modules(object):
         self._run("rejson", version, override)
 
     def rediscompat(self, version: Union[str, None] = None):
-        """rejson specific fetch"""
-        if version is None:
-            version = self.C.get_key("versions")["rediscompat"]
-            override = False
-        else:
-            override = True
+        """rediscompat specific fetch"""
+        version = self.C.get_key("versions")["rediscompat"]
+        override = False
         self._run("rediscompat", version, override)
 
     def redisgears(self, version: Union[str, None] = None):
