@@ -19,7 +19,7 @@ versions:
   # as in the past
   redis-stack: 7.4.0-rc1
   redis-stack-server: 7.4.0-rc1
-  packagedredisversion: 7.4-rc1
+  packagedredisversion: 7.4.0-rc1
   redisinsight: 2.50.0
   redisinsight-web: 2.50.0
 
