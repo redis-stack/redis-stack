@@ -367,6 +367,7 @@ jobs:
        echo REDISVERSION=`grep -w "redis:" redis-stack/config.yml | cut -d ":" -f 2-2|tr -d ' '` >> $GITHUB_OUTPUT
 
    - name: check if already built
+     if: steps.get_config_versions.outputs.REDISVERSION != 'unstable'
      id: redis-already-built
      continue-on-error: true
      run: |
@@ -408,7 +409,7 @@ jobs:
        make all BUILD_TLS=yes FINAL_LIBS="-lm -ldl ../deps/hiredis/libhiredis_ssl.a /usr/local/opt/openssl/lib/libssl.a /usr/local/opt/openssl/lib/libcrypto.a"
 
    - name: package redis for s3
-     if: steps.redis-already-built.outcome != 'success'
+     if: steps.redis-already-built.outcome != 'success' && steps.get_config_versions.outputs.REDISVERSION != 'unstable'
      run: |
        mkdir redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
        cp redis/src/redis-server \
@@ -428,7 +429,7 @@ jobs:
        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
    - name: persist redis to s3
-     if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
+     if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false' && steps.get_config_versions.outputs.REDISVERSION != 'unstable'
      run: |
        s3cmd put -P redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
        s3://redismodules/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
@@ -649,6 +650,7 @@ jobs:
        echo REDISVERSION=`grep -w "redis:" config.yml | cut -d ":" -f 2-2|tr -d ' '` >> $GITHUB_OUTPUT
 
    - name: check if already built
+     if: steps.get_config_versions.outputs.REDISVERSION != 'unstable'
      id: redis-already-built
      continue-on-error: true
      run: |
@@ -666,7 +668,7 @@ jobs:
         -p ${{ steps.get_config_versions.outputs.PACKAGEDREDISVERSION }}
 
    - name: package redis for s3
-     if: steps.redis-already-built.outcome != 'success'
+     if: steps.redis-already-built.outcome != 'success' && steps.get_config_versions.outputs.REDISVERSION != 'unstable'
      run: |
        tar -czvf redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
            redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
@@ -678,7 +680,7 @@ jobs:
        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
    - name: persist redis to s3
-     if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
+     if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false' && steps.get_config_versions.outputs.REDISVERSION != 'unstable'
      run: |
        s3cmd put -P redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
        s3://redismodules/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz

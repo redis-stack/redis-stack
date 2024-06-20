@@ -115,6 +115,7 @@ jobs:
         echo REDISVERSION=`grep -w "redis:" redis-stack/config.yml | cut -d ":" -f 2-2|tr -d ' '` >> $GITHUB_OUTPUT
 
     - name: check if already built
+      if: steps.get_config_versions.outputs.REDISVERSION != 'unstable'
       id: redis-already-built
       continue-on-error: true
       run: |
@@ -136,7 +137,7 @@ jobs:
       if: steps.redis-already-built.outcome != 'success'
       run: JEMALLOC_CONFIGURE_OPTS="--with-lg-page=16" make -C redis/src all BUILD_TLS=yes
     - name: package redis for s3
-      if: steps.redis-already-built.outcome != 'success'
+      if: steps.redis-already-built.outcome != 'success' && steps.get_config_versions.outputs.REDISVERSION != 'unstable'
       run: |
         mkdir redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
         cp redis/src/redis-server \
@@ -149,11 +150,11 @@ jobs:
         tar -czvf redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
            redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}
     - name: install s3cmd
-      if: steps.redis-already-built.outcome != 'success'
+      if: steps.redis-already-built.outcome != 'success' && steps.get_config_versions.outputs.REDISVERSION != 'unstable'
       run: |
         pip3 install s3cmd
     - name: persist redis to s3
-      if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
+      if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false' && steps.get_config_versions.outputs.REDISVERSION != 'unstable'
       run: |
         s3cmd --access_key=${{secrets.AWS_ACCESS_KEY_ID}} --secret_key=${{secrets.AWS_SECRET_ACCESS_KEY}} --region=us-east-1 put -P redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz \
           s3://redismodules/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
