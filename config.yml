@@ -19,7 +19,7 @@ versions:
   # as in the past
   redis-stack: 99.99.99
   redis-stack-server: 99.99.99
-  packagedredisversion: 7.2.5
+  packagedredisversion: 7.4.0-rc1
   redisinsight: 2.44.0
   redisinsight-web: 2.44.0
 
