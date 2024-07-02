@@ -48,6 +48,34 @@ class TestRHEL7(RPMTestBase):
     CONTAINER_NAME = "redis-stack-centos7"
     PLATFORM = "linux/amd64"
 
+    def install(self, container):
+        res, out = container.exec_run("sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*")
+        assert res == 0
+
+        res, out = container.exec_run("sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*")
+        assert res == 0
+
+        res, out = container.exec_run("yum install -y epel-release tar wget")
+        assert res == 0
+
+        # validate we properly get bad outputs as bad
+        res, out = container.exec_run("iamnotarealcommand")
+        assert res != 0
+
+        # fetch the rdb
+        target = "/var/lib/redis-stack/dumb.rdb"
+        cmd = f"wget -q https://redismodules.s3.amazonaws.com/redis-stack/testdata/dump-with-graph.rdb -O {target}"
+        res, _ = container.exec_run(cmd)
+        assert res != 0
+        res, out = container.exec_run("mkdir -p /data")
+
+        # now, install our package
+        res, out = container.exec_run(
+            "yum install -y /build/redis-stack/redis-stack-server.rpm"
+        )
+        if res != 0:
+            raise IOError(out)
+
 
 @pytest.mark.rhel8
 class TestRHEL8(RPMTestBase):
