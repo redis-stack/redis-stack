@@ -50,11 +50,11 @@ class TestRHEL7(RPMTestBase):
 
     def install(self, container):
         yum_target = "/etc/yum.repos.d/CentOS-*"
-        res, out = container.exec_run(f"sed -i 's/mirrorlist/#mirrorlist/g' {yum_target}")
+        res, out = container.exec_run(f"sed -i -s 's/mirrorlist/#mirrorlist/g' {yum_target}")
         print(out)
         assert res == 0
 
-        res, out = container.exec_run(f"sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' {yum_target}")
+        res, out = container.exec_run(f"sed -i -s 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' {yum_target}")
         print(out)
         assert res == 0
 
