@@ -49,6 +49,10 @@ class TestRHEL7(RPMTestBase):
     PLATFORM = "linux/amd64"
 
     def install(self, container):
+        res, out = container.exec_run("ls /etc/yum.repos.d/")
+        print(out)
+        assert res == 0
+
         res, out = container.exec_run("sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*")
         print(out)
         assert res == 0
