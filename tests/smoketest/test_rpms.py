@@ -56,6 +56,7 @@ class TestRHEL7(RPMTestBase):
             done
         '''
         res, out = container.exec_run(yum_mirror_fix_cmd)
+        print(out)
         assert res == 0
 
         # validate we properly get bad outputs as bad
