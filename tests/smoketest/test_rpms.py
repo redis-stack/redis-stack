@@ -49,16 +49,11 @@ class TestRHEL7(RPMTestBase):
     PLATFORM = "linux/amd64"
 
     def install(self, container):
-        yum_target = "/etc/yum.repos.d/CentOS-*"
-        res, out = container.exec_run(f"sed -i -s 's/mirrorlist/#mirrorlist/g' {yum_target}")
-        print(out)
-        assert res == 0
-
-        res, out = container.exec_run(f"sed -i -s 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' {yum_target}")
-        print(out)
-        assert res == 0
-
-        res, out = container.exec_run("yum install -y epel-release tar wget")
+        yum_mirror_fix_cmd = "for file in /etc/yum.repos.d/*.repo; do" +
+                                "$MODE sed -i 's/^mirrorlist=/#mirrorlist=/g' $file" +
+                                "$MODE sed -i 's/^#[[:space:]]*baseurl=http:\/\/mirror/baseurl=http:\/\/vault/g' $file" +
+                             "done"
+        res, out = container.exec_run(yum_mirror_fix_cmd)
         print(out)
         assert res == 0
 
