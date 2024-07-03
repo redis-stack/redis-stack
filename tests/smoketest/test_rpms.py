@@ -50,9 +50,9 @@ class TestRHEL7(RPMTestBase):
 
     def install(self, container):
         yum_mirror_fix_cmd = '''
-            for file in /etc/yum.repos.d/*.repo; do
-                $MODE sed -i 's/^mirrorlist=/#mirrorlist=/g' $file
-                $MODE sed -i 's/^#[[:space:]]*baseurl=http:\/\/mirror/baseurl=http:\/\/vault/g' $file
+            for file in /etc/yum.repos.d/*.repo; do \
+                $MODE sed -i 's/^mirrorlist=/#mirrorlist=/g' $file \
+                $MODE sed -i 's/^#[[:space:]]*baseurl=http:\/\/mirror/baseurl=http:\/\/vault/g' $file \
             done
         '''
         res, out = container.exec_run(yum_mirror_fix_cmd)
