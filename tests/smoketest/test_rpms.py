@@ -49,7 +49,7 @@ class TestRHEL7(RPMTestBase):
     PLATFORM = "linux/amd64"
 
     def install(self, container):
-        res, out = container.exec_run("ls /etc")
+        res, out = container.exec_run("which yum")
         print(out)
         assert res == 0
 
