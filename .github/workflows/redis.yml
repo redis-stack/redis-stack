@@ -248,25 +248,6 @@ jobs:
      GPG_KEY: ${{ secrets.GPG_KEY }}
      GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
- x86_64-rhel7:
-   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-   with:
-     image_name: centos:7
-     platform: rhel7
-     osname: Linux
-     osnick: rhel7
-     arch: x86_64
-     target: rpm
-     build_deps: |
-      yum install -y epel-release
-      yum install -y gcc make jemalloc-devel openssl-devel python3 python3-pip jq wget
-     pythonversion: "3.10"
-   secrets:
-     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
-
  x86_64-amazonlinux2:
    uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
    with:
@@ -277,6 +258,8 @@ jobs:
      arch: x86_64
      target: rpm
      build_deps: |
+      sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+      sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-* 
       yum install -y epel-release
       yum install -y gcc make jemalloc-devel openssl-devel python3 python3-pip jq wget
      pythonversion: "3.10"
