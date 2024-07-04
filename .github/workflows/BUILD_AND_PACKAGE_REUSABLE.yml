@@ -75,6 +75,9 @@ on:
       GPG_PASSWORD:
         required: true
 
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true #FIXME Added to avoid an issue https://github.com/actions/checkout/issues/1590
+
 jobs:
 
    build-redis:
