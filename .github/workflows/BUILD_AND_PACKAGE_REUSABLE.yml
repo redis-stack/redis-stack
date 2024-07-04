@@ -104,9 +104,11 @@ jobs:
           echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
     - name: check out redis-stack
-      uses: actions/checkout@v4 #FIXME version 3 is failed for amazonlinux and bionic due to nodejs 20 switch
+      uses: actions/checkout@v3
       with:
         path: redis-stack
+      env:
+        ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true #FIXME Added to avoid an issue https://github.com/actions/checkout/issues/1590
 
     - name: get versions from config file
       id: get_config_versions
