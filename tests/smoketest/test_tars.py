@@ -93,6 +93,20 @@ class TestJammy(TARTestBase):
         ]
 
 
+@pytest.mark.noble
+class TestNoble(TARTestBase):
+
+    DOCKER_NAME = "ubuntu:noble"
+    CONTAINER_NAME = "redis-stack-noble"
+    PLATFORM = "linux/amd64"
+
+    def __precommands__(self):
+        return [
+            "apt-get update -yq",
+            "apt-get install -yq libssl-dev",
+        ]
+
+
 @pytest.mark.bionic
 @pytest.mark.arm
 class TestARMBionic(TestBionic):

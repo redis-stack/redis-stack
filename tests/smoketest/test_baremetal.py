@@ -93,6 +93,13 @@ class TestXenial(DebVagrant):
     OSNICK = "xenial"
 
 
+@pytest.mark.noble
+@pytest.mark.physical
+class TestnNoble(DebVagrant):
+
+    OSNICK = "noble"
+
+
 @pytest.mark.bullseye
 @pytest.mark.physical
 class TestBullseye(DebVagrant):
