@@ -100,13 +100,6 @@ class TestBullseye(DebVagrant):
     OSNICK = "bullseye"
 
 
-@pytest.mark.rhel7
-@pytest.mark.physical
-class TestCentos7(RPMVagrant):
-
-    OSNICK = "centos7"
-
-
 @pytest.mark.rhel8
 @pytest.mark.physical
 class TestCentos8(RPMVagrant):
