@@ -23,8 +23,8 @@ versions:
 
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
-  redisinsight: 2.52.0
-  redisinsight-web: 2.52.0
+  redisinsight: 2.54.0
+  redisinsight-web: 2.54.0
 
 # common package variables
 email: Redis OSS <oss@redislabs.com>
