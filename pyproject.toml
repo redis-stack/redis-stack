@@ -36,7 +36,6 @@ markers = [
     "archlinux: archlinux tests",
     "amzn2: amazonlinux2 tests",
     "appimage: appimage tests",
-    "rhel7: RedHat 7 (rhel7) tests",
     "rhel8: RedHat 8 (rhel8) tests",
     "physical: run tests only within a vagrant image",
     "dockers_redis_stack: test the redis_stack docker",
