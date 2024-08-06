@@ -75,6 +75,9 @@ on:
       GPG_PASSWORD:
         required: true
 
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true #FIXME Added to avoid an issue https://github.com/actions/checkout/issues/1590
+
 jobs:
 
    build-redis:
@@ -94,9 +97,14 @@ jobs:
     - name: determine if in fork
       id: iamafork
       run: |
-        amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
-        echo "am I fork: ${amfork}"
-        echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+          if [ -z ${{ github.event.pull_request.head.repo.fork }} ]; then
+            amfork="false"
+          else
+            amfork="${{ github.event.pull_request.head.repo.fork }}"
+          fi
+          
+          echo "am I fork: ${amfork}"
+          echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
     - name: check out redis-stack
       uses: actions/checkout@v3
@@ -191,7 +199,12 @@ jobs:
       - name: determine if in fork
         id: iamafork
         run: |
-          amfork=`jq '.pull_request.head.repo.fork' $GITHUB_EVENT_PATH`
+          if [ -z ${{ github.event.pull_request.head.repo.fork }} ]; then
+            amfork="false"
+          else
+            amfork="${{ github.event.pull_request.head.repo.fork }}"
+          fi
+
           echo "am I fork: ${amfork}"
           echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
@@ -336,7 +349,7 @@ jobs:
         run: |
           mkdir -p s3uploads
           if [ -z ${{env.testplatform }} ]; then
-            cp *.${{env.target}} *.tar.gz *.asc s3uploads
+            cp *.${{env.target}} *.tar.gz s3uploads
           else
             cp *.${{env.target}} s3uploads
           fi

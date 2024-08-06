@@ -20,7 +20,6 @@ class RedisInsightTestMixin:
         content = c.read().decode()
         assert content.find("Redis Insight") != -1
 
-
 class RedisTestMixin:
 
 #    def test_redis_version(self, r):
