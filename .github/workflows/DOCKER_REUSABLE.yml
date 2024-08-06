@@ -61,12 +61,6 @@ jobs:
             ~/.local/share/gem
           key: pypoetry-${{hashFiles('**/pyproject.toml', '.github/workflows/*.yml')}}-${{inputs.platform}}-${{inputs.arch}}-package
 
-      - name: Install docker-compose plugin
-        if: steps.iamafork.outputs.IAMAFORK == 'false'
-        run: |
-          sudo apt-get update
-          docker compose version
-
       - name: install poetry
         if: steps.iamafork.outputs.IAMAFORK == 'false'
         uses: snok/install-poetry@v1
