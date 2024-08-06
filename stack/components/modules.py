@@ -43,6 +43,9 @@ class Modules(object):
         if module == "rejson":
             module = "rejson-oss"
 
+        if module == "redistimeseries" and self.arch == "arm64":
+            self.ARCH = "aarch64"
+
         # eg: if rejson-url-override is set, fetch from that location
         # this solves someone's testing need
         url_base_override = self.C.get_key(f"{module}-url-override")
