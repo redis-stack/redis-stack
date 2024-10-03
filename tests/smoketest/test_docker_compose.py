@@ -23,7 +23,7 @@ class DockerComposeBase(RedisTestMixin, object):
         with open(cls.COMPOSEFILE, "w") as fp:
             fp.write(content)
 
-        cmd = ["docker-compose", "-f", cls.COMPOSEFILE, "up", "-d"]
+        cmd = ["docker", "compose", "-f", cls.COMPOSEFILE, "up", "-d"]
         subprocess.run(cmd)
 
         # coalesce
@@ -45,7 +45,7 @@ class DockerComposeBase(RedisTestMixin, object):
 
     @classmethod
     def teardown_class(cls):
-        cmd = ["docker-compose", "-f", cls.COMPOSEFILE, "down"]
+        cmd = ["docker", "compose", "-f", cls.COMPOSEFILE, "down"]
         subprocess.run(cmd)
 
 
