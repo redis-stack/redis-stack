@@ -315,15 +315,15 @@ jobs:
    name: Mac (x86_64) Build
    env:
      arch: x86_64
-     osnick: catalina
+     osnick: ventura
      target: zip
-     platform: catalina
+     platform: ventura
      osname: macos
      pythonversion: "3.10"
      fpmversion: 1.15.1
      rubyversion: 3.1.4
 
-   runs-on: macos-12
+   runs-on: macos-13
 
    steps:
    - name: determine if in fork
@@ -480,12 +480,12 @@ jobs:
  test-osx-intel:
    name: Mac (x86_64) Tests
    needs: ['build-package-osx']
-   runs-on: macos-12
+   runs-on: macos-13
    env:
      arch: x86_64
-     osnick: catalina
+     osnick: ventura
      target: zip
-     platform: catalina
+     platform: ventura
      osname: macos
      pythonversion: "3.10"
 
@@ -565,9 +565,9 @@ jobs:
    name: Mac (M1) Package
    env:
      arch: arm64
-     osnick: monterey
+     osnick: sonoma
      target: zip
-     platform: monterey
+     platform: sonoma
      osname: macos
      pythonversion: "3.10"
      fpmversion: 1.15.1
@@ -759,9 +759,9 @@ jobs:
    needs: [build-package-osx-m1]
    env:
      arch: arm64
-     osnick: monterey
+     osnick: sonoma
      target: zip
-     platform: monterey
+     platform: sonoma
      osname: macos
      pythonversion: "3.10"
    runs-on: ubuntu-latest
