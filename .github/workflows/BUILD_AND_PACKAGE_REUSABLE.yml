@@ -107,7 +107,7 @@ jobs:
           echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
 
     - name: check out redis-stack
-      uses: actions/checkout@v4
+      uses: actions/checkout@v2
       with:
         path: redis-stack
 
