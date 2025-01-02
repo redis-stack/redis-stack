@@ -75,9 +75,15 @@ class Modules(object):
                 f"{module}/snapshots/{mod_url_part}",
             )
         else:
+            if module in ["redisgears", "rediscompat"]:
+                return urllib.parse.urljoin(
+                    f"https://{self.AWS_S3_BUCKET}",
+                    f"{module}/{mod_url_part}",
+                )
+
             return urllib.parse.urljoin(
-                f"https://{self.AWS_S3_BUCKET}",
-                f"{module}/snapshots/{mod_url_part}",
+                 f"https://{self.AWS_S3_BUCKET}",
+                 f"{module}/snapshots/{mod_url_part}",
             )
 
     def rejson(self, version: Union[str, None] = None):
