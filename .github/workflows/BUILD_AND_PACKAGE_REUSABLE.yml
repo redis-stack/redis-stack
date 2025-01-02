@@ -91,7 +91,11 @@ jobs:
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
     runs-on: ubuntu-latest
-    container: ${{inputs.image_name}}
+    container:
+      image: ${{inputs.image_name}}
+      volumes:
+        - ${{ inputs.fetch_node_js == 'true' && '/node20217:/node20217:rw,rshared' || ' ' }}
+        - ${{ inputs.fetch_node_js == 'true' && '/node20217:/__e/node20:ro,rshared' || ' ' }}
     steps:
 
     - name: install dependencies
@@ -109,9 +113,8 @@ jobs:
           echo "am I fork: ${amfork}"
           echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
     - name: Fetch NodeJS20
-      if: ${{inputs.fetch_node_js}} == 'true'
+      if: ${{ inputs.fetch_node_js == 'true' }}
       run: |
-        apt install curl -y
         curl -LO https://unofficial-builds.nodejs.org/download/release/v20.9.0/node-v20.9.0-linux-x64-glibc-217.tar.xz
         tar -xf node-v20.9.0-linux-x64-glibc-217.tar.xz --strip-components 1 -C /node20217
         ldd /__e/node20/bin/node
