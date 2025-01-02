@@ -152,7 +152,7 @@ class Modules(object):
         """redisearch specific fetch"""
 
         if version is None:
-            version = self.C.get_key("versions")["redisearch"]
+            version = str(self.C.get_key("versions")["redisearch"]) + "0"
             override = False
         else:
             override = True
