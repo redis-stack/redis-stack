@@ -64,6 +64,12 @@ on:
         required: false
         type: string
 
+      # Specifies if old node js version should be fetched before run the workflow
+      old_node_js:
+        required: false
+        type: string
+        default: 'false'
+
     # for AWS and code signing
     secrets:
       AWS_ACCESS_KEY_ID:
@@ -105,6 +111,15 @@ jobs:
           
           echo "am I fork: ${amfork}"
           echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+    - name: Run on old node
+      if: ${{inputs.old_node_js}} == 'true'
+      run: |
+        apt update && apt -y install wget
+        touch "$HOME/.bashrc"
+        wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+        nvm install 14.21.3
 
     - name: check out redis-stack
       uses: actions/checkout@v3
