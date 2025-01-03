@@ -73,9 +73,15 @@ class Modules(object):
                 f"{module}/snapshots/{module}.{self.OSNAME}-{self.OSNICK}-{arch}.{version}.zip",
             )
         else:
+            if module in ["redisgraph"]:
+                return urllib.parse.urljoin(
+                    f"https://{self.AWS_S3_BUCKET}",
+                    f"{module}/{module}.{self.OSNAME}-{self.OSNICK}-{arch}.{version}.zip",
+                )
+
             return urllib.parse.urljoin(
                 f"https://{self.AWS_S3_BUCKET}",
-                f"{module}/{module}.{self.OSNAME}-{self.OSNICK}-{arch}.{version}.zip",
+                f"{module}/snapshots/{module}.{self.OSNAME}-{self.OSNICK}-{arch}.{version}.zip",
             )
 
     def rejson(self, version: Union[str, None] = None):

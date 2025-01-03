@@ -64,6 +64,12 @@ on:
         required: false
         type: string
 
+      # Specifies if new node js version should be fetched before run job.
+      fetch_node_js:
+        required: false
+        type: string
+        default: 'false'
+
     # for AWS and code signing
     secrets:
       AWS_ACCESS_KEY_ID:
@@ -75,9 +81,6 @@ on:
       GPG_PASSWORD:
         required: true
 
-env:
-  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true #FIXME Added to avoid an issue https://github.com/actions/checkout/issues/1590
-
 jobs:
 
    build-redis:
@@ -88,7 +91,11 @@ jobs:
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
     runs-on: ubuntu-latest
-    container: ${{inputs.image_name}}
+    container:
+      image: ${{inputs.image_name}}
+      volumes:
+        - ${{ inputs.fetch_node_js == 'true' && '/node20217:/node20217:rw,rshared' || ' ' }}
+        - ${{ inputs.fetch_node_js == 'true' && '/node20217:/__e/node20:ro,rshared' || ' ' }}
     steps:
 
     - name: install dependencies
@@ -105,6 +112,13 @@ jobs:
           
           echo "am I fork: ${amfork}"
           echo "IAMAFORK=$amfork" >> $GITHUB_OUTPUT
+
+    - name: Fetch NodeJS20
+      if: ${{ inputs.fetch_node_js == 'true' }}
+      run: |
+        curl -LO https://unofficial-builds.nodejs.org/download/release/v20.9.0/node-v20.9.0-linux-x64-glibc-217.tar.xz
+        tar -xf node-v20.9.0-linux-x64-glibc-217.tar.xz --strip-components 1 -C /node20217
+        ldd /__e/node20/bin/node
 
     - name: check out redis-stack
       uses: actions/checkout@v3
