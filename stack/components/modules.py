@@ -48,6 +48,12 @@ class Modules(object):
         if module == "redistimeseries" and arch == "arm64v8":
             arch = "aarch64"
 
+        if module == "redisgraph" and arch == "x86_64":
+            osnick = "catalina"
+
+        if module == "redisgraph" and arch == "arm64v8":
+            osnick = "monterey"
+
         # eg: if rejson-url-override is set, fetch from that location
         # this solves someone's testing need
         url_base_override = self.C.get_key(f"{module}-url-override")
