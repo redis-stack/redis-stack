@@ -258,6 +258,7 @@ jobs:
             sudo apt update
             sudo apt install gcc-9
             sudo apt install libstdc++6
+          fi
           poetry install --no-root
 
       - run: gem install fpm -v ${{env.fpmversion}}
