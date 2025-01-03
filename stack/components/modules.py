@@ -44,7 +44,7 @@ class Modules(object):
         elif module == "rejson":
             module = "rejson-oss"
         elif module in ["rediscompat"] and self.OSNAME == "macos":
-            osnick = "monterey"
+            osnick = "sonoma"
 
         # TODO remove for gears pending https://github.com/RedisGears/RedisGears/pull/1044
         if module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "x86_64":
@@ -74,9 +74,15 @@ class Modules(object):
                 f"{module}/snapshots/{mod_url_part}",
             )
         else:
+            if module in ["redisgears", "rediscompat"]:
+                return urllib.parse.urljoin(
+                    f"https://{self.AWS_S3_BUCKET}",
+                    f"{module}/{mod_url_part}",
+                )
+
             return urllib.parse.urljoin(
-                f"https://{self.AWS_S3_BUCKET}",
-                f"{module}/{mod_url_part}",
+                 f"https://{self.AWS_S3_BUCKET}",
+                 f"{module}/snapshots/{mod_url_part}",
             )
 
     def rejson(self, version: Union[str, None] = None):
