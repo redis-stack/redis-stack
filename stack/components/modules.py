@@ -44,7 +44,7 @@ class Modules(object):
         elif module == "rejson":
             module = "rejson-oss"
         elif module in ["rediscompat"] and self.OSNAME == "macos":
-            osnick = "sonoma"
+            osnick = "monterey"
 
         # TODO remove for gears pending https://github.com/RedisGears/RedisGears/pull/1044
         if module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "x86_64":
