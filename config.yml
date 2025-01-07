@@ -4,27 +4,27 @@ islatest: no
 
 # module versions
 versions:
-  rejson: 2.4.9
-  redistimeseries: 1.8.14
-  redisearch: 2.6.20
+  rejson: 2.4.11
+  redistimeseries: 1.8.16
+  redisearch: 2.6.24
   redisgraph: 2.10.12
-  redisbloom: 2.4.9
+  redisbloom: 2.4.12
   nodejs: v18.18.1
 
   # the redis repository tag
-  redis: 6.2.16
+  redis: 6.2.17
 
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
-  packagedredisversion: 6.2.16-1
+  packagedredisversion: 6.2.17-1
 
-  redis-stack: 6.2.6-v17
-  redis-stack-server: 6.2.6-v17
+  redis-stack: 6.2.6-v18
+  redis-stack-server: 6.2.6-v18
 
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
-  redisinsight: 2.58.0
-  redisinsight-web: 2.58.0
+  redisinsight: 2.64.0
+  redisinsight-web: 2.64.0
 
 # common package variables
 email: Redis OSS <oss@redislabs.com>
