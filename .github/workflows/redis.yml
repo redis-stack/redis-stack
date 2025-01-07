@@ -386,7 +386,7 @@ jobs:
        brew install openssl@3
        gem install fpm -v ${{env.fpmversion}}
        cd redis-stack
-       poetry install
+       poetry install --no-root
    - name: build redis from source
      if: steps.redis-already-built.outcome != 'success'
      run: |
@@ -521,7 +521,7 @@ jobs:
    - name: install dependencies
      run: |
        brew install libomp openssl coreutils
-       poetry install
+       poetry install --no-root
    - name: gather artifacts
      uses: actions/download-artifact@v3
      with:
