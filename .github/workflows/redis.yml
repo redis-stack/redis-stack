@@ -651,7 +651,7 @@ jobs:
         -p ${{ steps.get_config_versions.outputs.PACKAGEDREDISVERSION }}
 
    - name: package redis for s3
-     if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
+     if: steps.redis-already-built.outcome != 'success'
      run: |
        tar -czvf redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
            redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
