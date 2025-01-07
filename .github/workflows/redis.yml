@@ -204,8 +204,9 @@ jobs:
      osnick: ubuntu18.04
      arch: x86_64
      target: deb
-     build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
+     build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget curl
      pythonversion: "3.10"
+     fetch_node_js: 'true'
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -261,8 +262,9 @@ jobs:
       sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
       sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-* 
       yum install -y epel-release
-      yum install -y gcc make jemalloc-devel openssl-devel python3 python3-pip jq wget
+      yum install -y gcc make jemalloc-devel openssl-devel python3 python3-pip jq wget curl
      pythonversion: "3.10"
+     fetch_node_js: 'true'
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -315,15 +317,15 @@ jobs:
    name: Mac (x86_64) Build
    env:
      arch: x86_64
-     osnick: catalina
+     osnick: ventura
      target: zip
-     platform: catalina
+     platform: ventura
      osname: macos
      pythonversion: "3.10"
      fpmversion: 1.15.1
      rubyversion: 3.1.4
 
-   runs-on: macos-12
+   runs-on: macos-13
 
    steps:
    - name: determine if in fork
@@ -480,12 +482,12 @@ jobs:
  test-osx-intel:
    name: Mac (x86_64) Tests
    needs: ['build-package-osx']
-   runs-on: macos-12
+   runs-on: macos-13
    env:
      arch: x86_64
-     osnick: catalina
+     osnick: ventura
      target: zip
-     platform: catalina
+     platform: ventura
      osname: macos
      pythonversion: "3.10"
 
@@ -565,9 +567,9 @@ jobs:
    name: Mac (M1) Package
    env:
      arch: arm64
-     osnick: monterey
+     osnick: sonoma
      target: zip
-     platform: monterey
+     platform: sonoma
      osname: macos
      pythonversion: "3.10"
      fpmversion: 1.15.1
@@ -649,7 +651,7 @@ jobs:
         -p ${{ steps.get_config_versions.outputs.PACKAGEDREDISVERSION }}
 
    - name: package redis for s3
-     if: steps.redis-already-built.outcome != 'success'
+     if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
      run: |
        tar -czvf redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
            redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
@@ -759,9 +761,9 @@ jobs:
    needs: [build-package-osx-m1]
    env:
      arch: arm64
-     osnick: monterey
+     osnick: sonoma
      target: zip
-     platform: monterey
+     platform: sonoma
      osname: macos
      pythonversion: "3.10"
    runs-on: ubuntu-latest
