@@ -414,7 +414,7 @@ jobs:
        access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
    - name: persist redis to s3
-     if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
+     if: steps.redis-already-built.outcome != 'success'
      run: |
        s3cmd put -P redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
        s3://redismodules/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
@@ -540,7 +540,7 @@ jobs:
    - name: get package version
      id: get_version
      run: |
-       poetry install
+       poetry install --no-root
        source .venv/bin/activate
        realversion=`invoke version`
        echo "VERSION=$realversion" >> $GITHUB_OUTPUT
@@ -608,7 +608,7 @@ jobs:
    - name: install packaging tools
      run: |
        gem install fpm -v ${{env.fpmversion}}
-       poetry install
+       poetry install --no-root
 
    - name: determine if in fork
      id: iamafork
@@ -652,7 +652,7 @@ jobs:
         -p ${{ steps.get_config_versions.outputs.PACKAGEDREDISVERSION }}
 
    - name: package redis for s3
-     if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
+     if: steps.redis-already-built.outcome != 'success'
      run: |
        tar -czvf redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
            redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}
@@ -664,7 +664,7 @@ jobs:
        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
    - name: persist redis to s3
-     if: steps.redis-already-built.outcome != 'success' && steps.iamafork.outputs.IAMAFORK == 'false'
+     if: steps.redis-already-built.outcome != 'success'
      run: |
        s3cmd put -P redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz \
        s3://redismodules/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.osname}}-${{env.osnick}}-${{env.arch}}.tgz
@@ -818,7 +818,7 @@ jobs:
      - name: get package version
        id: get_version
        run: |
-         poetry install
+         poetry install --no-root
          source .venv/bin/activate
          realversion=`invoke version`
          echo "VERSION=$realversion" >> $GITHUB_OUTPUT
@@ -863,7 +863,7 @@ jobs:
      - name: get package version
        id: get_version
        run: |
-         poetry install
+         poetry install --no-root
          source .venv/bin/activate
          realversion=`invoke version -p ${{ matrix.package }} -d true`
          echo "VERSION=$realversion" >> $GITHUB_OUTPUT
