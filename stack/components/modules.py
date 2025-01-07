@@ -166,7 +166,7 @@ class Modules(object):
     def redistimeseries(self, version: Union[str, None] = None):
         """redistimeseries specific fetch"""
         if version is None:
-            version = self.C.get_key("versions")["redistimeseries"]
+            version = str(self.C.get_key("versions")["redistimeseries"]) + "0"
             override = False
         else:
             override = True
