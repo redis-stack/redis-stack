@@ -16,22 +16,6 @@ class DEBTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
         res, out = container.exec_run("apt install -yq gdebi-core wget")
         assert res == 0
 
-        if self.DOCKER_NAME == "ubuntu:bionic" and self.PLATFORM == "linux/amd64":
-            res, out = container.exec_run("apt install -yq software-properties-common")
-            assert res == 0
-
-            res, out = container.exec_run("apt update -q")
-            assert res == 0
-
-            res, out = container.exec_run("add-apt-repository ppa:ubuntu-toolchain-r/test")
-            assert res == 0
-
-            res, out = container.exec_run("apt update -q")
-            assert res == 0
-
-            res, out = container.exec_run("apt install -yq gcc-9 libstdc++6")
-            assert res == 0
-
         # make sure gdebi is present
         res, out = container.exec_run("ls /usr/bin/gdebi")
         assert "/usr/bin/gdebi" in out.decode()

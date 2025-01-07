@@ -61,11 +61,7 @@ class TestBionic(TARTestBase):
     def __precommands__(self):
         return [
             "apt-get update -yq",
-            "apt-get install -yq libssl-dev software-properties-common",
-            "apt-get update -yq",
-            "add-apt-repository ppa:ubuntu-toolchain-r/test",
-            "apt-get update -yq",
-            "apt-get install -yq gcc-9 libstdc++6",
+            "apt-get install -yq libssl-dev",
         ]
 
 
