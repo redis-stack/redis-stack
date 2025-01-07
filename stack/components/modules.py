@@ -44,13 +44,8 @@ class Modules(object):
             module = "redisearch-oss"
         elif module == "rejson":
             module = "rejson-oss"
-<<<<<<< Updated upstream
-        elif module in ["rediscompat"] and self.OSNAME == "macos":
-            osnick = "monterey"
-=======
         elif module in ["redistimeseries", "rediscompat"] and self.OSNAME == "macos":
             osnick = "sonoma"
->>>>>>> Stashed changes
 
         # TODO remove for gears pending https://github.com/RedisGears/RedisGears/pull/1044
         if module == "redisgears" and self.OSNAME == "macos" and self.ARCH == "x86_64":
