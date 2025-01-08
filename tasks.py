@@ -131,8 +131,8 @@ def test_over_ssh(c, ip="", user="", ssh_key_path="", version="", binary="", git
     print(f"{tests}/.venv/bin/python -m pip install --upgrade pip")
     c.run(f"{tests}/.venv/bin/python -m pip install --upgrade pip")
     c.run(f"{tests}/.venv/bin/python -m pip install --upgrade poetry")
-    print(f"=======POETRY TIME: cd {tests} && .venv/bin/python -m poetry install")
-    c.run(f"cd {tests} && .venv/bin/python -m poetry install")
+    print(f"=======POETRY TIME: cd {tests} && .venv/bin/python -m poetry install --no-root")
+    c.run(f"cd {tests} && .venv/bin/python -m poetry install --no-root")
     c.run(f"cd {tests} && .venv/bin/pytest -m macos")
 
 @task(
