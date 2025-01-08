@@ -38,6 +38,7 @@ class Modules(object):
         which to grab it"""
 
         arch = self.ARCH
+        osnick = self.OSNICK
 
         if module == "redisearch":
             module = "redisearch-oss"
@@ -60,7 +61,7 @@ class Modules(object):
         if url_base_override is not None:
             return urllib.parse.urljoin(
                 f"{url_base_override}",
-                f"{module}.{self.OSNAME}-{self.OSNICK}-{arch}.{version}.zip",
+                f"{module}.{self.OSNAME}-{osnick}-{arch}.{version}.zip",
             )
 
         # FIXME mac M1 temporary hack until it moves
@@ -76,12 +77,12 @@ class Modules(object):
         if override:
             return urllib.parse.urljoin(
                 f"https://{self.AWS_S3_BUCKET}",
-                f"{module}/snapshots/{module}.{self.OSNAME}-{self.OSNICK}-{arch}.{version}.zip",
+                f"{module}/snapshots/{module}.{self.OSNAME}-{osnick}-{arch}.{version}.zip",
             )
         else:
             return urllib.parse.urljoin(
                 f"https://{self.AWS_S3_BUCKET}",
-                f"{module}/{module}.{self.OSNAME}-{self.OSNICK}-{arch}.{version}.zip",
+                f"{module}/{module}.{self.OSNAME}-{osnick}-{arch}.{version}.zip",
             )
 
     def rejson(self, version: Union[str, None] = None):
