@@ -111,20 +111,6 @@ class TestARMFocal(TestFocal):
     PLATFORM = "linux/amd64"
 
 
-@pytest.mark.xenial
-class TestXenial(TARTestBase):
-
-    DOCKER_NAME = "ubuntu:xenial"
-    CONTAINER_NAME = "redis-stack-xenial"
-    PLATFORM = "linux/amd64"
-
-    def __precommands__(self):
-        return [
-            "apt-get update -yq",
-            "apt-get install -yq libssl-dev libgomp1",
-        ]
-
-
 @pytest.mark.rhel8
 class TestCentos8(TARTestBase):
 

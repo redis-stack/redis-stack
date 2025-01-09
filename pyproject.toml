@@ -28,7 +28,6 @@ urllib3 = "1.26.15"
 
 [tool.pytest.ini_options]
 markers = [
-    "xenial: ubuntu xenial tests",
     "bionic: ubuntu bionic tests",
     "focal: ubuntu focal tests",
     "jammy: ubuntu jammy tests",
