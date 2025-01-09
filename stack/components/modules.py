@@ -38,6 +38,7 @@ class Modules(object):
         which to grab it"""
 
         arch = self.ARCH
+        osnick = self.OSNICK
 
         if module == "redisearch":
             module = "redisearch-oss"
@@ -45,8 +46,14 @@ class Modules(object):
         if module == "rejson":
             module = "rejson-oss"
 
-        if module == "redistimeseries" and arch == "arm64v8":
+        if module in ["redistimeseries", "redisbloom"] and arch == "arm64v8":
             arch = "aarch64"
+
+        if self.OSNAME == "macos" and module == "redisgraph" and arch == "x86_64":
+            osnick = "catalina"
+
+        if self.OSNAME == "macos" and module == "redisgraph" and arch == "arm64v8":
+            osnick = "monterey"
 
         # eg: if rejson-url-override is set, fetch from that location
         # this solves someone's testing need
@@ -54,7 +61,7 @@ class Modules(object):
         if url_base_override is not None:
             return urllib.parse.urljoin(
                 f"{url_base_override}",
-                f"{module}.{self.OSNAME}-{self.OSNICK}-{arch}.{version}.zip",
+                f"{module}.{self.OSNAME}-{osnick}-{arch}.{version}.zip",
             )
 
         # FIXME mac M1 temporary hack until it moves
@@ -70,12 +77,12 @@ class Modules(object):
         if override:
             return urllib.parse.urljoin(
                 f"https://{self.AWS_S3_BUCKET}",
-                f"{module}/snapshots/{module}.{self.OSNAME}-{self.OSNICK}-{arch}.{version}.zip",
+                f"{module}/snapshots/{module}.{self.OSNAME}-{osnick}-{arch}.{version}.zip",
             )
         else:
             return urllib.parse.urljoin(
                 f"https://{self.AWS_S3_BUCKET}",
-                f"{module}/{module}.{self.OSNAME}-{self.OSNICK}-{arch}.{version}.zip",
+                f"{module}/{module}.{self.OSNAME}-{osnick}-{arch}.{version}.zip",
             )
 
     def rejson(self, version: Union[str, None] = None):

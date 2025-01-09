@@ -86,12 +86,6 @@ class TestBionic(DebVagrant):
     OSNICK = "bionic"
 
 
-@pytest.mark.xenial
-@pytest.mark.physical
-class TestXenial(DebVagrant):
-
-    OSNICK = "xenial"
-
 
 @pytest.mark.bullseye
 @pytest.mark.physical

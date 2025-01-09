@@ -37,14 +37,6 @@ class DEBTestBase(DockerTestEnv, RedisTestMixin, RedisPackagingMixin, object):
             raise IOError(out)
 
 
-@pytest.mark.xenial
-class TestXenial(DEBTestBase):
-
-    DOCKER_NAME = "ubuntu:xenial"
-    CONTAINER_NAME = "redis-stack-xenial"
-    PLATFORM = "linux/amd64"
-
-
 @pytest.mark.bionic
 class TestBionic(DEBTestBase):
 

@@ -131,8 +131,8 @@ def test_over_ssh(c, ip="", user="", ssh_key_path="", version="", binary="", git
     print(f"{tests}/.venv/bin/python -m pip install --upgrade pip")
     c.run(f"{tests}/.venv/bin/python -m pip install --upgrade pip")
     c.run(f"{tests}/.venv/bin/python -m pip install --upgrade poetry")
-    print(f"=======POETRY TIME: cd {tests} && .venv/bin/python -m poetry install")
-    c.run(f"cd {tests} && .venv/bin/python -m poetry install")
+    print(f"=======POETRY TIME: cd {tests} && .venv/bin/python -m poetry install --no-root")
+    c.run(f"cd {tests} && .venv/bin/python -m poetry install --no-root")
     c.run(f"cd {tests} && .venv/bin/pytest -m macos")
 
 @task
@@ -153,7 +153,7 @@ def build_redis(c, redis_repo_path="redis", build_args="all build_tls=yes"):
         "packagedversion": "version to package this as",
     }
 )
-def build_m1_over_ssh(c, ip="", user="", ssh_key_path="", version="", packagedversion="", osname="macos", osnick="monterey", arch="arm64"):
+def build_m1_over_ssh(c, ip="", user="", ssh_key_path="", version="", packagedversion="", osname="macos", osnick="sonoma", arch="arm64"):
     """Triggering the m1 build, via ssh and fetch the outputs"""
     dest = f"depos/redis-{version}"
     argsdest = f"redis-{packagedversion}-{osname}-{osnick}-{arch}"
@@ -187,7 +187,7 @@ def package_redis(
     c,
     version="",
     osname="macos",
-    dist="monterey",
+    dist="sonoma",
     publish=False,
     arch="amd64",
     redis_repo_path="redis",

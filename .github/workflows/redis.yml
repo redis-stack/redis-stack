@@ -206,25 +206,9 @@ jobs:
      osnick: ubuntu18.04
      arch: x86_64
      target: deb
-     build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
+     build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget curl
      pythonversion: "3.10"
-   secrets:
-     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
-
- x86_64-xenial:
-   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-   with:
-     image_name: ubuntu:xenial
-     platform: xenial
-     osname: Linux
-     osnick: ubuntu16.04
-     arch: x86_64
-     target: deb
-     build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
-     pythonversion: "3.10"
+     fetch_node_js: 'true'
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -280,8 +264,9 @@ jobs:
       sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
       sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
       yum install -y epel-release
-      yum install -y gcc make jemalloc-devel openssl-devel python3 python3-pip jq wget
+      yum install -y gcc make jemalloc-devel openssl-devel python3 python3-pip jq wget curl
      pythonversion: "3.10"
+     fetch_node_js: 'true'
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -315,15 +300,15 @@ jobs:
    name: Mac (x86_64) Build
    env:
      arch: x86_64
-     osnick: catalina
+     osnick: ventura
      target: zip
-     platform: catalina
+     platform: ventura
      osname: macos
      pythonversion: "3.10"
      fpmversion: 1.15.1
      rubyversion: 3.1.4
 
-   runs-on: macos-12
+   runs-on: macos-13
 
    steps:
    - name: determine if in fork
@@ -383,7 +368,7 @@ jobs:
        brew install openssl@3
        gem install fpm -v ${{env.fpmversion}}
        cd redis-stack
-       poetry install
+       poetry install --no-root
    - name: build redis from source
      if: steps.redis-already-built.outcome != 'success'
      run: |
@@ -480,12 +465,12 @@ jobs:
  test-osx-intel:
    name: Mac (x86_64) Tests
    needs: ['build-package-osx']
-   runs-on: macos-12
+   runs-on: macos-13
    env:
      arch: x86_64
-     osnick: catalina
+     osnick: ventura
      target: zip
-     platform: catalina
+     platform: ventura
      osname: macos
      pythonversion: "3.10"
 
@@ -518,7 +503,7 @@ jobs:
    - name: install dependencies
      run: |
        brew install libomp openssl coreutils
-       poetry install
+       poetry install --no-root
    - name: gather artifacts
      uses: actions/download-artifact@v3
      with:
@@ -537,7 +522,7 @@ jobs:
    - name: get package version
      id: get_version
      run: |
-       poetry install
+       poetry install --no-root
        source .venv/bin/activate
        realversion=`invoke version`
        echo "VERSION=$realversion" >> $GITHUB_OUTPUT
@@ -565,14 +550,14 @@ jobs:
    name: Mac (M1) Package
    env:
      arch: arm64
-     osnick: monterey
+     osnick: sonoma
      target: zip
-     platform: monterey
+     platform: sonoma
      osname: macos
      pythonversion: "3.10"
      fpmversion: 1.15.1
      rubyversion: 3.1.4
-   runs-on: macos-12
+   runs-on: macos-latest
    steps:
    - name: checkout sources
      uses: actions/checkout@v3
@@ -605,7 +590,7 @@ jobs:
    - name: install packaging tools
      run: |
        gem install fpm -v ${{env.fpmversion}}
-       poetry install
+       poetry install --no-root
 
    - name: determine if in fork
      id: iamafork
@@ -759,9 +744,9 @@ jobs:
    needs: [build-package-osx-m1]
    env:
      arch: arm64
-     osnick: monterey
+     osnick: sonoma
      target: zip
-     platform: monterey
+     platform: sonoma
      osname: macos
      pythonversion: "3.10"
    runs-on: ubuntu-latest
@@ -815,7 +800,7 @@ jobs:
      - name: get package version
        id: get_version
        run: |
-         poetry install
+         poetry install --no-root
          source .venv/bin/activate
          realversion=`invoke version`
          echo "VERSION=$realversion" >> $GITHUB_OUTPUT
@@ -860,7 +845,7 @@ jobs:
      - name: get package version
        id: get_version
        run: |
-         poetry install
+         poetry install --no-root
          source .venv/bin/activate
          realversion=`invoke version -p ${{ matrix.package }} -d true`
          echo "VERSION=$realversion" >> $GITHUB_OUTPUT

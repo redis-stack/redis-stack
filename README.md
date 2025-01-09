@@ -62,11 +62,6 @@ Please see the CONTRIBUTING.md file in this source distribution for more informa
 invoke package -o Linux -p redis-stack-server -s ubuntu20.04 -t deb -d focal
 ```
 
-*To build a xenial package*
-```
-invoke package -o Linux -p redis-stack-server -s ubuntu16.04 -t deb -d xenial
-```
-
 *To build a macos (x86_64) zip, prior to homebrew*
 ```
 invoke package -o macos -p redis-stack-server -s catalina -t zip -d catalina
