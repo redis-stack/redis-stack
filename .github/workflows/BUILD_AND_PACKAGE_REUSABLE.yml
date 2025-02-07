@@ -90,7 +90,7 @@ jobs:
       pythonversion: "${{inputs.pythonversion}}"
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container:
       image: ${{inputs.image_name}}
       volumes:
@@ -203,7 +203,7 @@ jobs:
       target: ${{inputs.target}}
       moduleoverride: ${{inputs.moduleoverride}}
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [build-redis]
     strategy:
       matrix:

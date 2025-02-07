@@ -48,7 +48,7 @@ jobs:
       pythonversion: "${{inputs.pythonversion}}"
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
      - name: determine if in fork
        id: iamafork

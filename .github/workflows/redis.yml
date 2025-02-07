@@ -766,7 +766,7 @@ jobs:
      platform: sonoma
      osname: macos
      pythonversion: "3.10"
-   runs-on: ubuntu-latest
+   runs-on: ubuntu-22.04
    steps:
      - name: determine if in fork
        id: iamafork
@@ -845,7 +845,7 @@ jobs:
        package: ['redis-stack-server', 'redis-stack']
    env:
      pythonversion: "3.10"
-   runs-on: ubuntu-latest
+   runs-on: ubuntu-22.04
    steps:
      - uses: actions/checkout@v3
      - name: install python

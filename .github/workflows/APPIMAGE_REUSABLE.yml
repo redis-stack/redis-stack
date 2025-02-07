@@ -42,7 +42,7 @@ on:
 jobs:
   appimage:
     name: ${{matrix.package}} appimage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         package: ['redis-stack-server']
