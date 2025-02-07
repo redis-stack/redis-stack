@@ -114,7 +114,7 @@ jobs:
           cat VERSION
       - name: build appimage
         run: |
-          ./pkg2appimage--${{inputs.arch}}.AppImage `pwd`/etc/redis-stack-server.appimage
+          ./pkg2appimage-*${{inputs.arch}}.AppImage `pwd`/etc/redis-stack-server.appimage
           mv out/redis-stack-server-*.AppImage out/${{matrix.package}}-${{steps.get_version.outputs.VERSION}}-${{inputs.arch}}.AppImage
           for i in `ls out/*.AppImage`; do
             sha256sum $i | awk '{print $1}' > $i.sha256
