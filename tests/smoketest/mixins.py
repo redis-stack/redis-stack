@@ -19,7 +19,7 @@ class RedisInsightTestMixin:
         stack_dockloader(self)
         c = urlopen("http://localhost:8001")
         content = c.read().decode()
-        assert content.lower().find("redisinsight") != -1
+        assert content.lower().find("Redis Insight") != -1
 
 
 class RedisTestMixin:
