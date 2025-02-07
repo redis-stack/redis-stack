@@ -43,7 +43,7 @@ class RedisInsightBase(object):
         if url_base_override is not None:
             return urllib.parse.urljoin(
                 f"{url_base_override}",
-                f"RedisInsight-{self.APPTYPE}.{osname}-{arch}.tar.gz",
+                f"Redis-Insight-{self.APPTYPE}.{osname}-{arch}.tar.gz",
             )
 
         return f"https://s3.amazonaws.com/redisinsight.download/public/releases/{version}/{self.APPTYPE}/RedisInsight-{self.APPTYPE}-{osname}.{arch}.tar.gz"
