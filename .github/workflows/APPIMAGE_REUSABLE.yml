@@ -98,7 +98,7 @@ jobs:
           wget -c $(wget -q https://api.github.com/repos/AppImageCommunity/pkg2appimage/releases -O - | grep "pkg2appimage-.*-${{inputs.arch}}.AppImage" | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
           chmod a+x *.AppImage
       - name: fetch artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: redis-stack-server-${{inputs.platform}}-${{inputs.arch}}.tar.gz
           path: .

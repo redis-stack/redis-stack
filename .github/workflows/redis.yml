@@ -522,7 +522,7 @@ jobs:
        brew install libomp openssl coreutils
        poetry install --no-root
    - name: gather artifacts
-     uses: actions/download-artifact@v3
+     uses: actions/download-artifact@v4
      with:
        path: redis-stack
        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
@@ -804,7 +804,7 @@ jobs:
          virtualenvs-create: true
          installer-parallel: true
      - name: gather artifacts
-       uses: actions/download-artifact@v3
+       uses: actions/download-artifact@v4
        with:
          name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
 
