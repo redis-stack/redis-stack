@@ -21,7 +21,7 @@ jobs:
 
   promote_releases:
     name: Promote Releases
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - name: install python

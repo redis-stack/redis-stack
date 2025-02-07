@@ -420,7 +420,7 @@ jobs:
 
    - name: perist redis
      if: steps.redis-already-built.outcome != 'success'
-     uses: actions/upload-artifact@v3
+     uses: actions/upload-artifact@v4
      with:
        name: redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-osx
        path: |
@@ -462,7 +462,7 @@ jobs:
        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server -k fetch
 
    - name: perist the zipfile
-     uses: actions/upload-artifact@v3
+     uses: actions/upload-artifact@v4
      with:
        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
        path: |
@@ -522,7 +522,7 @@ jobs:
        brew install libomp openssl coreutils
        poetry install --no-root
    - name: gather artifacts
-     uses: actions/download-artifact@v3
+     uses: actions/download-artifact@v4
      with:
        path: redis-stack
        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
@@ -670,7 +670,7 @@ jobs:
 
    - name: perist redis
      if: steps.redis-already-built.outcome != 'success'
-     uses: actions/upload-artifact@v3
+     uses: actions/upload-artifact@v4
      with:
        name: redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.arch}}-osx
        path: |
@@ -719,7 +719,7 @@ jobs:
        done
 
    - name: persist the zipfile
-     uses: actions/upload-artifact@v3
+     uses: actions/upload-artifact@v4
      with:
        name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
        path: |
@@ -731,7 +731,7 @@ jobs:
        zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
 
    - name: persist the codesigned artifacts
-     uses: actions/upload-artifact@v3
+     uses: actions/upload-artifact@v4
      with:
        name: codesigned-${{env.platform}}-${{env.arch}}
        path: |
@@ -766,7 +766,7 @@ jobs:
      platform: sonoma
      osname: macos
      pythonversion: "3.10"
-   runs-on: ubuntu-latest
+   runs-on: ubuntu-22.04
    steps:
      - name: determine if in fork
        id: iamafork
@@ -804,7 +804,7 @@ jobs:
          virtualenvs-create: true
          installer-parallel: true
      - name: gather artifacts
-       uses: actions/download-artifact@v3
+       uses: actions/download-artifact@v4
        with:
          name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
 
@@ -845,7 +845,7 @@ jobs:
        package: ['redis-stack-server', 'redis-stack']
    env:
      pythonversion: "3.10"
-   runs-on: ubuntu-latest
+   runs-on: ubuntu-22.04
    steps:
      - uses: actions/checkout@v3
      - name: install python
