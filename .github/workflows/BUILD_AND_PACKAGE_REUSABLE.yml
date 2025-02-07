@@ -163,7 +163,7 @@ jobs:
 
     - name: perist redis
       if: steps.redis-already-built.outcome != 'success'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.platform}}
         path: |
@@ -322,7 +322,7 @@ jobs:
           fi
 
       - name: persist ${{env.target}} package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: env.testplatform == ''
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
@@ -330,7 +330,7 @@ jobs:
             ${{ matrix.package }}*.${{env.target}}
 
       - name: persist ${{env.target}} package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: env.testplatform != ''
         with:
           name: ${{ matrix.package }}-${{env.testplatform}}-${{env.arch}}.${{env.target}}
@@ -338,7 +338,7 @@ jobs:
             ${{ matrix.package }}*.${{env.target}}
 
       - name: persist tarball
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: env.testplatform == ''
         with:
           name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.tar.gz

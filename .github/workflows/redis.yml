@@ -418,7 +418,7 @@ jobs:
 
    - name: perist redis
      if: steps.redis-already-built.outcome != 'success'
-     uses: actions/upload-artifact@v3
+     uses: actions/upload-artifact@v4
      with:
        name: redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-osx
        path: |
@@ -460,7 +460,7 @@ jobs:
        invoke package -o ${{env.osname}} -s ${{env.osnick}} -d ${{env.platform}} -a ${{env.arch}} -r ../redis/src -t zip -p redis-stack-server -k fetch
 
    - name: perist the zipfile
-     uses: actions/upload-artifact@v3
+     uses: actions/upload-artifact@v4
      with:
        name: redis-stack-${{env.platform}}-${{env.arch}}.${{env.target}}
        path: |
@@ -668,7 +668,7 @@ jobs:
 
    - name: perist redis
      if: steps.redis-already-built.outcome != 'success'
-     uses: actions/upload-artifact@v3
+     uses: actions/upload-artifact@v4
      with:
        name: redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{env.arch}}-osx
        path: |
@@ -717,7 +717,7 @@ jobs:
        done
 
    - name: persist the zipfile
-     uses: actions/upload-artifact@v3
+     uses: actions/upload-artifact@v4
      with:
        name: redis-stack-server-${{env.platform}}-${{env.arch}}.${{env.target}}
        path: |
@@ -729,7 +729,7 @@ jobs:
        zip -r notarized-${{env.platform}}-${{env.arch}}.zip bin lib
 
    - name: persist the codesigned artifacts
-     uses: actions/upload-artifact@v3
+     uses: actions/upload-artifact@v4
      with:
        name: codesigned-${{env.platform}}-${{env.arch}}
        path: |
