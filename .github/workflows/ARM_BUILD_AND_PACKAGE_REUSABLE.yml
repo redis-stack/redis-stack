@@ -63,7 +63,7 @@ jobs:
       pythonversion: ${{inputs.pythonversion}}
       fpmversion: ${{inputs.fpmversion}}
       rubyversion: ${{inputs.rubyversion}}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - name: determine if in fork
       id: iamafork
@@ -140,7 +140,7 @@ jobs:
           s3://redismodules/redis-stack/dependencies/redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.osname}}-${{inputs.osnick}}-${{inputs.arch}}.tgz
 
     - name: perist redis
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: steps.redis-already-built.outcome != 'success'
       with:
         name: redis-${{steps.get_config_versions.outputs.PACKAGEDREDISVERSION}}-${{inputs.platform}}-${{inputs.arch}}
@@ -164,7 +164,7 @@ jobs:
       arch: ${{inputs.arch}}
       target: ${{inputs.target}}
       moduleoverride: ${{inputs.moduleoverride}}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [build-redis]
     strategy:
       matrix:
@@ -300,13 +300,13 @@ jobs:
     #      invoke test -m ${{env.platform}} -m arm -n physical
 
      - name: perist ${{env.target}} package
-       uses: actions/upload-artifact@v3
+       uses: actions/upload-artifact@v4
        with:
          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.${{env.target}}
          path: |
            ${{ matrix.package }}*.${{env.target}}
      - name: perist tarball
-       uses: actions/upload-artifact@v3
+       uses: actions/upload-artifact@v4
        with:
          name: ${{ matrix.package }}-${{env.platform}}-${{env.arch}}.tar.gz
          path: |
