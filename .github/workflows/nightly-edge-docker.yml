@@ -110,7 +110,7 @@ jobs:
        package: ['redis-stack-server', 'redis-stack']
    env:
      pythonversion: "3.10"
-   runs-on: ubuntu-latest
+   runs-on: ubuntu-22.04
    steps:
      - name: Log in to DockerHub
        uses: docker/login-action@v2
