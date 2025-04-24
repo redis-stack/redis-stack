@@ -17,9 +17,9 @@ versions:
 
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
-  redis-stack: 7.4.0-v3
-  redis-stack-server: 7.4.0-v3
-  packagedredisversion: 7.4.0-v3
+  redis-stack: 7.4.0-v4
+  redis-stack-server: 7.4.0-v4
+  packagedredisversion: 7.4.0-v4
   redisinsight: 2.66.0
   redisinsight-web: 2.66.0
 
