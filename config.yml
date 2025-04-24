@@ -6,7 +6,7 @@ islatest: no
 versions:
   rejson: 2.6.14
   redistimeseries: 1.10.16
-  redisearch: 2.8.26
+  redisearch: 2.8.25
   redisbloom: 2.6.17
   rediscompat: 1.0.0
   redisgears: 2.0.23
