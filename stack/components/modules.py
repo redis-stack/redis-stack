@@ -46,7 +46,7 @@ class Modules(object):
         if module == "rejson":
             module = "rejson-oss"
 
-        if module in ["redistimeseries", "redisbloom"] and arch == "arm64v8":
+        if module in ["redistimeseries", "redisbloom", "redisearch-oss"] and arch == "arm64v8":
             arch = "aarch64"
 
         if self.OSNAME == "macos" and module == "redisgraph" and arch == "x86_64":

@@ -6,13 +6,13 @@ islatest: no
 versions:
   rejson: 2.4.11
   redistimeseries: 1.8.16
-  redisearch: 2.6.26
+  redisearch: 2.6.28
   redisgraph: 2.10.12
-  redisbloom: 2.4.13
+  redisbloom: 2.4.14
   nodejs: v18.18.1
 
   # the redis repository tag
-  redis: 6.2.17
+  redis: 6.2.18
 
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
