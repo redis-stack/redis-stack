@@ -18,8 +18,8 @@ versions:
   # as in the past
   packagedredisversion: 6.2.17-1
 
-  redis-stack: 6.2.6-v19
-  redis-stack-server: 6.2.6-v19
+  redis-stack: 6.2.6-v20
+  redis-stack-server: 6.2.6-v20
 
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
