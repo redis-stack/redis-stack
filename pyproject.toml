@@ -33,6 +33,7 @@ markers = [
     "bionic: ubuntu bionic tests",
     "focal: ubuntu focal tests",
     "jammy: ubuntu jammy tests",
+    "noble: ubuntu noble tests",
     "bullseye: bullseye tests",
     "archlinux: archlinux tests",
     "amzn2: amazonlinux2 tests",
