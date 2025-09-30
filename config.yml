@@ -4,7 +4,7 @@ islatest: no
 
 # module versions
 versions:
-  rejson: 2.6.16
+  rejson: 2.6.15
   redistimeseries: 1.10.17
   redisearch: 2.8.28
   redisbloom: 2.6.18
