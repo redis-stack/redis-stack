@@ -447,7 +447,7 @@ jobs:
        security unlock-keychain -p ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
        security import certificate.p12 -k build.keychain -P ${{ secrets.MACOS_CERTIFICATE_PASSWORD }} -T /usr/bin/codesign
        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
-       CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
+       CODESIGN_IDENTITY=$(security find-identity -v -p codesigning build.keychain | head -n 1 | awk '{print $2}')
        for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} --entitlements etc/entitlements -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
        done
@@ -702,7 +702,7 @@ jobs:
        security unlock-keychain -p ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
        security import certificate.p12 -k build.keychain -P ${{ secrets.MACOS_CERTIFICATE_PASSWORD }} -T /usr/bin/codesign
        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ${{ secrets.MACOS_KEYCHAIN_PASSWORD }} build.keychain
-       CODESIGN_IDENTITY=`security find-identity -v|head -n 1|awk '{print $2}'`
+       CODESIGN_IDENTITY=$(security find-identity -v -p codesigning build.keychain | head -n 1 | awk '{print $2}')
        for i in `ls build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin`; do
          /usr/bin/codesign --options=runtime --timestamp -v --sign ${CODESIGN_IDENTITY} --entitlements etc/entitlements -f build/${{env.osname}}-${{env.osnick}}-${{env.arch}}.redis-stack-server/opt/redis-stack/bin/$i
        done
