@@ -13,15 +13,15 @@ versions:
   nodejs: v18.18.1
 
   # the redis repository tag
-  redis: 7.2.10
+  redis: 7.2.11
 
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
-  redis-stack: 7.2.0-v18
-  redis-stack-server: 7.2.0-v18
-  packagedredisversion: 7.2.10
-  redisinsight: 2.70.0
-  redisinsight-web: 2.70.0
+  redis-stack: 7.2.0-v19
+  redis-stack-server: 7.2.0-v19
+  packagedredisversion: 7.2.11
+  redisinsight: 2.70.1
+  redisinsight-web: 2.70.1
 
 # common package variables
 email: Redis OSS <oss@redislabs.com>
