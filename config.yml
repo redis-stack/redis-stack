@@ -7,7 +7,7 @@ versions:
   rejson: 2.8.9
   redistimeseries: 1.12.6
   redisearch: 2.10.20
-  redisbloom: 2.8.7
+  redisbloom: 2.8.10
   rediscompat: 1.0.0
   redisgears: 2.0.20
   nodejs: v18.18.1
