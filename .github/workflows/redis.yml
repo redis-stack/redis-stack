@@ -20,41 +20,6 @@ on:
 jobs:
 
 ###################### ARM JOBS #########################
- arm64-bionic:
-   uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
-   with:
-     image_name: ubuntu:bionic
-     platform: bionic
-     osname: Linux
-     osnick: ubuntu18.04
-     arch: arm64
-     target: deb
-     build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip
-     pythonversion: "3.10"
-   secrets:
-     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
-
-
- arm64-focal:
-   uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
-   with:
-     image_name: ubuntu:focal
-     platform: focal
-     osname: Linux
-     osnick: ubuntu20.04
-     arch: arm64
-     target: deb
-     build_deps: apt-get update && apt-get upgrade -y && apt-get install -y build-essential libssl-dev python3 python3-pip pkg-config
-     pythonversion: "3.10"
-   secrets:
-     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
-
  arm64-jammy:
    uses: ./.github/workflows/ARM_BUILD_AND_PACKAGE_REUSABLE.yml
    with:
@@ -100,11 +65,11 @@ jobs:
 
  arm64-snap:
    uses: ./.github/workflows/SNAP_REUSABLE.yml
-   needs: [arm64-bionic]
+   needs: [arm64-jammy]
    with:
      arch: arm64
-     platform: bionic
-     osnick: ubuntu18.04
+     platform: jammy
+     osnick: ubuntu22.04
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -119,23 +84,6 @@ jobs:
      osname: Linux
      osnick: ubuntu22.04
      target: deb
-     pythonversion: "3.10"
-   secrets:
-     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
-
- x86_64-focal:
-   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-   with:
-     image_name: ubuntu:focal
-     platform: focal
-     osname: Linux
-     osnick: ubuntu20.04
-     arch: x86_64
-     target: deb
-     build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -173,10 +121,10 @@ jobs:
 
  x86_64-snap:
    uses: ./.github/workflows/SNAP_REUSABLE.yml
-   needs: [x86_64-focal]
+   needs: [x86_64-jammy]
    with:
      arch: x86_64
-     platform: focal
+     platform: jammy
      osnick: ubuntu22.04
      pythonversion: "3.10"
    secrets:
@@ -185,33 +133,15 @@ jobs:
 
  x86_64-appimage:
    uses: ./.github/workflows/APPIMAGE_REUSABLE.yml
-   needs: [x86_64-bionic]
+   needs: [x86_64-jammy]
    with:
      arch: x86_64
-     platform: bionic
-     osnick: ubuntu18.04
+     platform: jammy
+     osnick: ubuntu22.04
      pythonversion: "3.10"
    secrets:
      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
- x86_64-bionic:
-   uses: ./.github/workflows/BUILD_AND_PACKAGE_REUSABLE.yml
-   with:
-     image_name: ubuntu:bionic
-     platform: bionic
-     osname: Linux
-     osnick: ubuntu18.04
-     arch: x86_64
-     target: deb
-     build_deps: apt-get update && apt-get install -y build-essential libssl-dev python3 python3-pip jq wget curl
-     pythonversion: "3.10"
-     fetch_node_js: 'true'
-   secrets:
-     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-     GPG_KEY: ${{ secrets.GPG_KEY }}
-     GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
 
 #  # uses precompiled ubuntu binaries, hence the testplatform override
 # x86_64-archlinux:

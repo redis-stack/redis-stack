@@ -7,19 +7,19 @@ versions:
   rejson: 2.6.15
   redistimeseries: 1.10.17
   redisearch: 2.8.28
-  redisbloom: 2.6.18
+  redisbloom: 2.6.24
   rediscompat: 1.0.0
   redisgears: 2.0.23
   nodejs: v18.18.1
 
   # the redis repository tag
-  redis: 7.2.11
+  redis: 7.2.12
 
   # the version of the package we build and track (separate, in case changes are needed)
   # as in the past
-  redis-stack: 7.2.0-v19
-  redis-stack-server: 7.2.0-v19
-  packagedredisversion: 7.2.11
+  redis-stack: 7.2.0-v20
+  redis-stack-server: 7.2.0-v20
+  packagedredisversion: 7.2.12
   redisinsight: 2.70.1
   redisinsight-web: 2.70.1
 
