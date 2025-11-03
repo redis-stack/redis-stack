@@ -53,6 +53,6 @@ class AppImageTestBase(DockerTestEnv, RedisTestMixin, object):
 
 @pytest.mark.appimage
 class TestAppImageX86(AppImageTestBase):
-    DOCKER_NAME = "ubuntu:bionic"
+    DOCKER_NAME = "ubuntu:jammy"
     CONTAINER_NAME = "redis-stack-appimage"
     PLATFORM = "linux/amd64"
